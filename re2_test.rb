@@ -47,4 +47,23 @@ class RE2Test < Test::Unit::TestCase
     assert_equal "wobewt", name
     assert_equal name_id, name.object_id
   end
+
+  def test_compiling
+    r = RE2.new("woo")
+    assert r.ok?
+    assert_equal "/woo/", r.inspect
+    assert_equal "woo", r.to_s
+  end
+
+  def test_full_match_with_re2
+    r = RE2.new("woo")
+    assert RE2::FullMatch("woo", r)
+    assert !RE2::FullMatch("wowzer", r)
+  end
+
+  def test_partial_match_with_re2
+    r = RE2.new("woo")
+    assert RE2::PartialMatch("woo", r)
+    assert !RE2::PartialMatch("wowzer", r)
+  end
 end

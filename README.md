@@ -11,6 +11,7 @@ You will need [re2][] and Ruby's headers installed as well as a C++ compiler suc
 What currently works?
 ---------------------
 
+* [`RE2.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96)
 * [`RE2::FullMatch(text, re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#30)
 * [`RE2::PartialMatch(text, re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#82)
 * [`RE2::Replace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#335)
@@ -19,7 +20,7 @@ What currently works?
 Why would I want to use this?
 ----------------------------
 
-At the moment, just to investigate [re2][] as it actually performs *worse* than Ruby's own `=~`, `sub!` and `gsub!` method.
+At the moment, just to investigate [re2][] as it actually performs *worse* than Ruby's own `=~`, `sub!` and `gsub!` method unless you pre-compile the expression by using `RE2.new`.
 
 What's wrong with [rre2][]?
 ---------------------------
