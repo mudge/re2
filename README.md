@@ -1,9 +1,6 @@
 re2
 ===
 
-What is this?
--------------
-
 A work-in-progress Ruby binding to [re2][], an "efficient, principled regular expression library".
 
 Dependencies
@@ -18,6 +15,11 @@ What currently works?
 * [`RE2::PartialMatch(text, re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#82)
 * [`RE2::Replace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#335)
 * [`RE2::GlobalReplace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#352)
+
+Why would I want to use this?
+----------------------------
+
+At the moment, just to investigate [re2][] as it actually performs *worse* than Ruby's own `=~`, `sub!` and `gsub!` method.
 
 What's wrong with [rre2][]?
 ---------------------------
