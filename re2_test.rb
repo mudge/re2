@@ -66,4 +66,14 @@ class RE2Test < Test::Unit::TestCase
     assert RE2::PartialMatch("woo", r)
     assert !RE2::PartialMatch("wowzer", r)
   end
+
+  def test_replace_with_re2
+    r = RE2.new("wo{2}")
+    assert_equal "miaow", RE2::Replace("woo", r, "miaow")
+  end
+
+  def test_global_replace_with_re2
+    r = RE2.new("o")
+    assert_equal "wii", RE2::GlobalReplace("woo", r, "i")
+  end
 end
