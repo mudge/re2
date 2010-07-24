@@ -14,7 +14,10 @@ You will need [re2][] and Ruby's headers installed as well as a C++ compiler suc
 What currently works?
 ---------------------
 
-Only `RE2::FullMatch(text, re)` and `RE2::PartialMatch(text, re)` at the moment.
+* [`RE2::FullMatch(text, re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#30)
+* [`RE2::PartialMatch(text, re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#82)
+* [`RE2::Replace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#335)
+* [`RE2::GlobalReplace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#352)
 
 What's wrong with [rre2][]?
 ---------------------------
