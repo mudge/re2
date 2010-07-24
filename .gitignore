@@ -1,0 +1,5 @@
+Makefile
+mkmf.log
+*.bundle
+*.o
+conftest.dSYM
