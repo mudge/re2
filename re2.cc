@@ -24,7 +24,7 @@ VALUE PartialMatch(VALUE self, VALUE text, VALUE re)
 extern "C" void Init_re2()
 {
   re2_mRE2 = rb_define_module("RE2");
-  rb_define_singleton_method(re2_mRE2, "FullMatch", (VALUE (*)(...))FullMatch, 2);
-  rb_define_singleton_method(re2_mRE2, "PartialMatch", (VALUE (*)(...))PartialMatch, 2);
+  rb_define_module_function(re2_mRE2, "FullMatch", (VALUE (*)(...))FullMatch, 2);
+  rb_define_module_function(re2_mRE2, "PartialMatch", (VALUE (*)(...))PartialMatch, 2);
 }
 
