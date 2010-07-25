@@ -6,12 +6,16 @@
  * Released under the BSD Licence, please see LICENSE.txt
  */
 
-#include <ruby.h>
 #include <re2/re2.h>
 
 extern "C" {
 
+  #include <ruby.h>
+
   #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
+  #if !defined(RSTRING_LEN)
+  #  define RSTRING_LEN(x) (RSTRING(x)->len)
+  #endif
 
   typedef struct _re2p {
     RE2 *pattern;
