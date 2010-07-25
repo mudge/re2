@@ -322,6 +322,65 @@ extern "C" {
 
   /*
    * call-seq:
+   *   re2.number_of_capturing_groups    -> int
+   *
+   * Returns the number of capturing subpatterns, or -1 if the regexp
+   * wasn't valid on construction. The overall match ($0) does not
+   * count: if the regexp is "(a)(b)", returns 2.
+   */
+
+  VALUE
+  re2_number_of_capturing_groups(VALUE self)
+  {
+    re2_pattern *p;
+
+    Data_Get_Struct(self, re2_pattern, p);
+    return INT2FIX(p->pattern->NumberOfCapturingGroups());
+  }
+
+  /*
+   * call-seq:
+   *   re2.match(text)
+   *
+   * Returns an array of matches for the compiled pattern in
+   * <i>regexp</i> on <i>text</i>. Unsuccessful matches are
+   * returned as nil.
+   */
+
+  VALUE
+  re2_match(VALUE self, VALUE text)
+  {
+    VALUE matches;
+    re2_pattern *p;
+    int n;
+    bool matched;
+
+    Data_Get_Struct(self, re2_pattern, p);
+    n = p->pattern->NumberOfCapturingGroups() + 1;
+    re2::StringPiece string_matches[n];
+    re2::StringPiece text_as_string_piece(StringValuePtr(text));
+
+    matched = p->pattern->Match(text_as_string_piece, 0, RE2::UNANCHORED, string_matches, n);
+
+    if (matched) {
+      matches = rb_ary_new();
+
+      for (int i = 0; i < n; i++) {
+        if (!string_matches[i].empty()) {
+          rb_ary_push(matches, rb_str_new2(string_matches[i].as_string().c_str()));
+        } else {
+          rb_ary_push(matches, Qnil);
+        }
+      }
+
+      return matches;
+    } else {
+      return Qnil;
+    }
+  }
+
+  /*
+   * call-seq:
    *   RE2::FullMatch(text, re)    -> true or false
    *
    * Returns whether or not a full match for __re__ was
@@ -346,10 +405,120 @@ extern "C" {
       result = RE2::FullMatch(StringValuePtr(text), StringValuePtr(re));
     }
 
-    if (result) {
-      return Qtrue;
+    return result ? Qtrue : Qfalse;
+  }
+
+  /*
+   * call-seq:
+   *   RE2::FullMatchN(text, re)    -> array of matches
+   *
+   * Returns an array of successful matches as defined in
+   * <i>re</i> for <i>text</i>.
+   *
+   *   RE2::FullMatchN("woo", "w(oo)")   #=> ["oo"]
+   */
+
+  VALUE
+  re2_FullMatchN(VALUE self, VALUE text, VALUE re)
+  {
+    VALUE matches;
+    RE2 *compiled_pattern;
+    int n;
+    bool matched;
+
+    if (rb_obj_is_kind_of(re, re2_cRE2)) {
+      re2_pattern *p;
+      Data_Get_Struct(re, re2_pattern, p);
+      compiled_pattern = p->pattern;
     } else {
-      return Qfalse;
+      compiled_pattern = new RE2(StringValuePtr(re));
+    }
+
+    n = compiled_pattern->NumberOfCapturingGroups();
+
+    RE2::Arg argv[n];
+    const RE2::Arg* args[n];
+    std::string string_matches[n];
+    int int_matches[n];
+
+    for (int i = 0; i < n; i++) {
+      args[i] = &argv[i];
+      argv[i] = &string_matches[i];
+    }
+
+    matched = RE2::FullMatchN(StringValuePtr(text), *compiled_pattern, args, n);
+
+    if (matched) {
+      matches = rb_ary_new();
+
+      for (int i = 0; i < n; i++) {
+        if (!string_matches[i].empty()) {
+          rb_ary_push(matches, rb_str_new2(string_matches[i].c_str()));
+        } else {
+          rb_ary_push(matches, Qnil);
+        }
+      }
+
+      return matches;
+    } else {
+      return Qnil;
+    }
+  }
+
+  /*
+   * call-seq:
+   *   RE2::PartialMatchN(text, re)    -> array of matches
+   *
+   * Returns an array of successful matches as defined in
+   * <i>re</i> for <i>text</i>.
+   *
+   *   RE2::PartialMatchN("woo", "w(oo)")   #=> ["oo"]
+   */
+
+  VALUE
+  re2_PartialMatchN(VALUE self, VALUE text, VALUE re)
+  {
+    VALUE matches;
+    RE2 *compiled_pattern;
+    int n;
+    bool matched;
+
+    if (rb_obj_is_kind_of(re, re2_cRE2)) {
+      re2_pattern *p;
+      Data_Get_Struct(re, re2_pattern, p);
+      compiled_pattern = p->pattern;
+    } else {
+      compiled_pattern = new RE2(StringValuePtr(re));
+    }
+
+    n = compiled_pattern->NumberOfCapturingGroups();
+
+    RE2::Arg argv[n];
+    const RE2::Arg* args[n];
+    std::string string_matches[n];
+    int int_matches[n];
+
+    for (int i = 0; i < n; i++) {
+      args[i] = &argv[i];
+      argv[i] = &string_matches[i];
+    }
+
+    matched = RE2::PartialMatchN(StringValuePtr(text), *compiled_pattern, args, n);
+
+    if (matched) {
+      matches = rb_ary_new();
+
+      for (int i = 0; i < n; i++) {
+        if (!string_matches[i].empty()) {
+          rb_ary_push(matches, rb_str_new2(string_matches[i].c_str()));
+        } else {
+          rb_ary_push(matches, Qnil);
+        }
+      }
+
+      return matches;
+    } else {
+      return Qnil;
     }
   }
 
@@ -511,12 +680,16 @@ extern "C" {
     rb_define_method(re2_cRE2, "error_arg", (VALUE (*)(...))re2_error_arg, 0);
     rb_define_method(re2_cRE2, "program_size", (VALUE (*)(...))re2_program_size, 0);
     rb_define_method(re2_cRE2, "options", (VALUE (*)(...))re2_options, 0);
+    rb_define_method(re2_cRE2, "number_of_capturing_groups", (VALUE (*)(...))re2_number_of_capturing_groups, 0);
+    rb_define_method(re2_cRE2, "match", (VALUE (*)(...))re2_match, 1);
     rb_define_method(re2_cRE2, "to_s", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "to_str", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "pattern", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "inspect", (VALUE (*)(...))re2_inspect, 0);
     rb_define_singleton_method(re2_cRE2, "FullMatch", (VALUE (*)(...))re2_FullMatch, 2);
+    rb_define_singleton_method(re2_cRE2, "FullMatchN", (VALUE (*)(...))re2_FullMatchN, 2);
     rb_define_singleton_method(re2_cRE2, "PartialMatch", (VALUE (*)(...))re2_PartialMatch, 2);
+    rb_define_singleton_method(re2_cRE2, "PartialMatchN", (VALUE (*)(...))re2_PartialMatchN, 2);
     rb_define_singleton_method(re2_cRE2, "Replace", (VALUE (*)(...))re2_Replace, 3);
     rb_define_singleton_method(re2_cRE2, "GlobalReplace", (VALUE (*)(...))re2_GlobalReplace, 3);
     rb_define_singleton_method(re2_cRE2, "QuoteMeta", (VALUE (*)(...))re2_QuoteMeta, 1);

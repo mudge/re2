@@ -4,7 +4,9 @@ require "test/unit"
 class RE2Test < Test::Unit::TestCase
   def test_interface
     assert_respond_to RE2, :FullMatch
+    assert_respond_to RE2, :FullMatchN
     assert_respond_to RE2, :PartialMatch
+    assert_respond_to RE2, :PartialMatchN
     assert_respond_to RE2, :Replace
     assert_respond_to RE2, :GlobalReplace
     assert_respond_to RE2, :QuoteMeta
@@ -30,11 +32,39 @@ class RE2Test < Test::Unit::TestCase
     assert !RE2::FullMatch("woo", "wowzer")
   end
 
+  def test_full_match_n
+    assert_equal ["oo"], RE2::FullMatchN("woo", "w(oo)")
+    assert_equal ["12"], RE2::FullMatchN("woo12w", 'woo(\d{2})w')
+    assert_equal [nil, "1", "234"], RE2::FullMatchN("w1234", 'w(a?)(\d)(\d+)')
+    assert_nil RE2::FullMatchN("bob", 'w(\d+)')
+  end
+
+  def test_full_match_n_with_compiled_pattern
+    assert_equal ["oo"], RE2::FullMatchN("woo", RE2.new("w(oo)"))
+    assert_equal ["12"], RE2::FullMatchN("woo12w", RE2.new('woo(\d{2})w'))
+    assert_equal [nil, "1", "234"], RE2::FullMatchN("w1234", RE2.new('w(a?)(\d)(\d+)'))
+    assert_nil RE2::FullMatchN("bob", RE2.new('w(\d+)'))
+  end
+
   def test_partial_match
     assert RE2::PartialMatch("woo", "oo")
     assert RE2::PartialMatch("woo", "oo?")
     assert RE2::PartialMatch("woo", "o{2}")
     assert !RE2::PartialMatch("woo", "ha")
+  end
+
+  def test_partial_match_n
+    assert_equal ["oo"], RE2::PartialMatchN("awooa", "w(oo)")
+    assert_equal ["12"], RE2::PartialMatchN("awoo12wa", 'woo(\d{2})w')
+    assert_equal [nil, "1", "234"], RE2::PartialMatchN("aw1234a", 'w(a?)(\d)(\d+)')
+    assert_nil RE2::PartialMatchN("bob", 'w(\d+)')
+  end
+
+  def test_partial_match_n_with_compiled_pattern
+    assert_equal ["oo"], RE2::PartialMatchN("awooa", RE2.new("w(oo)"))
+    assert_equal ["12"], RE2::PartialMatchN("awoo12wa", RE2.new('woo(\d{2})w'))
+    assert_equal [nil, "1", "234"], RE2::PartialMatchN("aw1234a", RE2.new('w(a?)(\d)(\d+)'))
+    assert_nil RE2::PartialMatchN("bob", RE2.new('w(\d+)'))
   end
 
   def test_replace
@@ -73,6 +103,8 @@ class RE2Test < Test::Unit::TestCase
     assert r.ok?
     assert RE2::FullMatch("woo", r)
     assert RE2::FullMatch("WOO", r)
+    assert !r.options[:case_sensitive]
+    assert r.options[:utf8]
   end
 
   def test_full_match_with_re2
