@@ -55,6 +55,13 @@ class RE2Test < Test::Unit::TestCase
     assert_equal "woo", r.to_s
   end
 
+  def test_compiling_with_options
+    r = RE2.new("woo", :case_sensitive => false)
+    assert r.ok?
+    assert RE2::FullMatch("woo", r)
+    assert RE2::FullMatch("WOO", r)
+  end
+
   def test_full_match_with_re2
     r = RE2.new("woo")
     assert RE2::FullMatch("woo", r)

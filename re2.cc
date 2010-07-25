@@ -31,12 +31,129 @@ extern "C" {
     return Data_Wrap_Struct(klass, 0, re2_free, p);
   }
 
+  /*
+   * call-seq:
+   *   RE2.new(pattern)           #=> re2
+   *   RE2.new(pattern, options)  #=> re2
+   *
+   * Returns a new RE2 object with a compiled version of
+   * <i>pattern</i> stored inside.
+   *
+   * Options can be a hash with the following keys:
+   *
+   *   :utf8           - text and pattern are UTF-8; otherwise 
+   *                     Latin-1 (default true)
+   *
+   *   :posix_syntax   - restrict regexps to POSIX egrep syntax
+   *                     (default false)
+   *
+   *   :longest_match  - search for longest match, not first match
+   *                     (default false)
+   *
+   *   :log_errors     - log syntax and execution errors to ERROR
+   *                     (default true)
+   *
+   *   :max_mem        - approx. max memory footprint of RE2
+   *
+   *   :literal        - interpret string as literal, not regexp
+   *                     (default false)
+   *
+   *   :never_nl       - never match \n, even if it is in regexp
+   *                     (default false)
+   *
+   *   :case_sensitive - match is case-sensitive (regexp can override
+   *                     with (?i) unless in posix_syntax mode)
+   *                     (default true)
+   *
+   *   :perl_classes   - allow Perl's \d \s \w \D \S \W when in
+   *                     posix_syntax mode (default false)
+   *
+   *   :word_boundary  - allow \b \B (word boundary and not) when
+   *                     in posix_syntax mode (default false)
+   *
+   *   :one_line       - ^ and $ only match beginning and end of text
+   *                     when in posix_syntax mode (default false)
+   */
+
   VALUE
-  re2_initialize(VALUE self, VALUE pattern)
+  re2_initialize(int argc, VALUE *argv, VALUE self)
   {
+    VALUE pattern, options, utf8, posix_syntax, longest_match, log_errors,
+          max_mem, literal, never_nl, case_sensitive, perl_classes, 
+          word_boundary, one_line;
     re2_pattern *p;
+    RE2::Options *re2_options;
+
+    rb_scan_args(argc, argv, "11", &pattern, &options);
     Data_Get_Struct(self, re2_pattern, p);
-    p->pattern = new RE2(StringValuePtr(pattern));
+
+    if (RTEST(options)) {
+      if (TYPE(options) != T_HASH) {
+        rb_raise(rb_eArgError, "options should be a hash");
+      }
+
+      re2_options = new RE2::Options();
+
+      utf8 = rb_hash_aref(options, ID2SYM(rb_intern("utf8")));
+      if (!NIL_P(utf8)) {
+        re2_options->set_utf8(RTEST(utf8));
+      }
+
+      posix_syntax = rb_hash_aref(options, ID2SYM(rb_intern("posix_syntax")));
+      if (!NIL_P(posix_syntax)) {
+        re2_options->set_posix_syntax(RTEST(posix_syntax));
+      }
+
+      longest_match = rb_hash_aref(options, ID2SYM(rb_intern("longest_match")));
+      if (!NIL_P(longest_match)) {
+        re2_options->set_longest_match(RTEST(longest_match));
+      }
+
+      log_errors = rb_hash_aref(options, ID2SYM(rb_intern("log_errors")));
+      if (!NIL_P(log_errors)) {
+        re2_options->set_log_errors(RTEST(log_errors));
+      }
+
+      max_mem = rb_hash_aref(options, ID2SYM(rb_intern("max_mem")));
+      if (!NIL_P(max_mem)) {
+        re2_options->set_max_mem(NUM2INT(max_mem));
+      }
+
+      literal = rb_hash_aref(options, ID2SYM(rb_intern("literal")));
+      if (!NIL_P(literal)) {
+        re2_options->set_literal(RTEST(literal));
+      }
+
+      never_nl = rb_hash_aref(options, ID2SYM(rb_intern("never_nl")));
+      if (!NIL_P(never_nl)) {
+        re2_options->set_never_nl(RTEST(never_nl));
+      }
+
+      case_sensitive = rb_hash_aref(options, ID2SYM(rb_intern("case_sensitive")));
+      if (!NIL_P(case_sensitive)) {
+        re2_options->set_case_sensitive(RTEST(case_sensitive));
+      }
+
+      perl_classes = rb_hash_aref(options, ID2SYM(rb_intern("perl_classes")));
+      if (!NIL_P(perl_classes)) {
+        re2_options->set_perl_classes(RTEST(perl_classes));
+      }
+
+      word_boundary = rb_hash_aref(options, ID2SYM(rb_intern("word_boundary")));
+      if (!NIL_P(word_boundary)) {
+        re2_options->set_word_boundary(RTEST(word_boundary));
+      }
+
+      one_line = rb_hash_aref(options, ID2SYM(rb_intern("one_line")));
+      if (!NIL_P(one_line)) {
+        re2_options->set_one_line(RTEST(one_line));
+      }
+
+      p->pattern = new RE2(StringValuePtr(pattern), *re2_options);
+    } else {
+      p->pattern = new RE2(StringValuePtr(pattern));
+    }
+
     p->pattern_as_string = StringValue(pattern);
     return self;
   }
@@ -274,7 +391,7 @@ extern "C" {
   {
     re2_cRE2 = rb_define_class("RE2", rb_cObject);
     rb_define_alloc_func(re2_cRE2, (VALUE (*)(VALUE))re2_allocate);
-    rb_define_method(re2_cRE2, "initialize", (VALUE (*)(...))re2_initialize, 1);
+    rb_define_method(re2_cRE2, "initialize", (VALUE (*)(...))re2_initialize, -1);
     rb_define_method(re2_cRE2, "ok?", (VALUE (*)(...))re2_ok, 0);
     rb_define_method(re2_cRE2, "to_s", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "to_str", (VALUE (*)(...))re2_to_s, 0);
