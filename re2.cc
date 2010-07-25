@@ -5,7 +5,6 @@ extern "C" {
 
   typedef struct _re2p {
     RE2 *pattern;
-    VALUE pattern_as_string;
   } re2_pattern;
 
   VALUE re2_cRE2;
@@ -16,18 +15,11 @@ extern "C" {
     free(self);
   }
 
-  void
-  re2_mark(re2_pattern* self)
-  {
-    rb_gc_mark(self->pattern_as_string);
-  }
-
   VALUE
   re2_allocate(VALUE klass)
   {
     re2_pattern *p = (re2_pattern*)malloc(sizeof(re2_pattern));
     p->pattern = NULL;
-    p->pattern_as_string = Qnil;
     return Data_Wrap_Struct(klass, 0, re2_free, p);
   }
 
@@ -154,7 +146,6 @@ extern "C" {
       p->pattern = new RE2(StringValuePtr(pattern));
     }
 
-    p->pattern_as_string = StringValue(pattern);
     return self;
   }
 
@@ -177,7 +168,7 @@ extern "C" {
 
     rb_str_buf_cat2(result, "/");
     Data_Get_Struct(self, re2_pattern, p);
-    rb_str_buf_cat2(result, StringValuePtr(p->pattern_as_string));
+    rb_str_buf_cat2(result, p->pattern->pattern().c_str());
     rb_str_buf_cat2(result, "/");
 
     return result;
@@ -198,7 +189,7 @@ extern "C" {
   {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return p->pattern_as_string;
+    return rb_str_new2(p->pattern->pattern().c_str());
   }
 
   /*
@@ -222,6 +213,111 @@ extern "C" {
     } else {
       return Qfalse;
     }
+  }
+
+  /*
+   * call-seq:
+   *   re2.error    -> error_str
+   *
+   * If the RE2 could not be created properly, returns an
+   * error string.
+   */
+
+  VALUE
+  re2_error(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return rb_str_new2(p->pattern->error().c_str());
+  }
+
+  /*
+   * call-seq:
+   *   re2.error_arg    -> error_str
+   *
+   * If the RE2 could not be created properly, returns
+   * the offending portion of the regexp.
+   */
+
+  VALUE
+  re2_error_arg(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return rb_str_new2(p->pattern->error_arg().c_str());
+  }
+
+  /*
+   * call-seq:
+   *   re2.program_size    -> size
+   *
+   * Returns the program size, a very approximate measure
+   * of a regexp's "cost". Larger numbers are more expensive
+   * than smaller numbers.
+   */
+
+  VALUE
+  re2_program_size(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return INT2FIX(p->pattern->ProgramSize());
+  }
+
+  /*
+   * call-seq:
+   *   re2.options    -> options_hash
+   *
+   * Returns a hash of the options currently set for
+   * <i>re2</i>.
+   */
+
+  VALUE
+  re2_options(VALUE self)
+  {
+    VALUE options;
+    re2_pattern *p;
+
+    Data_Get_Struct(self, re2_pattern, p);
+    options = rb_hash_new();
+
+    rb_hash_aset(options, ID2SYM(rb_intern("utf8")),
+        p->pattern->options().utf8() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("posix_syntax")),
+        p->pattern->options().posix_syntax() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("longest_match")),
+        p->pattern->options().longest_match() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("log_errors")),
+        p->pattern->options().log_errors() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("max_mem")),
+        INT2FIX(p->pattern->options().max_mem()));
+
+    rb_hash_aset(options, ID2SYM(rb_intern("literal")),
+        p->pattern->options().literal() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("never_nl")),
+        p->pattern->options().never_nl() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("case_sensitive")),
+        p->pattern->options().case_sensitive() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("perl_classes")),
+        p->pattern->options().perl_classes() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("word_boundary")),
+        p->pattern->options().word_boundary() ? Qtrue : Qfalse);
+
+    rb_hash_aset(options, ID2SYM(rb_intern("one_line")),
+        p->pattern->options().one_line() ? Qtrue : Qfalse);
+
+    // This is a read-only hash after all...
+    OBJ_FREEZE(options);
+
+    return options;
   }
 
   /*
@@ -386,6 +482,24 @@ extern "C" {
     return str;
   }
 
+  /*
+   * call-seq:
+   *   RE2::QuoteMeta(str)    -> str
+   *
+   * Returns a version of str with all potentially meaningful regexp
+   * characters escaped. The returned string, used as a regular
+   * expression, will exactly match the original string.
+   *
+   *   RE2::QuoteMeta("1.5-2.0?")    #=> "1\.5\-2\.0\?"
+   */
+
+  VALUE
+  re2_QuoteMeta(VALUE self, VALUE unquoted)
+  {
+    re2::StringPiece unquoted_as_string_piece(StringValuePtr(unquoted));
+    return rb_str_new2(RE2::QuoteMeta(unquoted_as_string_piece).c_str());
+  }
+
   void
   Init_re2()
   {
@@ -393,12 +507,18 @@ extern "C" {
     rb_define_alloc_func(re2_cRE2, (VALUE (*)(VALUE))re2_allocate);
     rb_define_method(re2_cRE2, "initialize", (VALUE (*)(...))re2_initialize, -1);
     rb_define_method(re2_cRE2, "ok?", (VALUE (*)(...))re2_ok, 0);
+    rb_define_method(re2_cRE2, "error", (VALUE (*)(...))re2_error, 0);
+    rb_define_method(re2_cRE2, "error_arg", (VALUE (*)(...))re2_error_arg, 0);
+    rb_define_method(re2_cRE2, "program_size", (VALUE (*)(...))re2_program_size, 0);
+    rb_define_method(re2_cRE2, "options", (VALUE (*)(...))re2_options, 0);
     rb_define_method(re2_cRE2, "to_s", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "to_str", (VALUE (*)(...))re2_to_s, 0);
+    rb_define_method(re2_cRE2, "pattern", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "inspect", (VALUE (*)(...))re2_inspect, 0);
     rb_define_singleton_method(re2_cRE2, "FullMatch", (VALUE (*)(...))re2_FullMatch, 2);
     rb_define_singleton_method(re2_cRE2, "PartialMatch", (VALUE (*)(...))re2_PartialMatch, 2);
     rb_define_singleton_method(re2_cRE2, "Replace", (VALUE (*)(...))re2_Replace, 3);
     rb_define_singleton_method(re2_cRE2, "GlobalReplace", (VALUE (*)(...))re2_GlobalReplace, 3);
+    rb_define_singleton_method(re2_cRE2, "QuoteMeta", (VALUE (*)(...))re2_QuoteMeta, 1);
   }
 }

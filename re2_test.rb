@@ -7,6 +7,19 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to RE2, :PartialMatch
     assert_respond_to RE2, :Replace
     assert_respond_to RE2, :GlobalReplace
+    assert_respond_to RE2, :QuoteMeta
+    assert_respond_to RE2, :new
+
+    r = RE2.new('woo')
+    assert_respond_to r, :ok?
+    assert_respond_to r, :options
+    assert_respond_to r, :error
+    assert_respond_to r, :error_arg
+    assert_respond_to r, :program_size
+    assert_respond_to r, :to_s
+    assert_respond_to r, :to_str
+    assert_respond_to r, :pattern
+    assert_respond_to r, :inspect
   end
 
   def test_full_match
@@ -82,5 +95,22 @@ class RE2Test < Test::Unit::TestCase
   def test_global_replace_with_re2
     r = RE2.new("o")
     assert_equal "wii", RE2::GlobalReplace("woo", r, "i")
+  end
+
+  def test_quote_meta
+    assert_equal "1\\.5\\-2\\.0\\?", RE2::QuoteMeta("1.5-2.0?")
+  end
+
+  def test_re2_error
+    r = RE2.new("woo")
+    assert_equal "", r.error
+    assert_equal "", r.error_arg
+  end
+
+  def test_re2_error_with_error
+    r = RE2.new("wo(o", :log_errors => false)
+    assert !r.ok?
+    assert_equal "missing ): wo(o", r.error
+    assert_equal "wo(o", r.error_arg
   end
 end
