@@ -22,8 +22,12 @@ Then you can use the compiled library from the working directory with something 
      => /w(\d)(\d+)/
     > r.match("w1234")
      => ["w1234", "1", "234"]
+    > r.match("w1234", 0)
+     => true
     > r.match("bob")
      => nil
+    > r.match("bob", 0)
+     => false
 
 What currently works?
 ---------------------
