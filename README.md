@@ -11,7 +11,7 @@ You will need [re2][] and Ruby's headers installed (sometimes provided by a `rub
 Installation
 ------------
 
-1. `ruby extconf.rb`
+1. `ruby extconf.rb --with-re2-dir=/usr/local`
 2. `make`
 
 Then you can use the compiled library from the working directory with something like the following:

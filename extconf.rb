@@ -6,7 +6,12 @@
 
 require 'mkmf'
 
-abort "You must have re2 installed, please go to http://code.google.com/p/re2/wiki/Install" unless have_library("re2")
-have_library("stdc++")
 dir_config("re2")
-create_makefile("re2")
+
+have_library("stdc++")
+if have_library("re2")
+  create_makefile("re2")
+else
+  puts "You must have re2 installed and specified with --with-re2-dir, please see http://code.google.com/p/re2/wiki/Install"
+  exit 1
+end
