@@ -292,37 +292,37 @@ extern "C" {
     options = rb_hash_new();
 
     rb_hash_aset(options, ID2SYM(rb_intern("utf8")),
-        p->pattern->options().utf8() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().utf8()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("posix_syntax")),
-        p->pattern->options().posix_syntax() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().posix_syntax()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("longest_match")),
-        p->pattern->options().longest_match() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().longest_match()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("log_errors")),
-        p->pattern->options().log_errors() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().log_errors()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("max_mem")),
         INT2FIX(p->pattern->options().max_mem()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("literal")),
-        p->pattern->options().literal() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().literal()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("never_nl")),
-        p->pattern->options().never_nl() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().never_nl()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("case_sensitive")),
-        p->pattern->options().case_sensitive() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().case_sensitive()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("perl_classes")),
-        p->pattern->options().perl_classes() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().perl_classes()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("word_boundary")),
-        p->pattern->options().word_boundary() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().word_boundary()));
 
     rb_hash_aset(options, ID2SYM(rb_intern("one_line")),
-        p->pattern->options().one_line() ? Qtrue : Qfalse);
+        BOOL2RUBY(p->pattern->options().one_line()));
 
     // This is a read-only hash after all...
     OBJ_FREEZE(options);
@@ -482,7 +482,6 @@ extern "C" {
     argv = new RE2::Arg[n];
     args = new const RE2::Arg*[n];
     string_matches = new std::string[n];
-    int int_matches[n];
 
     for (int i = 0; i < n; i++) {
       args[i] = &argv[i];
@@ -542,7 +541,6 @@ extern "C" {
     argv = new RE2::Arg[n];
     args = new const RE2::Arg*[n];
     string_matches = new std::string[n];
-    int int_matches[n];
 
     for (int i = 0; i < n; i++) {
       args[i] = &argv[i];
