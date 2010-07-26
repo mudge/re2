@@ -6,7 +6,10 @@
 
 require 'mkmf'
 
-dir_config("re2")
+incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
+
+# Add the specified re2 lib to the runtime library path.
+$LDFLAGS << " -Wl,-R #{lib}"
 
 have_library("stdc++")
 if have_library("re2")
