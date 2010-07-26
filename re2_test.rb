@@ -30,6 +30,18 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to r, :inspect
     assert_respond_to r, :match
     assert_respond_to r, :number_of_capturing_groups
+    assert_respond_to r, :utf8?
+    assert_respond_to r, :posix_syntax?
+    assert_respond_to r, :longest_match?
+    assert_respond_to r, :log_errors?
+    assert_respond_to r, :max_mem
+    assert_respond_to r, :literal?
+    assert_respond_to r, :never_nl?
+    assert_respond_to r, :case_sensitive?
+    assert_respond_to r, :case_insensitive?
+    assert_respond_to r, :perl_classes?
+    assert_respond_to r, :word_boundary?
+    assert_respond_to r, :one_line?
   end
 
   def test_full_match
@@ -130,6 +142,9 @@ class RE2Test < Test::Unit::TestCase
     assert RE2::FullMatch("woo", r)
     assert RE2::FullMatch("WOO", r)
     assert !r.options[:case_sensitive]
+    assert r.case_insensitive?
+    assert !r.case_sensitive?
+    assert r.utf8?
     assert r.options[:utf8]
   end
 

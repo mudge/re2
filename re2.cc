@@ -43,7 +43,7 @@ extern "C" {
    *   RE2.new(pattern, options)  #=> re2
    *
    * Returns a new RE2 object with a compiled version of
-   * <i>pattern</i> stored inside.
+   * +pattern+ stored inside.
    *
    * Options can be a hash with the following keys:
    *
@@ -167,7 +167,7 @@ extern "C" {
    * call-seq:
    *   re2.inspect   -> string
    *
-   * Returns a printable version of the regular expression __re2__,
+   * Returns a printable version of the regular expression +re2+,
    * surrounded by forward slashes.
    *
    *   re2 = RE2.new("woo?")
@@ -192,7 +192,7 @@ extern "C" {
    * call-seq:
    *   re2.to_s    -> string
    *
-   * Returns a string version of the regular expression __re2__.
+   * Returns a string version of the regular expression +re2+.
    *
    *   re2 = RE2.new("woo?")
    *   re2.to_s    #=> "woo?"
@@ -210,7 +210,7 @@ extern "C" {
    * call-seq:
    *   re2.ok?    -> true or false
    *
-   * Returns whether or not the regular expression __re2__
+   * Returns whether or not the regular expression +re2+
    * was compiled successfully or not.
    *
    *   re2 = RE2.new("woo?")
@@ -223,6 +223,231 @@ extern "C" {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->ok());
+  }
+
+  /*
+   * call-seq:
+   *   re2.utf8?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the utf8 option set to true.
+   *
+   *   re2 = RE2.new("woo?", :utf8 => true)
+   *   re2.utf8?    #=> true
+   */
+
+  VALUE
+  re2_utf8(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().utf8());
+  }
+
+  /*
+   * call-seq:
+   *   re2.posix_syntax?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the posix_syntax option set to true.
+   *
+   *   re2 = RE2.new("woo?", :posix_syntax => true)
+   *   re2.posix_syntax?    #=> true
+   */
+
+  VALUE
+  re2_posix_syntax(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().posix_syntax());
+  }
+
+  /*
+   * call-seq:
+   *   re2.longest_match?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the longest_match option set to true.
+   *
+   *   re2 = RE2.new("woo?", :longest_match => true)
+   *   re2.longest_match?    #=> true
+   */
+
+  VALUE
+  re2_longest_match(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().longest_match());
+  }
+
+  /*
+   * call-seq:
+   *   re2.log_errors?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the log_errors option set to true.
+   *
+   *   re2 = RE2.new("woo?", :log_errors => true)
+   *   re2.log_errors?    #=> true
+   */
+
+  VALUE
+  re2_log_errors(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().log_errors());
+  }
+
+  /*
+   * call-seq:
+   *   re2.max_mem    -> int
+   *
+   * Returns the max_mem setting for the regular expression
+   * +re2+.
+   *
+   *   re2 = RE2.new("woo?", :max_mem => 1024)
+   *   re2.max_mem    #=> 1024
+   */
+
+  VALUE
+  re2_max_mem(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return INT2FIX(p->pattern->options().max_mem());
+  }
+
+  /*
+   * call-seq:
+   *   re2.literal?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the literal option set to true.
+   *
+   *   re2 = RE2.new("woo?", :literal => true)
+   *   re2.literal?    #=> true
+   */
+
+  VALUE
+  re2_literal(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().literal());
+  }
+
+  /*
+   * call-seq:
+   *   re2.never_nl?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the never_nl option set to true.
+   *
+   *   re2 = RE2.new("woo?", :never_nl => true)
+   *   re2.never_nl?    #=> true
+   */
+
+  VALUE
+  re2_never_nl(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().never_nl());
+  }
+
+  /*
+   * call-seq:
+   *   re2.case_sensitive?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the case_sensitive option set to true.
+   *
+   *   re2 = RE2.new("woo?", :case_sensitive => true)
+   *   re2.case_sensitive?    #=> true
+   */
+
+  VALUE
+  re2_case_sensitive(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().case_sensitive());
+  }
+
+  /*
+   * call-seq:
+   *   re2.case_insensitive?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the case_sensitive option set to false.
+   *
+   *   re2 = RE2.new("woo?", :case_sensitive => true)
+   *   re2.case_insensitive?    #=> false
+   */
+  VALUE
+  re2_case_insensitive(VALUE self)
+  {
+    return BOOL2RUBY(re2_case_sensitive(self) != Qtrue);
+  }
+
+  /*
+   * call-seq:
+   *   re2.perl_classes?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the perl_classes option set to true.
+   *
+   *   re2 = RE2.new("woo?", :perl_classes => true)
+   *   re2.perl_classes?    #=> true
+   */
+
+  VALUE
+  re2_perl_classes(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().perl_classes());
+  }
+
+  /*
+   * call-seq:
+   *   re2.word_boundary?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the word_boundary option set to true.
+   *
+   *   re2 = RE2.new("woo?", :word_boundary => true)
+   *   re2.word_boundary?    #=> true
+   */
+
+  VALUE
+  re2_word_boundary(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().word_boundary());
+  }
+
+  /*
+   * call-seq:
+   *   re2.one_line?    -> true or false
+   *
+   * Returns whether or not the regular expression +re2+
+   * was compiled with the one_line option set to true.
+   *
+   *   re2 = RE2.new("woo?", :one_line => true)
+   *   re2.one_line?    #=> true
+   */
+
+  VALUE
+  re2_one_line(VALUE self)
+  {
+    re2_pattern *p;
+    Data_Get_Struct(self, re2_pattern, p);
+    return BOOL2RUBY(p->pattern->options().one_line());
   }
 
   /*
@@ -279,7 +504,7 @@ extern "C" {
    *   re2.options    -> options_hash
    *
    * Returns a hash of the options currently set for
-   * <i>re2</i>.
+   * +re2+.
    */
 
   VALUE
@@ -354,7 +579,7 @@ extern "C" {
    *   re2.match(text, 0)              -> true or false
    *   re2.match(text, num_of_matches) -> [match, match]
    *
-   * Looks for the pattern in <i>re2</i> in <i>text</i>; when specified
+   * Looks for the pattern in +re2+ in +text+; when specified
    * without a second argument, will return an array of the matching
    * pattern and all subpatterns. If the second argument is 0, a
    * simple true or false will be returned to indicate a successful
@@ -423,7 +648,7 @@ extern "C" {
    * call-seq:
    *   RE2::FullMatch(text, re)    -> true or false
    *
-   * Returns whether or not a full match for __re__ was
+   * Returns whether or not a full match for +re2+ was
    * found in text.
    *
    *   RE2::FullMatch("woo", "wo+")    #=> true
@@ -453,7 +678,7 @@ extern "C" {
    *   RE2::FullMatchN(text, re)    -> array of matches
    *
    * Returns an array of successful matches as defined in
-   * <i>re</i> for <i>text</i>.
+   * +re+ for +text+.
    *
    *   RE2::FullMatchN("woo", "w(oo)")   #=> ["oo"]
    */
@@ -512,7 +737,7 @@ extern "C" {
    *   RE2::PartialMatchN(text, re)    -> array of matches
    *
    * Returns an array of successful matches as defined in
-   * <i>re</i> for <i>text</i>.
+   * +re+ for +text+.
    *
    *   RE2::PartialMatchN("woo", "w(oo)")   #=> ["oo"]
    */
@@ -570,7 +795,7 @@ extern "C" {
    * call-seq:
    *   RE2::PartialMatch(text, re)    -> true or false
    *
-   * Returns whether or not a partial match for __re__ was
+   * Returns whether or not a partial match for +re2+ was
    * found in text.
    *
    *   RE2::PartialMatch("woo", "o+")     #=> true
@@ -599,8 +824,8 @@ extern "C" {
    * call-seq:
    *   RE2::Replace(str, pattern, rewrite)    -> str
    *
-   * Replaces the first occurrence __pattern__ in __str__ with 
-   * __rewrite__ <i>in place</i>.
+   * Replaces the first occurrence +pattern+ in +str+ with 
+   * +rewrite+ <i>in place</i>.
    *
    *   RE2::Replace("hello there", "hello", "howdy") #=> "howdy there"
    *   re2 = RE2.new("hel+o")
@@ -641,8 +866,8 @@ extern "C" {
    * call-seq:
    *   RE2::GlobalReplace(str, pattern, rewrite)    -> str
    *
-   * Replaces every occurrence of __pattern__ in __str__ with 
-   * __rewrite__ <i>in place</i>.
+   * Replaces every occurrence of +pattern+ in +str+ with 
+   * +rewrite+ <i>in place</i>.
    *
    *   RE2::GlobalReplace("hello there", "e", "i")   #=> "hillo thiri"
    *   re2 = RE2.new("oo?")
@@ -714,6 +939,18 @@ extern "C" {
     rb_define_method(re2_cRE2, "to_str", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "pattern", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "inspect", (VALUE (*)(...))re2_inspect, 0);
+    rb_define_method(re2_cRE2, "utf8?", (VALUE (*)(...))re2_utf8, 0);
+    rb_define_method(re2_cRE2, "posix_syntax?", (VALUE (*)(...))re2_posix_syntax, 0);
+    rb_define_method(re2_cRE2, "longest_match?", (VALUE (*)(...))re2_longest_match, 0);
+    rb_define_method(re2_cRE2, "log_errors?", (VALUE (*)(...))re2_log_errors, 0);
+    rb_define_method(re2_cRE2, "max_mem", (VALUE (*)(...))re2_max_mem, 0);
+    rb_define_method(re2_cRE2, "literal?", (VALUE (*)(...))re2_literal, 0);
+    rb_define_method(re2_cRE2, "never_nl?", (VALUE (*)(...))re2_never_nl, 0);
+    rb_define_method(re2_cRE2, "case_sensitive?", (VALUE (*)(...))re2_case_sensitive, 0);
+    rb_define_method(re2_cRE2, "case_insensitive?", (VALUE (*)(...))re2_case_insensitive, 0);
+    rb_define_method(re2_cRE2, "perl_classes?", (VALUE (*)(...))re2_perl_classes, 0);
+    rb_define_method(re2_cRE2, "word_boundary?", (VALUE (*)(...))re2_word_boundary, 0);
+    rb_define_method(re2_cRE2, "one_line?", (VALUE (*)(...))re2_one_line, 0);
     rb_define_singleton_method(re2_cRE2, "FullMatch", (VALUE (*)(...))re2_FullMatch, 2);
     rb_define_singleton_method(re2_cRE2, "FullMatchN", (VALUE (*)(...))re2_FullMatchN, 2);
     rb_define_singleton_method(re2_cRE2, "PartialMatch", (VALUE (*)(...))re2_PartialMatch, 2);
