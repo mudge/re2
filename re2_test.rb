@@ -29,6 +29,8 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to r, :pattern
     assert_respond_to r, :inspect
     assert_respond_to r, :match
+    assert_respond_to r, :match?
+    assert_respond_to r, :=~
     assert_respond_to r, :number_of_capturing_groups
     assert_respond_to r, :utf8?
     assert_respond_to r, :posix_syntax?
@@ -134,11 +136,22 @@ class RE2Test < Test::Unit::TestCase
     assert_equal 2, RE2.new('a((b)c)').number_of_capturing_groups
   end
 
-  def test_matching
+  def test_matching_all_subpatterns
     assert_equal ["woo", "o", "o"], RE2.new('w(o)(o)').match('woo')
     assert_equal ["ab", nil, "a", "b"], RE2.new('(\d?)(a)(b)').match('ab')
+  end
+
+  def test_matching_no_subpatterns
     assert RE2.new('woo').match('woo', 0)
     assert !RE2.new('bob').match('woo', 0)
+    assert RE2.new('woo').match?('woo')
+    assert !RE2.new('bob').match?('woo')
+    assert RE2.new('woo') =~ 'woo'
+    assert !(RE2.new('bob') =~ 'woo')
+    assert RE2.new('bob') !~ 'woo'
+  end
+
+  def test_matching_some_sub_patterns
     assert_equal ["woo", "o"], RE2.new('w(o)(o)').match('woo', 1)
     assert_equal ["woo", "o", "o"], RE2.new('w(o)(o)').match('woo', 2)
     assert_equal ["woo", "o", "o", nil], RE2.new('w(o)(o)').match('woo', 3)

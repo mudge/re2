@@ -44,8 +44,24 @@ extern "C" {
 
   /*
    * call-seq:
-   *   RE2.new(pattern)           #=> re2
-   *   RE2.new(pattern, options)  #=> re2
+   *   RE2(pattern)           -> re2
+   *   RE2(pattern, options)  -> re2
+   *
+   * Returns a new RE2 object with a compiled version of
+   * +pattern+ stored inside. Equivalent to +RE2.new+.
+   */
+
+  static VALUE
+  re2_re2(int argc, VALUE *argv, VALUE self)
+  {
+    VALUE re2_class = rb_const_get(rb_cObject, id_re2);
+    return rb_class_new_instance(argc, argv, re2_class);
+  }
+
+  /*
+   * call-seq:
+   *   RE2.new(pattern)           -> re2
+   *   RE2.new(pattern, options)  -> re2
    *
    * Returns a new RE2 object with a compiled version of
    * +pattern+ stored inside.
@@ -85,13 +101,6 @@ extern "C" {
    *   :one_line       - ^ and $ only match beginning and end of text
    *                     when in posix_syntax mode (default false)
    */
-
-  static VALUE
-  re2_re2(int argc, VALUE *argv, VALUE self)
-  {
-    VALUE re2_class = rb_const_get(rb_cObject, id_re2);
-    return rb_class_new_instance(argc, argv, re2_class);
-  }
 
   static VALUE
   re2_initialize(int argc, VALUE *argv, VALUE self)
@@ -202,7 +211,11 @@ extern "C" {
 
   /*
    * call-seq:
-   *   re2.to_s    -> string
+   *   re2.to_s       -> string
+   *   re2.to_str     -> string
+   *   re2.pattern    -> string
+   *   re2.source     -> string
+   *   re2.inspect    -> string
    *
    * Returns a string version of the regular expression +re2+.
    *
@@ -658,6 +671,39 @@ extern "C" {
 
   /*
    * call-seq:
+   *   re2.match?(text)  -> true or false
+   *   re2 =~ text  -> true or false
+   *
+   * Returns true or false to indicate a successful match.
+   * Equivalent to +re2.match(text, 0)+.
+   */
+
+  static VALUE
+  re2_match_query(VALUE self, VALUE text)
+  {
+    VALUE argv[2];
+    argv[0] = text;
+    argv[1] = INT2FIX(0);
+
+    return re2_match(2, argv, self);
+  }
+
+  /*
+   * call-seq:
+   *   re2 !~ text  -> true or false
+   *
+   * Returns true or false to indicate an unsuccessful match.
+   * Equivalent to +!re2.match(text, 0)+.
+   */
+
+  static VALUE
+  re2_bang_tilde(VALUE self, VALUE text)
+  {
+    return BOOL2RUBY(re2_match_query(self, text) != Qtrue);
+  }
+
+  /*
+   * call-seq:
    *   RE2::FullMatch(text, re)    -> true or false
    *
    * Returns whether or not a full match for +re2+ was
@@ -947,9 +993,13 @@ extern "C" {
     rb_define_method(re2_cRE2, "options", (VALUE (*)(...))re2_options, 0);
     rb_define_method(re2_cRE2, "number_of_capturing_groups", (VALUE (*)(...))re2_number_of_capturing_groups, 0);
     rb_define_method(re2_cRE2, "match", (VALUE (*)(...))re2_match, -1);
+    rb_define_method(re2_cRE2, "match?", (VALUE (*)(...))re2_match_query, 1);
+    rb_define_method(re2_cRE2, "=~", (VALUE (*)(...))re2_match_query, 1);
+    rb_define_method(re2_cRE2, "!~", (VALUE (*)(...))re2_bang_tilde, 1);
     rb_define_method(re2_cRE2, "to_s", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "to_str", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "pattern", (VALUE (*)(...))re2_to_s, 0);
+    rb_define_method(re2_cRE2, "source", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "inspect", (VALUE (*)(...))re2_inspect, 0);
     rb_define_method(re2_cRE2, "utf8?", (VALUE (*)(...))re2_utf8, 0);
     rb_define_method(re2_cRE2, "posix_syntax?", (VALUE (*)(...))re2_posix_syntax, 0);

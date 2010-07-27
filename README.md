@@ -1,7 +1,7 @@
 re2
 ===
 
-A work-in-progress Ruby binding to [re2][], an "efficient, principled regular expression library".
+A Ruby binding to [re2][], an "efficient, principled regular expression library".
 
 Dependencies
 ------------
@@ -22,12 +22,12 @@ Then you can use the compiled library from the working directory with something 
      => /w(\d)(\d+)/
     > r.match("w1234")
      => ["w1234", "1", "234"]
-    > r.match("w1234", 0)
+    > r =~ "w1234"
      => true
     > r.match("bob")
      => nil
-    > r.match("bob", 0)
-     => false
+    > r !~ "bob"
+     => true
 
 What currently works?
 ---------------------
@@ -35,6 +35,8 @@ What currently works?
 * Pre-compiling regular expressions with [`RE2.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96) or `RE2(re)` (including specifying options, e.g. `RE2.new("pattern", :case_sensitive => false)`
 
   * Extracting matches with `re2.match(text)`
+
+  * Checking for matches with `re2 =~ text` and `re2 !~ text`
 
   * Checking regular expression compilation with `re2.ok?`, `re2.error` and `re2.error_arg`
 
