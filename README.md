@@ -3,34 +3,35 @@ re2
 
 A Ruby binding to [re2][], an "efficient, principled regular expression library".
 
-Dependencies
-------------
-
-You will need [re2][] and Ruby's headers installed (sometimes provided by a `ruby-dev` package) as well as a C++ compiler such as [gcc][].
-
 Installation
 ------------
 
-1. `ruby extconf.rb` (or `ruby extconf.rb --with-re2-dir=/opt/local` if re2 is installed in a non-standard location)
-2. `make`
+You will need [re2][] installed in its default location of /usr/local as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this is provided by the [build-essential][] package).
 
-Then you can use the compiled library from the working directory with something like the following:
+If you are using a packaged Ruby distribution, make sure you also have the Ruby header files installed such as those provided by the [ruby-dev][] package on Debian and Ubuntu.
 
-    $ irb
-    > require './re2' # the ./ is necessary for Ruby 1.9.2
-    > r = RE2('w(\d)(\d+)')
+You can then install the library via RubyGems: `gem install re2`
+
+Usage
+-----
+
+You can use re2 as a mostly drop-in replacement for Ruby's own [Regexp][] class:
+
+    $ irb -rubygems
+    > require 're2'
+    > r = RE2.compile('w(\d)(\d+)')
      => /w(\d)(\d+)/
     > r.match("w1234")
      => ["w1234", "1", "234"]
     > r =~ "w1234"
      => true
-    > r.match("bob")
-     => nil
     > r !~ "bob"
      => true
+    > r.match("bob")
+     => nil
 
-What currently works?
----------------------
+Features
+--------
 
 * Pre-compiling regular expressions with [`RE2.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96), `RE2.compile(re)` or `RE2(re)` (including specifying options, e.g. `RE2.new("pattern", :case_sensitive => false)`
 
@@ -56,16 +57,14 @@ What currently works?
 
 re2.cc should be well-documented so feel free to consult this file to see what can currently be used.
 
-Why would I want to use this?
-----------------------------
+Contact
+-------
 
-To investigate [re2][]; be warned that using `RE2::FullMatch` or `RE2::PartialMatch` without a pre-compiled expression (viz. `RE2.new(pattern)`) will result in *worse* performance than Ruby's native regular expression library (see `re2_benchmark.rb` for rudimentary benchmarks).
+All feedback should go to the mailing list: ruby.re2@librelist.com
 
-What's wrong with [rre2][]?
----------------------------
-
-Nothing, I just wanted to teach myself to write Ruby extensions in C++ and match re2's native interface more closely.
-
-  [gcc]: http://gcc.gnu.org/
   [re2]: http://code.google.com/p/re2/
-  [rre2]: http://github.com/axic/rre2
+  [gcc]: http://gcc.gnu.org/
+  [ruby-dev]: http://packages.debian.org/ruby-dev
+  [build-essential]: http://packages.debian.org/build-essential
+  [Regexp]: http://ruby-doc.org/core/classes/Regexp.html
+

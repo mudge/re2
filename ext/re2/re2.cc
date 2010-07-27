@@ -13,6 +13,8 @@ extern "C" {
   #include <ruby.h>
 
   #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
+  #define UNUSED(x) ((void)x)
+
   #if !defined(RSTRING_LEN)
   #  define RSTRING_LEN(x) (RSTRING(x)->len)
   #endif
@@ -24,9 +26,9 @@ extern "C" {
   VALUE re2_cRE2;
 
   /* Symbols used in RE2 options. */
-  static int id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
+  static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
              id_max_mem, id_literal, id_never_nl, id_case_sensitive,
-             id_perl_classes, id_word_boundary, id_one_line, id_re2;
+             id_perl_classes, id_word_boundary, id_one_line;
 
   void
   re2_free(re2_pattern* self)
@@ -46,24 +48,23 @@ extern "C" {
    * call-seq:
    *   RE2(pattern)                  -> re2
    *   RE2(pattern, options)         -> re2
-   *   RE2.compile(pattern)          -> re2
-   *   RE2.compile(pattern, options) -> re2
    *
    * Returns a new RE2 object with a compiled version of
    * +pattern+ stored inside. Equivalent to +RE2.new+.
    */
-
   static VALUE
   re2_re2(int argc, VALUE *argv, VALUE self)
   {
-    VALUE re2_class = rb_const_get(rb_cObject, id_re2);
-    return rb_class_new_instance(argc, argv, re2_class);
+    UNUSED(self);
+    return rb_class_new_instance(argc, argv, re2_cRE2);
   }
 
   /*
    * call-seq:
-   *   RE2.new(pattern)           -> re2
-   *   RE2.new(pattern, options)  -> re2
+   *   RE2.new(pattern)               -> re2
+   *   RE2.new(pattern, options)      -> re2
+   *   RE2.compile(pattern)           -> re2
+   *   RE2.compile(pattern, options)  -> re2
    *
    * Returns a new RE2 object with a compiled version of
    * +pattern+ stored inside.
@@ -103,7 +104,6 @@ extern "C" {
    *   :one_line       - ^ and $ only match beginning and end of text
    *                     when in posix_syntax mode (default false)
    */
-
   static VALUE
   re2_initialize(int argc, VALUE *argv, VALUE self)
   {
@@ -196,7 +196,6 @@ extern "C" {
    *   re2 = RE2.new("woo?")
    *   re2.inspect    #=> "/woo?/"
    */
-
   static VALUE
   re2_inspect(VALUE self)
   {
@@ -224,7 +223,6 @@ extern "C" {
    *   re2 = RE2.new("woo?")
    *   re2.to_s    #=> "woo?"
    */
-
   static VALUE
   re2_to_s(VALUE self)
   {
@@ -243,7 +241,6 @@ extern "C" {
    *   re2 = RE2.new("woo?")
    *   re2.ok?    #=> true
    */
-
   static VALUE
   re2_ok(VALUE self)
   {
@@ -262,7 +259,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :utf8 => true)
    *   re2.utf8?    #=> true
    */
-
   static VALUE
   re2_utf8(VALUE self)
   {
@@ -281,7 +277,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :posix_syntax => true)
    *   re2.posix_syntax?    #=> true
    */
-
   static VALUE
   re2_posix_syntax(VALUE self)
   {
@@ -300,7 +295,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :longest_match => true)
    *   re2.longest_match?    #=> true
    */
-
   static VALUE
   re2_longest_match(VALUE self)
   {
@@ -319,7 +313,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :log_errors => true)
    *   re2.log_errors?    #=> true
    */
-
   static VALUE
   re2_log_errors(VALUE self)
   {
@@ -338,7 +331,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :max_mem => 1024)
    *   re2.max_mem    #=> 1024
    */
-
   static VALUE
   re2_max_mem(VALUE self)
   {
@@ -357,7 +349,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :literal => true)
    *   re2.literal?    #=> true
    */
-
   static VALUE
   re2_literal(VALUE self)
   {
@@ -376,7 +367,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :never_nl => true)
    *   re2.never_nl?    #=> true
    */
-
   static VALUE
   re2_never_nl(VALUE self)
   {
@@ -395,7 +385,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :case_sensitive => true)
    *   re2.case_sensitive?    #=> true
    */
-
   static VALUE
   re2_case_sensitive(VALUE self)
   {
@@ -431,7 +420,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :perl_classes => true)
    *   re2.perl_classes?    #=> true
    */
-
   static VALUE
   re2_perl_classes(VALUE self)
   {
@@ -450,7 +438,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :word_boundary => true)
    *   re2.word_boundary?    #=> true
    */
-
   static VALUE
   re2_word_boundary(VALUE self)
   {
@@ -469,7 +456,6 @@ extern "C" {
    *   re2 = RE2.new("woo?", :one_line => true)
    *   re2.one_line?    #=> true
    */
-
   static VALUE
   re2_one_line(VALUE self)
   {
@@ -485,7 +471,6 @@ extern "C" {
    * If the RE2 could not be created properly, returns an
    * error string.
    */
-
   static VALUE
   re2_error(VALUE self)
   {
@@ -501,7 +486,6 @@ extern "C" {
    * If the RE2 could not be created properly, returns
    * the offending portion of the regexp.
    */
-
   static VALUE
   re2_error_arg(VALUE self)
   {
@@ -518,7 +502,6 @@ extern "C" {
    * of a regexp's "cost". Larger numbers are more expensive
    * than smaller numbers.
    */
-
   static VALUE
   re2_program_size(VALUE self)
   {
@@ -534,7 +517,6 @@ extern "C" {
    * Returns a hash of the options currently set for
    * +re2+.
    */
-
   static VALUE
   re2_options(VALUE self)
   {
@@ -591,7 +573,6 @@ extern "C" {
    * wasn't valid on construction. The overall match ($0) does not
    * count: if the regexp is "(a)(b)", returns 2.
    */
-
   static VALUE
   re2_number_of_capturing_groups(VALUE self)
   {
@@ -621,7 +602,6 @@ extern "C" {
    *   r.match('bob', 0) #=> false
    *   r.match('woo', 1) #=> ["woo", "o"]
    */
-
   static VALUE
   re2_match(int argc, VALUE *argv, VALUE self)
   {
@@ -680,7 +660,6 @@ extern "C" {
    * Returns true or false to indicate a successful match.
    * Equivalent to +re2.match(text, 0)+.
    */
-
   static VALUE
   re2_match_query(VALUE self, VALUE text)
   {
@@ -698,7 +677,6 @@ extern "C" {
    * Returns true or false to indicate an unsuccessful match.
    * Equivalent to +!re2.match(text, 0)+.
    */
-
   static VALUE
   re2_bang_tilde(VALUE self, VALUE text)
   {
@@ -717,10 +695,10 @@ extern "C" {
    *   re2 = RE2.new("woo")
    *   RE2::FullMatch("woo", re2)      #=> true
    */
-
   static VALUE
   re2_FullMatch(VALUE self, VALUE text, VALUE re)
   {
+    UNUSED(self);
     bool result;
     re2_pattern *p;
 
@@ -743,10 +721,10 @@ extern "C" {
    *
    *   RE2::FullMatchN("woo", "w(oo)")   #=> ["oo"]
    */
-
   static VALUE
   re2_FullMatchN(VALUE self, VALUE text, VALUE re)
   {
+    UNUSED(self);
     int n;
     bool matched;
     re2_pattern *p;
@@ -802,10 +780,10 @@ extern "C" {
    *
    *   RE2::PartialMatchN("woo", "w(oo)")   #=> ["oo"]
    */
-
   static VALUE
   re2_PartialMatchN(VALUE self, VALUE text, VALUE re)
   {
+    UNUSED(self);
     int n;
     bool matched;
     re2_pattern *p;
@@ -864,10 +842,10 @@ extern "C" {
    *   re2 = RE2.new("oo?")
    *   RE2::PartialMatch("woo", re2)      #=> true
    */
-
   static VALUE
   re2_PartialMatch(VALUE self, VALUE text, VALUE re)
   {
+    UNUSED(self);
     bool result;
     re2_pattern *p;
 
@@ -895,10 +873,10 @@ extern "C" {
    *   RE2::Replace(text, "morn", "even")            #=> "Good evening"
    *   text                                          #=> "Good evening"
    */
-
   static VALUE
   re2_Replace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
   {
+    UNUSED(self);
     VALUE repl;
     re2_pattern *p;
 
@@ -937,10 +915,10 @@ extern "C" {
    *   RE2::GlobalReplace(text, "o", "ee")           #=> "Geeeed meerning"
    *   text                                          #=> "Geeeed meerning"
    */
-
   static VALUE
   re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
   {
+    UNUSED(self);
 
     // Convert all the inputs to be pumped into RE2::GlobalReplace.
     re2_pattern *p;
@@ -977,10 +955,10 @@ extern "C" {
    *
    *   RE2::QuoteMeta("1.5-2.0?")    #=> "1\.5\-2\.0\?"
    */
-
   static VALUE
   re2_QuoteMeta(VALUE self, VALUE unquoted)
   {
+    UNUSED(self);
     re2::StringPiece unquoted_as_string_piece(StringValuePtr(unquoted));
     return rb_str_new2(RE2::QuoteMeta(unquoted_as_string_piece).c_str());
   }
@@ -1029,7 +1007,7 @@ extern "C" {
     rb_define_singleton_method(re2_cRE2, "QuoteMeta", (VALUE (*)(...))re2_QuoteMeta, 1);
     rb_define_singleton_method(re2_cRE2, "escape", (VALUE (*)(...))re2_QuoteMeta, 1);
     rb_define_singleton_method(re2_cRE2, "quote", (VALUE (*)(...))re2_QuoteMeta, 1);
-    rb_define_singleton_method(re2_cRE2, "compile", (VALUE (*)(...))re2_re2, -1);
+    rb_define_singleton_method(re2_cRE2, "compile", (VALUE (*)(...))rb_class_new_instance, -1);
     rb_define_global_function("RE2", (VALUE (*)(...))re2_re2, -1);
 
     /* Create the symbols used in options. */
@@ -1044,6 +1022,5 @@ extern "C" {
     id_perl_classes = rb_intern("perl_classes");
     id_word_boundary = rb_intern("word_boundary");
     id_one_line = rb_intern("one_line");
-    id_re2 = rb_intern("RE2");
   }
 }

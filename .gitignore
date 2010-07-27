@@ -4,3 +4,5 @@ mkmf.log
 *.o
 *.so
 conftest.dSYM
+tmp
+*.gem

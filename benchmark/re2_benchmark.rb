@@ -4,7 +4,8 @@
 # Copyright (c) 2010, Paul Mucur (http://mucur.name)
 # Released under the BSD Licence, please see LICENSE.txt
 
-require File.join(File.dirname(__FILE__), "re2")
+$:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require "re2"
 require "benchmark"
 
 a = "R" * 1000
