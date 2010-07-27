@@ -18,7 +18,7 @@ Then you can use the compiled library from the working directory with something 
 
     $ irb
     > require './re2' # the ./ is necessary for Ruby 1.9.2
-    > r = RE2.new('w(\d)(\d+)')
+    > r = RE2('w(\d)(\d+)')
      => /w(\d)(\d+)/
     > r.match("w1234")
      => ["w1234", "1", "234"]
@@ -32,12 +32,15 @@ Then you can use the compiled library from the working directory with something 
 What currently works?
 ---------------------
 
-* Pre-compiling regular expressions with [`RE2.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96) (including specifying options, e.g. `RE2.new("pattern", :case_sensitive => false)`
+* Pre-compiling regular expressions with [`RE2.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96) or `RE2(re)` (including specifying options, e.g. `RE2.new("pattern", :case_sensitive => false)`
 
   * Extracting matches with `re2.match(text)`
+
   * Checking regular expression compilation with `re2.ok?`, `re2.error` and `re2.error_arg`
+
   * Checking regular expression "cost" with `re2.program_size`
-  * Checking the options for an expression with `re2.options`
+
+  * Checking the options for an expression with `re2.options` or individually with `re2.case_sensitive?`
 
 * Performing full matches with [`RE2::FullMatch(text, re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#30)
 

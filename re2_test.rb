@@ -42,6 +42,14 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to r, :perl_classes?
     assert_respond_to r, :word_boundary?
     assert_respond_to r, :one_line?
+
+    assert_respond_to Kernel, :RE2
+  end
+
+  def test_global_re2
+    r = RE2('w(o)(o)')
+    assert_kind_of RE2, r
+    assert_respond_to r, :ok?
   end
 
   def test_full_match

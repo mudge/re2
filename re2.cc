@@ -23,13 +23,18 @@ extern "C" {
 
   VALUE re2_cRE2;
 
+  /* Symbols used in RE2 options. */
+  static int id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
+             id_max_mem, id_literal, id_never_nl, id_case_sensitive,
+             id_perl_classes, id_word_boundary, id_one_line, id_re2;
+
   void
   re2_free(re2_pattern* self)
   {
     free(self);
   }
 
-  VALUE
+  static VALUE
   re2_allocate(VALUE klass)
   {
     re2_pattern *p = (re2_pattern*)malloc(sizeof(re2_pattern));
@@ -81,7 +86,14 @@ extern "C" {
    *                     when in posix_syntax mode (default false)
    */
 
-  VALUE
+  static VALUE
+  re2_re2(int argc, VALUE *argv, VALUE self)
+  {
+    VALUE re2_class = rb_const_get(rb_cObject, id_re2);
+    return rb_class_new_instance(argc, argv, re2_class);
+  }
+
+  static VALUE
   re2_initialize(int argc, VALUE *argv, VALUE self)
   {
     VALUE pattern, options, utf8, posix_syntax, longest_match, log_errors,
@@ -100,57 +112,57 @@ extern "C" {
 
       re2_options = new RE2::Options();
 
-      utf8 = rb_hash_aref(options, ID2SYM(rb_intern("utf8")));
+      utf8 = rb_hash_aref(options, ID2SYM(id_utf8));
       if (!NIL_P(utf8)) {
         re2_options->set_utf8(RTEST(utf8));
       }
 
-      posix_syntax = rb_hash_aref(options, ID2SYM(rb_intern("posix_syntax")));
+      posix_syntax = rb_hash_aref(options, ID2SYM(id_posix_syntax));
       if (!NIL_P(posix_syntax)) {
         re2_options->set_posix_syntax(RTEST(posix_syntax));
       }
 
-      longest_match = rb_hash_aref(options, ID2SYM(rb_intern("longest_match")));
+      longest_match = rb_hash_aref(options, ID2SYM(id_longest_match));
       if (!NIL_P(longest_match)) {
         re2_options->set_longest_match(RTEST(longest_match));
       }
 
-      log_errors = rb_hash_aref(options, ID2SYM(rb_intern("log_errors")));
+      log_errors = rb_hash_aref(options, ID2SYM(id_log_errors));
       if (!NIL_P(log_errors)) {
         re2_options->set_log_errors(RTEST(log_errors));
       }
 
-      max_mem = rb_hash_aref(options, ID2SYM(rb_intern("max_mem")));
+      max_mem = rb_hash_aref(options, ID2SYM(id_max_mem));
       if (!NIL_P(max_mem)) {
         re2_options->set_max_mem(NUM2INT(max_mem));
       }
 
-      literal = rb_hash_aref(options, ID2SYM(rb_intern("literal")));
+      literal = rb_hash_aref(options, ID2SYM(id_literal));
       if (!NIL_P(literal)) {
         re2_options->set_literal(RTEST(literal));
       }
 
-      never_nl = rb_hash_aref(options, ID2SYM(rb_intern("never_nl")));
+      never_nl = rb_hash_aref(options, ID2SYM(id_never_nl));
       if (!NIL_P(never_nl)) {
         re2_options->set_never_nl(RTEST(never_nl));
       }
 
-      case_sensitive = rb_hash_aref(options, ID2SYM(rb_intern("case_sensitive")));
+      case_sensitive = rb_hash_aref(options, ID2SYM(id_case_sensitive));
       if (!NIL_P(case_sensitive)) {
         re2_options->set_case_sensitive(RTEST(case_sensitive));
       }
 
-      perl_classes = rb_hash_aref(options, ID2SYM(rb_intern("perl_classes")));
+      perl_classes = rb_hash_aref(options, ID2SYM(id_perl_classes));
       if (!NIL_P(perl_classes)) {
         re2_options->set_perl_classes(RTEST(perl_classes));
       }
 
-      word_boundary = rb_hash_aref(options, ID2SYM(rb_intern("word_boundary")));
+      word_boundary = rb_hash_aref(options, ID2SYM(id_word_boundary));
       if (!NIL_P(word_boundary)) {
         re2_options->set_word_boundary(RTEST(word_boundary));
       }
 
-      one_line = rb_hash_aref(options, ID2SYM(rb_intern("one_line")));
+      one_line = rb_hash_aref(options, ID2SYM(id_one_line));
       if (!NIL_P(one_line)) {
         re2_options->set_one_line(RTEST(one_line));
       }
@@ -174,7 +186,7 @@ extern "C" {
    *   re2.inspect    #=> "/woo?/"
    */
 
-  VALUE
+  static VALUE
   re2_inspect(VALUE self)
   {
     VALUE result = rb_str_buf_new(0);
@@ -198,7 +210,7 @@ extern "C" {
    *   re2.to_s    #=> "woo?"
    */
 
-  VALUE
+  static VALUE
   re2_to_s(VALUE self)
   {
     re2_pattern *p;
@@ -217,7 +229,7 @@ extern "C" {
    *   re2.ok?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_ok(VALUE self)
   {
     re2_pattern *p;
@@ -236,7 +248,7 @@ extern "C" {
    *   re2.utf8?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_utf8(VALUE self)
   {
     re2_pattern *p;
@@ -255,7 +267,7 @@ extern "C" {
    *   re2.posix_syntax?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_posix_syntax(VALUE self)
   {
     re2_pattern *p;
@@ -274,7 +286,7 @@ extern "C" {
    *   re2.longest_match?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_longest_match(VALUE self)
   {
     re2_pattern *p;
@@ -293,7 +305,7 @@ extern "C" {
    *   re2.log_errors?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_log_errors(VALUE self)
   {
     re2_pattern *p;
@@ -312,7 +324,7 @@ extern "C" {
    *   re2.max_mem    #=> 1024
    */
 
-  VALUE
+  static VALUE
   re2_max_mem(VALUE self)
   {
     re2_pattern *p;
@@ -331,7 +343,7 @@ extern "C" {
    *   re2.literal?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_literal(VALUE self)
   {
     re2_pattern *p;
@@ -350,7 +362,7 @@ extern "C" {
    *   re2.never_nl?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_never_nl(VALUE self)
   {
     re2_pattern *p;
@@ -369,7 +381,7 @@ extern "C" {
    *   re2.case_sensitive?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_case_sensitive(VALUE self)
   {
     re2_pattern *p;
@@ -387,7 +399,7 @@ extern "C" {
    *   re2 = RE2.new("woo?", :case_sensitive => true)
    *   re2.case_insensitive?    #=> false
    */
-  VALUE
+  static VALUE
   re2_case_insensitive(VALUE self)
   {
     return BOOL2RUBY(re2_case_sensitive(self) != Qtrue);
@@ -404,7 +416,7 @@ extern "C" {
    *   re2.perl_classes?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_perl_classes(VALUE self)
   {
     re2_pattern *p;
@@ -423,7 +435,7 @@ extern "C" {
    *   re2.word_boundary?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_word_boundary(VALUE self)
   {
     re2_pattern *p;
@@ -442,7 +454,7 @@ extern "C" {
    *   re2.one_line?    #=> true
    */
 
-  VALUE
+  static VALUE
   re2_one_line(VALUE self)
   {
     re2_pattern *p;
@@ -458,7 +470,7 @@ extern "C" {
    * error string.
    */
 
-  VALUE
+  static VALUE
   re2_error(VALUE self)
   {
     re2_pattern *p;
@@ -474,7 +486,7 @@ extern "C" {
    * the offending portion of the regexp.
    */
 
-  VALUE
+  static VALUE
   re2_error_arg(VALUE self)
   {
     re2_pattern *p;
@@ -491,7 +503,7 @@ extern "C" {
    * than smaller numbers.
    */
 
-  VALUE
+  static VALUE
   re2_program_size(VALUE self)
   {
     re2_pattern *p;
@@ -507,7 +519,7 @@ extern "C" {
    * +re2+.
    */
 
-  VALUE
+  static VALUE
   re2_options(VALUE self)
   {
     VALUE options;
@@ -516,37 +528,37 @@ extern "C" {
     Data_Get_Struct(self, re2_pattern, p);
     options = rb_hash_new();
 
-    rb_hash_aset(options, ID2SYM(rb_intern("utf8")),
+    rb_hash_aset(options, ID2SYM(id_utf8),
         BOOL2RUBY(p->pattern->options().utf8()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("posix_syntax")),
+    rb_hash_aset(options, ID2SYM(id_posix_syntax),
         BOOL2RUBY(p->pattern->options().posix_syntax()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("longest_match")),
+    rb_hash_aset(options, ID2SYM(id_longest_match),
         BOOL2RUBY(p->pattern->options().longest_match()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("log_errors")),
+    rb_hash_aset(options, ID2SYM(id_log_errors),
         BOOL2RUBY(p->pattern->options().log_errors()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("max_mem")),
+    rb_hash_aset(options, ID2SYM(id_max_mem),
         INT2FIX(p->pattern->options().max_mem()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("literal")),
+    rb_hash_aset(options, ID2SYM(id_literal),
         BOOL2RUBY(p->pattern->options().literal()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("never_nl")),
+    rb_hash_aset(options, ID2SYM(id_never_nl),
         BOOL2RUBY(p->pattern->options().never_nl()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("case_sensitive")),
+    rb_hash_aset(options, ID2SYM(id_case_sensitive),
         BOOL2RUBY(p->pattern->options().case_sensitive()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("perl_classes")),
+    rb_hash_aset(options, ID2SYM(id_perl_classes),
         BOOL2RUBY(p->pattern->options().perl_classes()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("word_boundary")),
+    rb_hash_aset(options, ID2SYM(id_word_boundary),
         BOOL2RUBY(p->pattern->options().word_boundary()));
 
-    rb_hash_aset(options, ID2SYM(rb_intern("one_line")),
+    rb_hash_aset(options, ID2SYM(id_one_line),
         BOOL2RUBY(p->pattern->options().one_line()));
 
     // This is a read-only hash after all...
@@ -564,7 +576,7 @@ extern "C" {
    * count: if the regexp is "(a)(b)", returns 2.
    */
 
-  VALUE
+  static VALUE
   re2_number_of_capturing_groups(VALUE self)
   {
     re2_pattern *p;
@@ -594,7 +606,7 @@ extern "C" {
    *   r.match('woo', 1) #=> ["woo", "o"]
    */
 
-  VALUE
+  static VALUE
   re2_match(int argc, VALUE *argv, VALUE self)
   {
     int n;
@@ -657,7 +669,7 @@ extern "C" {
    *   RE2::FullMatch("woo", re2)      #=> true
    */
 
-  VALUE
+  static VALUE
   re2_FullMatch(VALUE self, VALUE text, VALUE re)
   {
     bool result;
@@ -683,7 +695,7 @@ extern "C" {
    *   RE2::FullMatchN("woo", "w(oo)")   #=> ["oo"]
    */
 
-  VALUE
+  static VALUE
   re2_FullMatchN(VALUE self, VALUE text, VALUE re)
   {
     int n;
@@ -742,7 +754,7 @@ extern "C" {
    *   RE2::PartialMatchN("woo", "w(oo)")   #=> ["oo"]
    */
 
-  VALUE
+  static VALUE
   re2_PartialMatchN(VALUE self, VALUE text, VALUE re)
   {
     int n;
@@ -804,7 +816,7 @@ extern "C" {
    *   RE2::PartialMatch("woo", re2)      #=> true
    */
 
-  VALUE
+  static VALUE
   re2_PartialMatch(VALUE self, VALUE text, VALUE re)
   {
     bool result;
@@ -835,7 +847,7 @@ extern "C" {
    *   text                                          #=> "Good evening"
    */
 
-  VALUE
+  static VALUE
   re2_Replace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
   {
     VALUE repl;
@@ -877,7 +889,7 @@ extern "C" {
    *   text                                          #=> "Geeeed meerning"
    */
 
-  VALUE
+  static VALUE
   re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
   {
 
@@ -915,7 +927,7 @@ extern "C" {
    *   RE2::QuoteMeta("1.5-2.0?")    #=> "1\.5\-2\.0\?"
    */
 
-  VALUE
+  static VALUE
   re2_QuoteMeta(VALUE self, VALUE unquoted)
   {
     re2::StringPiece unquoted_as_string_piece(StringValuePtr(unquoted));
@@ -958,5 +970,20 @@ extern "C" {
     rb_define_singleton_method(re2_cRE2, "Replace", (VALUE (*)(...))re2_Replace, 3);
     rb_define_singleton_method(re2_cRE2, "GlobalReplace", (VALUE (*)(...))re2_GlobalReplace, 3);
     rb_define_singleton_method(re2_cRE2, "QuoteMeta", (VALUE (*)(...))re2_QuoteMeta, 1);
+    rb_define_global_function("RE2", (VALUE (*)(...))re2_re2, -1);
+
+    /* Create the symbols used in options. */
+    id_utf8 = rb_intern("utf8");
+    id_posix_syntax = rb_intern("posix_syntax");
+    id_longest_match = rb_intern("longest_match");
+    id_log_errors = rb_intern("log_errors");
+    id_max_mem = rb_intern("max_mem");
+    id_literal = rb_intern("literal");
+    id_never_nl = rb_intern("never_nl");
+    id_case_sensitive = rb_intern("case_sensitive");
+    id_perl_classes = rb_intern("perl_classes");
+    id_word_boundary = rb_intern("word_boundary");
+    id_one_line = rb_intern("one_line");
+    id_re2 = rb_intern("RE2");
   }
 }
