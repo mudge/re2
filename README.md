@@ -32,11 +32,11 @@ Then you can use the compiled library from the working directory with something 
 What currently works?
 ---------------------
 
-* Pre-compiling regular expressions with [`RE2.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96) or `RE2(re)` (including specifying options, e.g. `RE2.new("pattern", :case_sensitive => false)`
+* Pre-compiling regular expressions with [`RE2.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96), `RE2.compile(re)` or `RE2(re)` (including specifying options, e.g. `RE2.new("pattern", :case_sensitive => false)`
 
-  * Extracting matches with `re2.match(text)`
+  * Extracting matches with `re2.match(text)` (and an exact number of matches with `re2.match(text, number_of_matches)` such as `re2.match("123-234", 2)`)
 
-  * Checking for matches with `re2 =~ text` and `re2 !~ text`
+  * Checking for matches with `re2 =~ text`, `re2 === text` (for use in `case` statement) and `re2 !~ text`
 
   * Checking regular expression compilation with `re2.ok?`, `re2.error` and `re2.error_arg`
 
@@ -52,7 +52,7 @@ What currently works?
 
 * Performing in-place global replacement with [`RE2::GlobalReplace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#352)
 
-* Escaping regular expressions with [`RE2::QuoteMeta(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377)
+* Escaping regular expressions with [`RE2::QuoteMeta(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377), `RE2.escape(unquoted)` or `RE2.quote(unquoted)`
 
 re2.cc should be well-documented so feel free to consult this file to see what can currently be used.
 

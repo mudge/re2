@@ -44,8 +44,10 @@ extern "C" {
 
   /*
    * call-seq:
-   *   RE2(pattern)           -> re2
-   *   RE2(pattern, options)  -> re2
+   *   RE2(pattern)                  -> re2
+   *   RE2(pattern, options)         -> re2
+   *   RE2.compile(pattern)          -> re2
+   *   RE2.compile(pattern, options) -> re2
    *
    * Returns a new RE2 object with a compiled version of
    * +pattern+ stored inside. Equivalent to +RE2.new+.
@@ -405,6 +407,7 @@ extern "C" {
   /*
    * call-seq:
    *   re2.case_insensitive?    -> true or false
+   *   re2.casefold?            -> true or false
    *
    * Returns whether or not the regular expression +re2+
    * was compiled with the case_sensitive option set to false.
@@ -965,6 +968,8 @@ extern "C" {
   /*
    * call-seq:
    *   RE2::QuoteMeta(str)    -> str
+   *   RE2.escape(str)        -> str
+   *   RE2.quote(str)         -> str
    *
    * Returns a version of str with all potentially meaningful regexp
    * characters escaped. The returned string, used as a regular
@@ -995,6 +1000,7 @@ extern "C" {
     rb_define_method(re2_cRE2, "match", (VALUE (*)(...))re2_match, -1);
     rb_define_method(re2_cRE2, "match?", (VALUE (*)(...))re2_match_query, 1);
     rb_define_method(re2_cRE2, "=~", (VALUE (*)(...))re2_match_query, 1);
+    rb_define_method(re2_cRE2, "===", (VALUE (*)(...))re2_match_query, 1);
     rb_define_method(re2_cRE2, "!~", (VALUE (*)(...))re2_bang_tilde, 1);
     rb_define_method(re2_cRE2, "to_s", (VALUE (*)(...))re2_to_s, 0);
     rb_define_method(re2_cRE2, "to_str", (VALUE (*)(...))re2_to_s, 0);
@@ -1010,6 +1016,7 @@ extern "C" {
     rb_define_method(re2_cRE2, "never_nl?", (VALUE (*)(...))re2_never_nl, 0);
     rb_define_method(re2_cRE2, "case_sensitive?", (VALUE (*)(...))re2_case_sensitive, 0);
     rb_define_method(re2_cRE2, "case_insensitive?", (VALUE (*)(...))re2_case_insensitive, 0);
+    rb_define_method(re2_cRE2, "casefold?", (VALUE (*)(...))re2_case_insensitive, 0);
     rb_define_method(re2_cRE2, "perl_classes?", (VALUE (*)(...))re2_perl_classes, 0);
     rb_define_method(re2_cRE2, "word_boundary?", (VALUE (*)(...))re2_word_boundary, 0);
     rb_define_method(re2_cRE2, "one_line?", (VALUE (*)(...))re2_one_line, 0);
@@ -1020,6 +1027,9 @@ extern "C" {
     rb_define_singleton_method(re2_cRE2, "Replace", (VALUE (*)(...))re2_Replace, 3);
     rb_define_singleton_method(re2_cRE2, "GlobalReplace", (VALUE (*)(...))re2_GlobalReplace, 3);
     rb_define_singleton_method(re2_cRE2, "QuoteMeta", (VALUE (*)(...))re2_QuoteMeta, 1);
+    rb_define_singleton_method(re2_cRE2, "escape", (VALUE (*)(...))re2_QuoteMeta, 1);
+    rb_define_singleton_method(re2_cRE2, "quote", (VALUE (*)(...))re2_QuoteMeta, 1);
+    rb_define_singleton_method(re2_cRE2, "compile", (VALUE (*)(...))re2_re2, -1);
     rb_define_global_function("RE2", (VALUE (*)(...))re2_re2, -1);
 
     /* Create the symbols used in options. */

@@ -16,7 +16,10 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to RE2, :Replace
     assert_respond_to RE2, :GlobalReplace
     assert_respond_to RE2, :QuoteMeta
+    assert_respond_to RE2, :escape
+    assert_respond_to RE2, :quote
     assert_respond_to RE2, :new
+    assert_respond_to RE2, :compile
 
     r = RE2.new('woo')
     assert_respond_to r, :ok?
@@ -31,6 +34,7 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to r, :match
     assert_respond_to r, :match?
     assert_respond_to r, :=~
+    assert_respond_to r, :===
     assert_respond_to r, :number_of_capturing_groups
     assert_respond_to r, :utf8?
     assert_respond_to r, :posix_syntax?
@@ -41,6 +45,7 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to r, :never_nl?
     assert_respond_to r, :case_sensitive?
     assert_respond_to r, :case_insensitive?
+    assert_respond_to r, :casefold?
     assert_respond_to r, :perl_classes?
     assert_respond_to r, :word_boundary?
     assert_respond_to r, :one_line?
@@ -50,6 +55,12 @@ class RE2Test < Test::Unit::TestCase
 
   def test_global_re2
     r = RE2('w(o)(o)')
+    assert_kind_of RE2, r
+    assert_respond_to r, :ok?
+  end
+
+  def test_re2_compile
+    r = RE2.compile('w(o)(o)')
     assert_kind_of RE2, r
     assert_respond_to r, :ok?
   end
@@ -148,7 +159,10 @@ class RE2Test < Test::Unit::TestCase
     assert !RE2.new('bob').match?('woo')
     assert RE2.new('woo') =~ 'woo'
     assert !(RE2.new('bob') =~ 'woo')
+    assert !(RE2.new('woo') !~ 'woo')
     assert RE2.new('bob') !~ 'woo'
+    assert RE2.new('woo') === 'woo'
+    assert !(RE2.new('bob') === 'woo')
   end
 
   def test_matching_some_sub_patterns
@@ -164,6 +178,7 @@ class RE2Test < Test::Unit::TestCase
     assert RE2::FullMatch("WOO", r)
     assert !r.options[:case_sensitive]
     assert r.case_insensitive?
+    assert r.casefold?
     assert !r.case_sensitive?
     assert r.utf8?
     assert r.options[:utf8]
@@ -193,6 +208,8 @@ class RE2Test < Test::Unit::TestCase
 
   def test_quote_meta
     assert_equal "1\\.5\\-2\\.0\\?", RE2::QuoteMeta("1.5-2.0?")
+    assert_equal "1\\.5\\-2\\.0\\?", RE2.escape("1.5-2.0?")
+    assert_equal "1\\.5\\-2\\.0\\?", RE2.quote("1.5-2.0?")
   end
 
   def test_re2_error
