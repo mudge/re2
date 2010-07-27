@@ -36,7 +36,7 @@ What currently works?
 
   * Extracting matches with `re2.match(text)` (and an exact number of matches with `re2.match(text, number_of_matches)` such as `re2.match("123-234", 2)`)
 
-  * Checking for matches with `re2 =~ text`, `re2 === text` (for use in `case` statement) and `re2 !~ text`
+  * Checking for matches with `re2 =~ text`, `re2 === text` (for use in `case` statements) and `re2 !~ text`
 
   * Checking regular expression compilation with `re2.ok?`, `re2.error` and `re2.error_arg`
 
@@ -59,7 +59,7 @@ re2.cc should be well-documented so feel free to consult this file to see what c
 Why would I want to use this?
 ----------------------------
 
-To investigate [re2][]; be warned that not using a pre-compiled expression (viz. `RE2.new(pattern)`) will result in *worse* performance than Ruby's native regular expression library (see `re2_benchmark.rb` for rudimentary benchmarks).
+To investigate [re2][]; be warned that using `RE2::FullMatch` or `RE2::PartialMatch` without a pre-compiled expression (viz. `RE2.new(pattern)`) will result in *worse* performance than Ruby's native regular expression library (see `re2_benchmark.rb` for rudimentary benchmarks).
 
 What's wrong with [rre2][]?
 ---------------------------
