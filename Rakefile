@@ -7,7 +7,9 @@ rescue LoadError
   require 'rake/testtask'
 end
 
-Rake::ExtensionTask.new('re2')
+Rake::ExtensionTask.new('re2') do |e|
+  # e.config_options << "--with-re2-dir=/opt/local/re2"
+end
 
 Rake::TestTask.new do |t|
   t.test_files = FileList["test/*_test.rb"]

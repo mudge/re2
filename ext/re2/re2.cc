@@ -33,6 +33,9 @@ extern "C" {
   void
   re2_free(re2_pattern* self)
   {
+    if (self->pattern) {
+      delete self->pattern;
+    }
     free(self);
   }
 
