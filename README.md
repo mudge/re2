@@ -6,11 +6,11 @@ A Ruby binding to [re2][], an "efficient, principled regular expression library"
 Installation
 ------------
 
-You will need [re2][] installed in its default location of /usr/local as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this is provided by the [build-essential][] package).
+You will need [re2][] installed as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this is provided by the [build-essential][] package).
 
 If you are using a packaged Ruby distribution, make sure you also have the Ruby header files installed such as those provided by the [ruby-dev][] package on Debian and Ubuntu.
 
-You can then install the library via RubyGems: `gem install re2`
+You can then install the library via RubyGems with `gem install re2` or `gem install re2 -- --with-re2-dir=/opt/local/re2` if re2 is not installed in the default location of `/usr/local/`.
 
 Usage
 -----
