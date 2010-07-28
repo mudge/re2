@@ -170,6 +170,9 @@ class RE2Test < Test::Unit::TestCase
     assert_equal ["woo", "o"], RE2.new('w(o)(o)').match('woo', 1)
     assert_equal ["woo", "o", "o"], RE2.new('w(o)(o)').match('woo', 2)
     assert_equal ["woo", "o", "o", nil], RE2.new('w(o)(o)').match('woo', 3)
+    assert_equal ["w", nil], RE2.new('w(o)?(o)?').match('w', 1)
+    assert_equal ["w", nil, nil], RE2.new('w(o)?(o)?').match('w', 2)
+    assert_equal ["w", nil, nil, nil], RE2.new('w(o)?(o)?').match('w', 3)
   end
 
   def test_compiling_with_options

@@ -19,16 +19,16 @@ extern "C" {
   #  define RSTRING_LEN(x) (RSTRING(x)->len)
   #endif
 
-  typedef struct _re2p {
+  struct re2_pattern {
     RE2 *pattern;
-  } re2_pattern;
+  };
 
   VALUE re2_cRE2;
 
   /* Symbols used in RE2 options. */
   static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
-             id_max_mem, id_literal, id_never_nl, id_case_sensitive,
-             id_perl_classes, id_word_boundary, id_one_line;
+            id_max_mem, id_literal, id_never_nl, id_case_sensitive,
+            id_perl_classes, id_word_boundary, id_one_line;
 
   void
   re2_free(re2_pattern* self)
@@ -42,9 +42,8 @@ extern "C" {
   static VALUE
   re2_allocate(VALUE klass)
   {
-    re2_pattern *p = (re2_pattern*)malloc(sizeof(re2_pattern));
-    p->pattern = NULL;
-    return Data_Wrap_Struct(klass, 0, re2_free, p);
+    re2_pattern *p;
+    return Data_Make_Struct(klass, re2_pattern, 0, re2_free, p);
   }
 
   /*
@@ -202,7 +201,7 @@ extern "C" {
   static VALUE
   re2_inspect(VALUE self)
   {
-    VALUE result = rb_str_buf_new(0);
+    VALUE result = rb_str_buf_new(2);
     re2_pattern *p;
 
     rb_str_buf_cat2(result, "/");
