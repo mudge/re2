@@ -74,6 +74,18 @@ class RE2Test < Test::Unit::TestCase
     assert !RE2::FullMatch("woo", "wowzer")
   end
 
+  def test_full_match_with_compiled_pattern
+    r = RE2.new("woo")
+    assert RE2::FullMatch("woo", r)
+    assert !RE2::FullMatch("wowzer", r)
+
+    assert RE2::FullMatch("woo", RE2("woo"))
+    assert RE2::FullMatch("woo", RE2("wo+"))
+    assert RE2::FullMatch("woo", RE2("woo?"))
+    assert RE2::FullMatch("woo", RE2("wo{2}"))
+    assert !RE2::FullMatch("woo", RE2("wowzer"))
+  end
+
   def test_full_match_n
     assert_equal ["oo"], RE2::FullMatchN("woo", "w(oo)")
     assert_equal ["12"], RE2::FullMatchN("woo12w", 'woo(\d{2})w')
@@ -93,6 +105,17 @@ class RE2Test < Test::Unit::TestCase
     assert RE2::PartialMatch("woo", "oo?")
     assert RE2::PartialMatch("woo", "o{2}")
     assert !RE2::PartialMatch("woo", "ha")
+  end
+
+  def test_partial_match_with_compiled_pattern
+    r = RE2.new("woo")
+    assert RE2::PartialMatch("woo", r)
+    assert !RE2::PartialMatch("wowzer", r)
+
+    assert RE2::PartialMatch("woo", RE2("oo"))
+    assert RE2::PartialMatch("woo", RE2("oo?"))
+    assert RE2::PartialMatch("woo", RE2("o{2}"))
+    assert !RE2::PartialMatch("woo", RE2("ha"))
   end
 
   def test_partial_match_n
@@ -188,26 +211,24 @@ class RE2Test < Test::Unit::TestCase
     assert r.options[:utf8]
   end
 
-  def test_full_match_with_re2
-    r = RE2.new("woo")
-    assert RE2::FullMatch("woo", r)
-    assert !RE2::FullMatch("wowzer", r)
-  end
-
-  def test_partial_match_with_re2
-    r = RE2.new("woo")
-    assert RE2::PartialMatch("woo", r)
-    assert !RE2::PartialMatch("wowzer", r)
-  end
-
   def test_replace_with_re2
     r = RE2.new("wo{2}")
     assert_equal "miaow", RE2::Replace("woo", r, "miaow")
+
+    assert_equal "wao", RE2::Replace("woo", RE2("o"), "a")
+    assert_equal "hoo", RE2::Replace("woo", RE2("w"), "h")
+    assert_equal "we", RE2::Replace("woo", RE2("o+"), "e")
+    assert_equal "Good morning", RE2::Replace("hi", RE2("hih?"), "Good morning")
+    assert_equal "hi", RE2::Replace("Good morning", RE2("gOOD MORNING", :case_sensitive => false), "hi")
   end
 
   def test_global_replace_with_re2
     r = RE2.new("o")
     assert_equal "wii", RE2::GlobalReplace("woo", r, "i")
+
+    assert_equal "waa", RE2::GlobalReplace("woo", RE2("o"), "a")
+    assert_equal "hoo", RE2::GlobalReplace("woo", RE2("w"), "h")
+    assert_equal "we", RE2::GlobalReplace("woo", RE2("o+"), "e")
   end
 
   def test_quote_meta
