@@ -626,7 +626,12 @@ extern "C" {
     text_as_string_piece = new re2::StringPiece(StringValuePtr(text));
 
     if (n == 0) {
-      return BOOL2RUBY(p->pattern->Match(*text_as_string_piece, 0, RE2::UNANCHORED, 0, 0));
+      matched = p->pattern->Match(*text_as_string_piece, 0, RE2::UNANCHORED, 0, 0);
+
+      delete text_as_string_piece;
+
+      return BOOL2RUBY(matched);
+
     } else {
 
       /* Because match returns the whole match as well. */
@@ -635,6 +640,8 @@ extern "C" {
       string_matches = new re2::StringPiece[n];
 
       matched = p->pattern->Match(*text_as_string_piece, 0, RE2::UNANCHORED, string_matches, n);
+
+      delete text_as_string_piece;
 
       if (matched) {
         matches = rb_ary_new();
@@ -647,8 +654,13 @@ extern "C" {
           }
         }
 
+        delete[] string_matches;
+
         return matches;
       } else {
+
+        delete[] string_matches;
+
         return Qnil;
       }
     }
