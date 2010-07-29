@@ -123,7 +123,11 @@ extern "C" {
         rb_raise(rb_eArgError, "options should be a hash");
       }
 
-      re2_options = new RE2::Options();
+      re2_options = new (std::nothrow) RE2::Options();
+
+      if (re2_options == 0) {
+        rb_raise(rb_eNoMemError, "not enough memory to allocate RE2::Options");
+      }
 
       utf8 = rb_hash_aref(options, ID2SYM(id_utf8));
       if (!NIL_P(utf8)) {
@@ -180,9 +184,13 @@ extern "C" {
         re2_options->set_one_line(RTEST(one_line));
       }
 
-      p->pattern = new RE2(StringValuePtr(pattern), *re2_options);
+      p->pattern = new (std::nothrow) RE2(StringValuePtr(pattern), *re2_options);
     } else {
-      p->pattern = new RE2(StringValuePtr(pattern));
+      p->pattern = new (std::nothrow) RE2(StringValuePtr(pattern));
+    }
+
+    if (p->pattern == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
     }
 
     return self;
@@ -623,7 +631,11 @@ extern "C" {
       n = p->pattern->NumberOfCapturingGroups();
     }
 
-    text_as_string_piece = new re2::StringPiece(StringValuePtr(text));
+    text_as_string_piece = new (std::nothrow) re2::StringPiece(StringValuePtr(text));
+
+    if (text_as_string_piece == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate StringPiece for text");
+    }
 
     if (n == 0) {
       matched = p->pattern->Match(*text_as_string_piece, 0, RE2::UNANCHORED, 0, 0);
@@ -637,7 +649,11 @@ extern "C" {
       /* Because match returns the whole match as well. */
       n += 1;
 
-      string_matches = new re2::StringPiece[n];
+      string_matches = new (std::nothrow) re2::StringPiece[n];
+
+      if (string_matches == 0) {
+        rb_raise(rb_eNoMemError, "not enough memory to allocate array of StringPieces for matches");
+      }
 
       matched = p->pattern->Match(*text_as_string_piece, 0, RE2::UNANCHORED, string_matches, n);
 
@@ -740,7 +756,7 @@ extern "C" {
   {
     UNUSED(self);
     int n;
-    bool matched;
+    bool matched, re2_given;
     re2_pattern *p;
     VALUE matches;
     RE2 *compiled_pattern;
@@ -748,18 +764,36 @@ extern "C" {
     const RE2::Arg **args;
     std::string *string_matches;
 
-    if (rb_obj_is_kind_of(re, re2_cRE2)) {
+    re2_given = rb_obj_is_kind_of(re, re2_cRE2);
+
+    if (re2_given) {
       Data_Get_Struct(re, re2_pattern, p);
       compiled_pattern = p->pattern;
     } else {
-      compiled_pattern = new RE2(StringValuePtr(re));
+      compiled_pattern = new (std::nothrow) RE2(StringValuePtr(re));
+
+      if (compiled_pattern == 0) {
+        rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object for pattern");
+      }
     }
 
     n = compiled_pattern->NumberOfCapturingGroups();
 
-    argv = new RE2::Arg[n];
-    args = new const RE2::Arg*[n];
-    string_matches = new std::string[n];
+    argv = new (std::nothrow) RE2::Arg[n];
+    args = new (std::nothrow) const RE2::Arg*[n];
+    string_matches = new (std::nothrow) std::string[n];
+
+    if (argv == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate array of RE2::Args");
+    }
+
+    if (args == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate array of pointers to RE2::Args");
+    }
+
+    if (string_matches == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate array of strings for matches");
+    }
 
     for (int i = 0; i < n; i++) {
       args[i] = &argv[i];
@@ -767,6 +801,13 @@ extern "C" {
     }
 
     matched = RE2::FullMatchN(StringValuePtr(text), *compiled_pattern, args, n);
+
+    if (!re2_given) {
+      delete compiled_pattern;
+    }
+
+    delete[] argv;
+    delete[] args;
 
     if (matched) {
       matches = rb_ary_new();
@@ -779,8 +820,11 @@ extern "C" {
         }
       }
 
+      delete[] string_matches;
+
       return matches;
     } else {
+      delete[] string_matches;
       return Qnil;
     }
   }
@@ -799,7 +843,7 @@ extern "C" {
   {
     UNUSED(self);
     int n;
-    bool matched;
+    bool matched, re2_given;
     re2_pattern *p;
     VALUE matches;
     RE2 *compiled_pattern;
@@ -807,18 +851,36 @@ extern "C" {
     const RE2::Arg **args;
     std::string *string_matches;
 
-    if (rb_obj_is_kind_of(re, re2_cRE2)) {
+    re2_given = rb_obj_is_kind_of(re, re2_cRE2);
+
+    if (re2_given) {
       Data_Get_Struct(re, re2_pattern, p);
       compiled_pattern = p->pattern;
     } else {
-      compiled_pattern = new RE2(StringValuePtr(re));
+      compiled_pattern = new (std::nothrow) RE2(StringValuePtr(re));
+
+      if (compiled_pattern == 0) {
+        rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object for pattern");
+      }
     }
 
     n = compiled_pattern->NumberOfCapturingGroups();
 
-    argv = new RE2::Arg[n];
-    args = new const RE2::Arg*[n];
-    string_matches = new std::string[n];
+    argv = new (std::nothrow) RE2::Arg[n];
+    args = new (std::nothrow) const RE2::Arg*[n];
+    string_matches = new (std::nothrow) std::string[n];
+
+    if (argv == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate array of RE2::Args");
+    }
+
+    if (args == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate array of pointers to RE2::Args");
+    }
+
+    if (string_matches == 0) {
+      rb_raise(rb_eNoMemError, "not enough memory to allocate array of strings for matches");
+    }
 
     for (int i = 0; i < n; i++) {
       args[i] = &argv[i];
@@ -826,6 +888,13 @@ extern "C" {
     }
 
     matched = RE2::PartialMatchN(StringValuePtr(text), *compiled_pattern, args, n);
+
+    if (!re2_given) {
+      delete compiled_pattern;
+    }
+
+    delete[] argv;
+    delete[] args;
 
     if (matched) {
       matches = rb_ary_new();
@@ -838,8 +907,11 @@ extern "C" {
         }
       }
 
+      delete[] string_matches;
+
       return matches;
     } else {
+      delete[] string_matches;
       return Qnil;
     }
   }
