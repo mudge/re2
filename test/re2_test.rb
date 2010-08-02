@@ -10,19 +10,15 @@ require "test/unit"
 
 class RE2Test < Test::Unit::TestCase
   def test_interface
-    assert_respond_to RE2, :FullMatch
-    assert_respond_to RE2, :FullMatchN
-    assert_respond_to RE2, :PartialMatch
-    assert_respond_to RE2, :PartialMatchN
     assert_respond_to RE2, :Replace
     assert_respond_to RE2, :GlobalReplace
     assert_respond_to RE2, :QuoteMeta
-    assert_respond_to RE2, :escape
-    assert_respond_to RE2, :quote
-    assert_respond_to RE2, :new
-    assert_respond_to RE2, :compile
+    assert_respond_to RE2::Regexp, :escape
+    assert_respond_to RE2::Regexp, :quote
+    assert_respond_to RE2::Regexp, :new
+    assert_respond_to RE2::Regexp, :compile
 
-    r = RE2.new('woo')
+    r = RE2::Regexp.new('woo')
     assert_respond_to r, :ok?
     assert_respond_to r, :options
     assert_respond_to r, :error
@@ -56,80 +52,14 @@ class RE2Test < Test::Unit::TestCase
 
   def test_global_re2
     r = RE2('w(o)(o)')
-    assert_kind_of RE2, r
+    assert_kind_of RE2::Regexp, r
     assert_respond_to r, :ok?
   end
 
   def test_re2_compile
-    r = RE2.compile('w(o)(o)')
-    assert_kind_of RE2, r
+    r = RE2::Regexp.compile('w(o)(o)')
+    assert_kind_of RE2::Regexp, r
     assert_respond_to r, :ok?
-  end
-
-  def test_full_match
-    assert RE2::FullMatch("woo", "woo")
-    assert RE2::FullMatch("woo", "wo+")
-    assert RE2::FullMatch("woo", "woo?")
-    assert RE2::FullMatch("woo", "wo{2}")
-    assert !RE2::FullMatch("woo", "wowzer")
-  end
-
-  def test_full_match_with_compiled_pattern
-    r = RE2.new("woo")
-    assert RE2::FullMatch("woo", r)
-    assert !RE2::FullMatch("wowzer", r)
-
-    assert RE2::FullMatch("woo", RE2("woo"))
-    assert RE2::FullMatch("woo", RE2("wo+"))
-    assert RE2::FullMatch("woo", RE2("woo?"))
-    assert RE2::FullMatch("woo", RE2("wo{2}"))
-    assert !RE2::FullMatch("woo", RE2("wowzer"))
-  end
-
-  def test_full_match_n
-    assert_equal ["oo"], RE2::FullMatchN("woo", "w(oo)")
-    assert_equal ["12"], RE2::FullMatchN("woo12w", 'woo(\d{2})w')
-    assert_equal [nil, "1", "234"], RE2::FullMatchN("w1234", 'w(a?)(\d)(\d+)')
-    assert_nil RE2::FullMatchN("bob", 'w(\d+)')
-  end
-
-  def test_full_match_n_with_compiled_pattern
-    assert_equal ["oo"], RE2::FullMatchN("woo", RE2.new("w(oo)"))
-    assert_equal ["12"], RE2::FullMatchN("woo12w", RE2.new('woo(\d{2})w'))
-    assert_equal [nil, "1", "234"], RE2::FullMatchN("w1234", RE2.new('w(a?)(\d)(\d+)'))
-    assert_nil RE2::FullMatchN("bob", RE2.new('w(\d+)'))
-  end
-
-  def test_partial_match
-    assert RE2::PartialMatch("woo", "oo")
-    assert RE2::PartialMatch("woo", "oo?")
-    assert RE2::PartialMatch("woo", "o{2}")
-    assert !RE2::PartialMatch("woo", "ha")
-  end
-
-  def test_partial_match_with_compiled_pattern
-    r = RE2.new("woo")
-    assert RE2::PartialMatch("woo", r)
-    assert !RE2::PartialMatch("wowzer", r)
-
-    assert RE2::PartialMatch("woo", RE2("oo"))
-    assert RE2::PartialMatch("woo", RE2("oo?"))
-    assert RE2::PartialMatch("woo", RE2("o{2}"))
-    assert !RE2::PartialMatch("woo", RE2("ha"))
-  end
-
-  def test_partial_match_n
-    assert_equal ["oo"], RE2::PartialMatchN("awooa", "w(oo)")
-    assert_equal ["12"], RE2::PartialMatchN("awoo12wa", 'woo(\d{2})w')
-    assert_equal [nil, "1", "234"], RE2::PartialMatchN("aw1234a", 'w(a?)(\d)(\d+)')
-    assert_nil RE2::PartialMatchN("bob", 'w(\d+)')
-  end
-
-  def test_partial_match_n_with_compiled_pattern
-    assert_equal ["oo"], RE2::PartialMatchN("awooa", RE2.new("w(oo)"))
-    assert_equal ["12"], RE2::PartialMatchN("awoo12wa", RE2.new('woo(\d{2})w'))
-    assert_equal [nil, "1", "234"], RE2::PartialMatchN("aw1234a", RE2.new('w(a?)(\d)(\d+)'))
-    assert_nil RE2::PartialMatchN("bob", RE2.new('w(\d+)'))
   end
 
   def test_replace
@@ -159,50 +89,78 @@ class RE2Test < Test::Unit::TestCase
   end
 
   def test_compiling
-    r = RE2.new("woo")
+    r = RE2::Regexp.new("woo")
     assert r.ok?
-    assert_equal "/woo/", r.inspect
+    assert_equal "#<RE2::Regexp /woo/>", r.inspect
     assert_equal "woo", r.to_s
   end
 
   def test_number_of_capturing_groups
-    assert_equal 3, RE2.new('(a)(b)(c)').number_of_capturing_groups
-    assert_equal 0, RE2.new('abc').number_of_capturing_groups
-    assert_equal 2, RE2.new('a((b)c)').number_of_capturing_groups
+    assert_equal 3, RE2('(a)(b)(c)').number_of_capturing_groups
+    assert_equal 0, RE2('abc').number_of_capturing_groups
+    assert_equal 2, RE2('a((b)c)').number_of_capturing_groups
   end
 
   def test_matching_all_subpatterns
-    assert_equal ["woo", "o", "o"], RE2.new('w(o)(o)').match('woo')
-    assert_equal ["ab", nil, "a", "b"], RE2.new('(\d?)(a)(b)').match('ab')
+    assert_equal ["woo", "o", "o"], RE2('w(o)(o)').match('woo').to_a
+    assert_equal ["ab", nil, "a", "b"], RE2('(\d?)(a)(b)').match('ab').to_a
+  end
+
+  def test_matchdata
+    r = RE2('(\d+)')
+    text = "bob 123"
+    m = r.match(text)
+    assert_kind_of RE2::MatchData, m
+    assert_respond_to m, :string
+    assert_respond_to m, :size
+    assert_respond_to m, :length
+    assert_respond_to m, :regexp
+    assert_respond_to m, :to_a
+    assert_respond_to m, :[]
+    assert_equal r, m.regexp
+    assert_equal text, m.string
+    assert m.string.frozen?
+    assert_not_equal m.string.object_id, text.object_id
+    assert_equal '#<RE2::MatchData "123" 1:"123">', m.inspect
+    assert_equal "123", m.to_s
+    assert_equal "123", m[0]
+    assert_equal "123", m[1]
+    assert_equal ["123"], m[0, 1]
+    assert_equal ["123", "123"], m[0, 2]
+    assert_equal ["123"], m[0...1]
+    assert_equal ["123", "123"], m[0..1]
+    m1, m2 = *r.match(text)
+    assert_equal "123", m1
+    assert_equal "123", m2
   end
 
   def test_matching_no_subpatterns
-    assert RE2.new('woo').match('woo', 0)
-    assert !RE2.new('bob').match('woo', 0)
-    assert RE2.new('woo').match?('woo')
-    assert !RE2.new('bob').match?('woo')
-    assert RE2.new('woo') =~ 'woo'
-    assert !(RE2.new('bob') =~ 'woo')
-    assert !(RE2.new('woo') !~ 'woo')
-    assert RE2.new('bob') !~ 'woo'
-    assert RE2.new('woo') === 'woo'
-    assert !(RE2.new('bob') === 'woo')
+    assert RE2('woo').match('woo', 0)
+    assert !RE2('bob').match('woo', 0)
+    assert RE2('woo').match?('woo')
+    assert !RE2('bob').match?('woo')
+    assert RE2('woo') =~ 'woo'
+    assert !(RE2('bob') =~ 'woo')
+    assert !(RE2('woo') !~ 'woo')
+    assert RE2('bob') !~ 'woo'
+    assert RE2('woo') === 'woo'
+    assert !(RE2('bob') === 'woo')
   end
 
   def test_matching_some_sub_patterns
-    assert_equal ["woo", "o"], RE2.new('w(o)(o)').match('woo', 1)
-    assert_equal ["woo", "o", "o"], RE2.new('w(o)(o)').match('woo', 2)
-    assert_equal ["woo", "o", "o", nil], RE2.new('w(o)(o)').match('woo', 3)
-    assert_equal ["w", nil], RE2.new('w(o)?(o)?').match('w', 1)
-    assert_equal ["w", nil, nil], RE2.new('w(o)?(o)?').match('w', 2)
-    assert_equal ["w", nil, nil, nil], RE2.new('w(o)?(o)?').match('w', 3)
+    assert_equal ["woo", "o"], RE2('w(o)(o)').match('woo', 1).to_a
+    assert_equal ["woo", "o", "o"], RE2('w(o)(o)').match('woo', 2).to_a
+    assert_equal ["woo", "o", "o", nil], RE2('w(o)(o)').match('woo', 3).to_a
+    assert_equal ["w", nil], RE2('w(o)?(o)?').match('w', 1).to_a
+    assert_equal ["w", nil, nil], RE2('w(o)?(o)?').match('w', 2).to_a
+    assert_equal ["w", nil, nil, nil], RE2('w(o)?(o)?').match('w', 3).to_a
   end
 
   def test_compiling_with_options
-    r = RE2.new("woo", :case_sensitive => false)
+    r = RE2("woo", :case_sensitive => false)
     assert r.ok?
-    assert RE2::FullMatch("woo", r)
-    assert RE2::FullMatch("WOO", r)
+    assert r =~ "woo"
+    assert r =~ "WOO"
     assert !r.options[:case_sensitive]
     assert r.case_insensitive?
     assert r.casefold?
@@ -212,7 +170,7 @@ class RE2Test < Test::Unit::TestCase
   end
 
   def test_replace_with_re2
-    r = RE2.new("wo{2}")
+    r = RE2("wo{2}")
     assert_equal "miaow", RE2::Replace("woo", r, "miaow")
 
     assert_equal "wao", RE2::Replace("woo", RE2("o"), "a")
@@ -223,7 +181,7 @@ class RE2Test < Test::Unit::TestCase
   end
 
   def test_global_replace_with_re2
-    r = RE2.new("o")
+    r = RE2("o")
     assert_equal "wii", RE2::GlobalReplace("woo", r, "i")
 
     assert_equal "waa", RE2::GlobalReplace("woo", RE2("o"), "a")
@@ -233,18 +191,18 @@ class RE2Test < Test::Unit::TestCase
 
   def test_quote_meta
     assert_equal "1\\.5\\-2\\.0\\?", RE2::QuoteMeta("1.5-2.0?")
-    assert_equal "1\\.5\\-2\\.0\\?", RE2.escape("1.5-2.0?")
-    assert_equal "1\\.5\\-2\\.0\\?", RE2.quote("1.5-2.0?")
+    assert_equal "1\\.5\\-2\\.0\\?", RE2::Regexp.escape("1.5-2.0?")
+    assert_equal "1\\.5\\-2\\.0\\?", RE2::Regexp.quote("1.5-2.0?")
   end
 
   def test_re2_error
-    r = RE2.new("woo")
+    r = RE2("woo")
     assert_equal "", r.error
     assert_equal "", r.error_arg
   end
 
   def test_re2_error_with_error
-    r = RE2.new("wo(o", :log_errors => false)
+    r = RE2("wo(o", :log_errors => false)
     assert !r.ok?
     assert_equal "missing ): wo(o", r.error
     assert_equal "wo(o", r.error_arg
