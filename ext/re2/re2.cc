@@ -790,23 +790,25 @@ extern "C" {
 
   /*
    * call-seq:
-   *   re2.match(text)                 -> [match, match]
+   *   re2.match(text)                 -> RE2::MatchData
    *   re2.match(text, 0)              -> true or false
-   *   re2.match(text, num_of_matches) -> [match, match]
+   *   re2.match(text, num_of_matches) -> RE2::MatchData
    *
    * Looks for the pattern in +re2+ in +text+; when specified
-   * without a second argument, will return an array of the matching
-   * pattern and all subpatterns. If the second argument is 0, a
-   * simple true or false will be returned to indicate a successful
-   * match. If the second argument is any integer greater than 0,
-   * that number of matches will be returned (padded with nils if
-   * there are insufficient matches).
+   * without a second argument, will return an RE2::MatchData
+   * instance of the matching pattern and all subpatterns.
+   * If the second argument is 0, a simple true or false will
+   * be returned to indicate a successful match. If the second
+   * argument is any integer greater than 0, that number of
+   * matches will be returned (padded with nils if there are
+   * insufficient matches).
    *
    *   r = RE2::Regexp.new('w(o)(o)')
-   *   r.match('woo')    #=> ["woo", "o", "o"]
+   *   r.match('woo')    #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
    *   r.match('woo', 0) #=> true
    *   r.match('bob', 0) #=> false
-   *   r.match('woo', 1) #=> ["woo", "o"]
+   *   r.match('woo', 1) #=> #<RE2::MatchData "woo" 1:"o">
+   *   r.match('woo', 3) #=> #<RE2::MatchData "woo" 1:"o" 2:"o" 3:nil>
    */
   static VALUE
   re2_regexp_match(int argc, VALUE *argv, VALUE self)
