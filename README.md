@@ -15,7 +15,7 @@ You can then install the library via RubyGems with `gem install re2` or `gem ins
 Documentation
 -------------
 
-Full documentation is available at <http://mudge.github.com/re2/>
+Full documentation is available at <http://yardoc.org/docs/mudge-re2/>
 
 Usage
 -----
