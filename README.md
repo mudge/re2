@@ -12,6 +12,11 @@ If you are using a packaged Ruby distribution, make sure you also have the Ruby 
 
 You can then install the library via RubyGems with `gem install re2` or `gem install re2 -- --with-re2-dir=/opt/local/re2` if re2 is not installed in the default location of `/usr/local/`.
 
+Documentation
+-------------
+
+Full documentation is available at http://mudge.github.com/re2/
+
 Usage
 -----
 
@@ -55,12 +60,10 @@ Features
 
 * Escaping regular expressions with [`RE2::Regexp.escape(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377), `RE2::Regexp.quote(unquoted)` or `RE2::QuoteMeta(unquoted)`
 
-re2.cc should be well-documented so feel free to consult this file to see what can currently be used.
-
 Contact
 -------
 
-All feedback should go to the mailing list: ruby.re2@librelist.com
+All feedback should go to the mailing list: <ruby.re2@librelist.com>
 
   [re2]: http://code.google.com/p/re2/
   [gcc]: http://gcc.gnu.org/
