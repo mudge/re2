@@ -15,7 +15,7 @@ You can then install the library via RubyGems with `gem install re2` or `gem ins
 Documentation
 -------------
 
-Full documentation is available at <http://yardoc.org/docs/mudge-re2/>
+Full documentation automatically generated from the latest version is available at <http://rdoc.info/projects/mudge/re2> and <http://yardoc.org/docs/mudge-re2/>.
 
 Usage
 -----
@@ -71,4 +71,3 @@ All feedback should go to the mailing list: <mailto:ruby.re2@librelist.com>
   [build-essential]: http://packages.debian.org/build-essential
   [Regexp]: http://ruby-doc.org/core/classes/Regexp.html
   [MatchData]: http://ruby-doc.org/core/classes/MatchData.html 
-
