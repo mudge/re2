@@ -15,7 +15,7 @@ You can then install the library via RubyGems with `gem install re2` or `gem ins
 Documentation
 -------------
 
-Full documentation is available at http://mudge.github.com/re2/
+Full documentation is available at <http://mudge.github.com/re2/>
 
 Usage
 -----
@@ -63,7 +63,7 @@ Features
 Contact
 -------
 
-All feedback should go to the mailing list: <ruby.re2@librelist.com>
+All feedback should go to the mailing list: <mailto:ruby.re2@librelist.com>
 
   [re2]: http://code.google.com/p/re2/
   [gcc]: http://gcc.gnu.org/
