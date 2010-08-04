@@ -163,6 +163,10 @@ extern "C" {
   }
 
   /*
+   * Retrieve zero, one or more matches by index.
+   *
+   * @return [Array<String, nil>, String, Boolean]
+   *
    * @overload [](index)
    *   Access a particular match by index.
    *
@@ -275,6 +279,11 @@ extern "C" {
   }
 
   /*
+   * Returns a new {RE2::Regexp} object with a compiled version of
+   * +pattern+ stored inside.
+   *
+   * @return [RE2::Regexp]
+   *
    * @overload initialize(pattern)
    *   Returns a new {RE2::Regexp} object with a compiled version of
    *   +pattern+ stored inside with the default options.
@@ -759,6 +768,12 @@ extern "C" {
   }
 
   /*
+   * Match the pattern against the given +text+ and return either
+   * a boolean (if no submatches are required) or a {RE2::MatchData}
+   * instance.
+   *
+   * @return [Boolean, RE2::MatchData]
+   *
    * @overload match(text)
    *   Returns an {RE2::MatchData} containing the matching
    *   pattern and all subpatterns resulting from looking for
