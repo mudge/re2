@@ -119,6 +119,7 @@ class RE2Test < Test::Unit::TestCase
     assert_respond_to m, :[]
     assert_equal r, m.regexp
     assert_equal text, m.string
+    assert !text.frozen?
     assert m.string.frozen?
     assert_not_equal m.string.object_id, text.object_id
     assert_equal '#<RE2::MatchData "123" 1:"123">', m.inspect

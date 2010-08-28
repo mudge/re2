@@ -236,27 +236,27 @@ extern "C" {
 
     Data_Get_Struct(self, re2_matchdata, m);
 
-    result = rb_str_buf_new2("#<RE2::MatchData");
+    result = rb_str_new2("#<RE2::MatchData");
 
     for (i = 0; i < m->number_of_matches; i++) {
-      rb_str_buf_cat2(result, " ");
+      rb_str_cat2(result, " ");
 
       if (i > 0) {
         char buf[sizeof(i)*3+1];
         snprintf(buf, sizeof(buf), "%d", i);
-        rb_str_buf_cat2(result, buf);
-        rb_str_buf_cat2(result, ":");
+        rb_str_cat2(result, buf);
+        rb_str_cat2(result, ":");
       }
 
       match = re2_matchdata_nth_match(i, self);
 
       if (match == Qnil) {
-        rb_str_buf_cat2(result, "nil");
+        rb_str_cat2(result, "nil");
       } else {
-        rb_str_buf_append(result, rb_str_inspect(match));
+        rb_str_append(result, rb_str_inspect(match));
       }
     }
-    rb_str_buf_cat2(result, ">");
+    rb_str_cat2(result, ">");
 
     return result;
   }
@@ -409,11 +409,11 @@ extern "C" {
   re2_regexp_inspect(VALUE self)
   {
     re2_pattern *p;
-    VALUE result = rb_str_buf_new2("#<RE2::Regexp /");
+    VALUE result = rb_str_new2("#<RE2::Regexp /");
 
     Data_Get_Struct(self, re2_pattern, p);
-    rb_str_buf_cat2(result, p->pattern->pattern().c_str());
-    rb_str_buf_cat2(result, "/>");
+    rb_str_cat2(result, p->pattern->pattern().c_str());
+    rb_str_cat2(result, "/>");
 
     return result;
   }
