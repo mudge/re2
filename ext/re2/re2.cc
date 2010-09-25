@@ -142,7 +142,7 @@ extern "C" {
     int i;
     re2_matchdata *m;
     Data_Get_Struct(self, re2_matchdata, m);
-    VALUE array = rb_ary_new2(m->number_of_matches);
+    VALUE array = rb_ary_new();
     for (i = 0; i < m->number_of_matches; i++) {
       if (m->matches[i].empty()) {
         rb_ary_store(array, i, Qnil);
@@ -257,7 +257,7 @@ extern "C" {
       if (match == Qnil) {
         rb_str_cat2(result, "nil");
       } else {
-        rb_str_append(result, rb_inspect(match));
+        rb_str_cat2(result, RSTRING_PTR(rb_inspect(match)));
       }
     }
     rb_str_cat2(result, ">");
