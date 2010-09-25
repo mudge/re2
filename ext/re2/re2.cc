@@ -19,6 +19,10 @@ extern "C" {
   #  define RSTRING_LEN(x) (RSTRING(x)->len)
   #endif
 
+  #if !defined(RSTRING_PTR)
+  #  define RSTRING_PTR(x) (RSTRING(x)->ptr)
+  #endif
+
   typedef struct {
     RE2 *pattern;
   } re2_pattern;
@@ -253,7 +257,7 @@ extern "C" {
       if (match == Qnil) {
         rb_str_cat2(result, "nil");
       } else {
-        rb_str_append(result, rb_str_inspect(match));
+        rb_str_append(result, rb_inspect(match));
       }
     }
     rb_str_cat2(result, ">");
@@ -746,7 +750,7 @@ extern "C" {
         BOOL2RUBY(p->pattern->options().one_line()));
 
     /* This is a read-only hash after all... */
-    OBJ_FREEZE(options);
+    rb_obj_freeze(options);
 
     return options;
   }
@@ -844,7 +848,8 @@ extern "C" {
       Data_Get_Struct(matchdata, re2_matchdata, m);
       m->matches = new (std::nothrow) re2::StringPiece[n];
       m->regexp = self;
-      m->string = rb_str_dup_frozen(text);
+      m->string = rb_str_dup(text);
+      rb_str_freeze(m->string);
 
       if (m->matches == 0) {
         rb_raise(rb_eNoMemError, "not enough memory to allocate StringPieces for matches");
@@ -896,6 +901,10 @@ extern "C" {
   static VALUE
   re2_Replace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
   {
+
+    /* Look out for frozen strings. */
+    rb_check_frozen(str);
+
     UNUSED(self);
     VALUE repl;
     re2_pattern *p;
@@ -916,7 +925,10 @@ extern "C" {
     repl = rb_str_new(str_as_string.c_str(), str_as_string.length());
 
     /* Replace the original string with the replacement. */
-    rb_str_update(str, 0, RSTRING_LEN(str), repl);
+    if (RSTRING_LEN(str) != RSTRING_LEN(repl)) {
+      rb_str_resize(str, RSTRING_LEN(repl));
+    }
+    memcpy(RSTRING_PTR(str), RSTRING_PTR(repl), RSTRING_LEN(repl));
 
     return str;
   }
@@ -939,6 +951,10 @@ extern "C" {
   static VALUE
   re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
   {
+
+    /* Look out for frozen strings. */
+    rb_check_frozen(str);
+
     UNUSED(self);
 
     /* Convert all the inputs to be pumped into RE2::GlobalReplace. */
@@ -959,7 +975,10 @@ extern "C" {
     repl = rb_str_new(str_as_string.c_str(), str_as_string.length());
 
     /* Replace the original string with the replacement. */
-    rb_str_update(str, 0, RSTRING_LEN(str), repl);
+    if (RSTRING_LEN(str) != RSTRING_LEN(repl)) {
+      rb_str_resize(str, RSTRING_LEN(repl));
+    }
+    memcpy(RSTRING_PTR(str), RSTRING_PTR(repl), RSTRING_LEN(repl));
 
     return str;
   }

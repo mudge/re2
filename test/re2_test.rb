@@ -76,6 +76,16 @@ class RE2Test < Test::Unit::TestCase
     assert_equal name_id, name.object_id
   end
 
+  def test_replace_with_a_frozen_string
+    frozen_name = "Arnold".freeze
+    assert frozen_name.frozen?
+
+    # Ruby 1.9 raises a RuntimeError instead of a TypeError.
+    assert_raise TypeError, RuntimeError do
+      RE2::Replace(frozen_name, "o", "a")
+    end
+  end
+
   def test_global_replace
     assert_equal "waa", RE2::GlobalReplace("woo", "o", "a")
     assert_equal "hoo", RE2::GlobalReplace("woo", "w", "h")
@@ -86,6 +96,16 @@ class RE2Test < Test::Unit::TestCase
     assert_equal "wobewt", RE2::GlobalReplace(name, "(?i)R", "w")
     assert_equal "wobewt", name
     assert_equal name_id, name.object_id
+  end
+
+  def test_global_replace_with_a_frozen_string
+    frozen_name = "Arnold".freeze
+    assert frozen_name.frozen?
+
+    # Ruby 1.9 raises a RuntimeError instead of a TypeError.
+    assert_raise TypeError, RuntimeError do
+      RE2::GlobalReplace(frozen_name, "o", "a")
+    end
   end
 
   def test_compiling
