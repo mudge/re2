@@ -16,6 +16,10 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
+task :valgrind do
+  system "valgrind  --tool=memcheck --leak-check=full --show-reachable=no --num-callers=15 --track-fds=yes --workaround-gcc296-bugs=yes --max-stackframe=7304328 --dsymutil=yes --track-origins=yes --log-file=report.txt ruby test/leak.rb"
+end
+
 task :test => :compile
 task :default => :test
 

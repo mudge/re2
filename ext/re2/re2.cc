@@ -142,12 +142,12 @@ extern "C" {
     int i;
     re2_matchdata *m;
     Data_Get_Struct(self, re2_matchdata, m);
-    VALUE array = rb_ary_new();
+    VALUE array = rb_ary_new2(m->number_of_matches);
     for (i = 0; i < m->number_of_matches; i++) {
       if (m->matches[i].empty()) {
-        rb_ary_store(array, i, Qnil);
+        rb_ary_push(array, Qnil);
       } else {
-        rb_ary_store(array, i, rb_str_new2(m->matches[i].as_string().c_str()));
+        rb_ary_push(array, rb_str_new(m->matches[i].data(), m->matches[i].size()));
       }
     }
     return array;
@@ -162,7 +162,7 @@ extern "C" {
     if (nth >= m->number_of_matches || m->matches[nth].empty()) {
       return Qnil;
     } else {
-      return rb_str_new2(m->matches[nth].as_string().c_str());
+      return rb_str_new(m->matches[nth].data(), m->matches[nth].size());
     }
   }
 
@@ -240,27 +240,29 @@ extern "C" {
 
     Data_Get_Struct(self, re2_matchdata, m);
 
-    result = rb_str_new2("#<RE2::MatchData");
+    result = rb_str_new("#<RE2::MatchData", 16);
 
     for (i = 0; i < m->number_of_matches; i++) {
-      rb_str_cat2(result, " ");
+      rb_str_cat(result, " ", 1);
 
       if (i > 0) {
         char buf[sizeof(i)*3+1];
         snprintf(buf, sizeof(buf), "%d", i);
         rb_str_cat2(result, buf);
-        rb_str_cat2(result, ":");
+        rb_str_cat(result, ":", 1);
       }
 
       match = re2_matchdata_nth_match(i, self);
 
       if (match == Qnil) {
-        rb_str_cat2(result, "nil");
+        rb_str_cat(result, "nil", 3);
       } else {
-        rb_str_cat2(result, RSTRING_PTR(rb_inspect(match)));
+        rb_str_cat(result, "\"", 1);
+        rb_str_cat(result, RSTRING_PTR(match), RSTRING_LEN(match));
+        rb_str_cat(result, "\"", 1);
       }
     }
-    rb_str_cat2(result, ">");
+    rb_str_cat(result, ">", 1);
 
     return result;
   }
@@ -413,11 +415,11 @@ extern "C" {
   re2_regexp_inspect(VALUE self)
   {
     re2_pattern *p;
-    VALUE result = rb_str_new2("#<RE2::Regexp /");
+    VALUE result = rb_str_new("#<RE2::Regexp /", 15);
 
     Data_Get_Struct(self, re2_pattern, p);
-    rb_str_cat2(result, p->pattern->pattern().c_str());
-    rb_str_cat2(result, "/>");
+    rb_str_cat(result, p->pattern->pattern().data(), p->pattern->pattern().size());
+    rb_str_cat(result, "/>", 2);
 
     return result;
   }
@@ -435,7 +437,7 @@ extern "C" {
   {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return rb_str_new2(p->pattern->pattern().c_str());
+    return rb_str_new(p->pattern->pattern().data(), p->pattern->pattern().size());
   }
 
   /*
@@ -669,7 +671,7 @@ extern "C" {
   {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return rb_str_new2(p->pattern->error().c_str());
+    return rb_str_new(p->pattern->error().data(), p->pattern->error().size());
   }
 
   /*
@@ -683,7 +685,7 @@ extern "C" {
   {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return rb_str_new2(p->pattern->error_arg().c_str());
+    return rb_str_new(p->pattern->error_arg().data(), p->pattern->error_arg().size());
   }
 
   /*
@@ -998,7 +1000,8 @@ extern "C" {
   {
     UNUSED(self);
     re2::StringPiece unquoted_as_string_piece(StringValuePtr(unquoted));
-    return rb_str_new2(RE2::QuoteMeta(unquoted_as_string_piece).c_str());
+    std::string quoted_string = RE2::QuoteMeta(unquoted_as_string_piece);
+    return rb_str_new(quoted_string.data(), quoted_string.size());
   }
 
   void
