@@ -6,7 +6,9 @@ A Ruby binding to [re2][], an "efficient, principled regular expression library"
 Installation
 ------------
 
-You will need [re2][] installed as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this is provided by the [build-essential][] package).
+You will need at least [revision d9f8806c004d][d9f880] of [re2][] installed as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this is provided by the [build-essential][] package). If you are using Mac OS X, I recommend installing re2 with [Homebrew][] by running the following:
+
+    $ brew install re2
 
 If you are using a packaged Ruby distribution, make sure you also have the Ruby header files installed such as those provided by the [ruby-dev][] package on Debian and Ubuntu.
 
@@ -71,3 +73,5 @@ All feedback should go to the mailing list: <mailto:ruby.re2@librelist.com>
   [build-essential]: http://packages.debian.org/build-essential
   [Regexp]: http://ruby-doc.org/core/classes/Regexp.html
   [MatchData]: http://ruby-doc.org/core/classes/MatchData.html 
+  [d9f880]: http://code.google.com/p/re2/source/detail?spec=svnd9f8806c004d00cbfed45081afd591f78ab22818&r=d9f8806c004d00cbfed45081afd591f78ab22818
+  [Homebrew]: http://mxcl.github.com/homebrew
