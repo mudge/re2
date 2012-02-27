@@ -12,12 +12,18 @@ $CFLAGS << " -Wall -Wextra -funroll-loops"
 
 have_library("stdc++")
 if have_library("re2")
+
+  # Determine which version of re2 the user has installed.
+  # Revision d9f8806c004d added an `endpos` argument to the
+  # generic Match() function.
+  #
+  # To test for this, try to compile a simple program that uses
+  # the newer form of Match() and set a flag if it is successful.
   checking_for("RE2::Match() with endpos argument") do
-    with_cflags("-x c++") do
-      test_re2_match_signature = <<SRC
+    test_re2_match_signature = <<SRC
 #include <re2/re2.h>
 
-extern "C" int main() {
+int main() {
   RE2 pattern("test");
   re2::StringPiece *match;
   pattern.Match("test", 0, 0, RE2::UNANCHORED, match, 0);
@@ -25,9 +31,11 @@ extern "C" int main() {
   return 0;
 }
 SRC
-      if try_compile(test_re2_match_signature)
-        $defs.push("-DHAVE_ENDPOS_ARGUMENT")
-      end
+
+    # Pass -x c++ to force gcc to compile the test program
+    # as C++ (as it will end in .c by default).
+    if try_compile(test_re2_match_signature, "-x c++")
+      $defs.push("-DHAVE_ENDPOS_ARGUMENT")
     end
   end
 
