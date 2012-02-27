@@ -7,6 +7,8 @@
  */
 
 #include <re2/re2.h>
+#include <string>
+using namespace std;
 
 extern "C" {
 
@@ -30,7 +32,7 @@ extern "C" {
   typedef struct {
     re2::StringPiece *matches;
     int number_of_matches;
-    VALUE regexp, string;
+    VALUE regexp, text;
   } re2_matchdata;
 
   VALUE re2_mRE2, re2_cRegexp, re2_cMatchData;
@@ -43,7 +45,7 @@ extern "C" {
   void re2_matchdata_mark(re2_matchdata* self)
   {
     rb_gc_mark(self->regexp);
-    rb_gc_mark(self->string);
+    rb_gc_mark(self->text);
   }
 
   void re2_matchdata_free(re2_matchdata* self)
@@ -84,7 +86,7 @@ extern "C" {
     re2_matchdata *m;
     Data_Get_Struct(self, re2_matchdata, m);
 
-    return m->string;
+    return m->text;
   }
 
   /*
@@ -141,13 +143,16 @@ extern "C" {
   {
     int i;
     re2_matchdata *m;
+    re2::StringPiece match;
+
     Data_Get_Struct(self, re2_matchdata, m);
     VALUE array = rb_ary_new2(m->number_of_matches);
     for (i = 0; i < m->number_of_matches; i++) {
       if (m->matches[i].empty()) {
         rb_ary_push(array, Qnil);
       } else {
-        rb_ary_push(array, rb_str_new(m->matches[i].data(), m->matches[i].size()));
+        match = m->matches[i];
+        rb_ary_push(array, rb_str_new(match.data(), match.size()));
       }
     }
     return array;
@@ -157,17 +162,42 @@ extern "C" {
   re2_matchdata_nth_match(int nth, VALUE self)
   {
     re2_matchdata *m;
-    Data_Get_Struct(self, re2_matchdata, m);
+    re2::StringPiece match;
 
-    if (nth >= m->number_of_matches || m->matches[nth].empty()) {
+    Data_Get_Struct(self, re2_matchdata, m);
+    match = m->matches[nth];
+
+    if (nth >= m->number_of_matches || match.empty()) {
       return Qnil;
     } else {
-      return rb_str_new(m->matches[nth].data(), m->matches[nth].size());
+      return rb_str_new(match.data(), match.size());
+    }
+  }
+
+  static VALUE
+  re2_matchdata_named_match(const char* name, VALUE self)
+  {
+    int idx;
+    re2_matchdata *m;
+    re2_pattern *p;
+    map<string, int> groups;
+    string name_as_string(name);
+
+    Data_Get_Struct(self, re2_matchdata, m);
+    Data_Get_Struct(m->regexp, re2_pattern, p);
+
+    groups = p->pattern->NamedCapturingGroups();
+
+    if (groups.count(name_as_string) == 1) {
+      idx = groups[name_as_string];
+      return re2_matchdata_nth_match(idx, self);
+    } else {
+      return Qnil;
     }
   }
 
   /*
-   * Retrieve zero, one or more matches by index.
+   * Retrieve zero, one or more matches by index or name.
    *
    * @return [Array<String, nil>, String, Boolean]
    *
@@ -198,6 +228,16 @@ extern "C" {
    *   @example
    *     m = RE2('(\d+)').match("bob 123")
    *     m[0..1]    #=> "[123", "123"]
+   *
+   * @overload [](name)
+   *   Access a particular match by name.
+   *
+   *   @param [String, Symbol] name the name of the match to fetch
+   *   @return [String, nil] the specific match
+   *   @example
+   *     m = RE2('(?P<number>\d+)').match("bob 123")
+   *     m["number"] #=> "123"
+   *     m[:number]  #=> "123"
    */
   static VALUE
   re2_matchdata_aref(int argc, VALUE *argv, VALUE self)
@@ -205,7 +245,11 @@ extern "C" {
     VALUE idx, rest;
     rb_scan_args(argc, argv, "11", &idx, &rest);
 
-    if (!NIL_P(rest) || !FIXNUM_P(idx) || FIX2INT(idx) < 0) {
+    if (TYPE(idx) == T_STRING) {
+      return re2_matchdata_named_match(StringValuePtr(idx), self);
+    } else if (TYPE(idx) == T_SYMBOL) {
+      return re2_matchdata_named_match(rb_id2name(SYM2ID(idx)), self);
+    } else if (!NIL_P(rest) || !FIXNUM_P(idx) || FIX2INT(idx) < 0) {
       return rb_ary_aref(argc, argv, re2_matchdata_to_a(self));
     } else {
       return re2_matchdata_nth_match(FIX2INT(idx), self);
@@ -391,9 +435,9 @@ extern "C" {
         re2_options.set_one_line(RTEST(one_line));
       }
 
-      p->pattern = new (std::nothrow) RE2(StringValuePtr(pattern), re2_options);
+      p->pattern = new (nothrow) RE2(StringValuePtr(pattern), re2_options);
     } else {
-      p->pattern = new (std::nothrow) RE2(StringValuePtr(pattern));
+      p->pattern = new (nothrow) RE2(StringValuePtr(pattern));
     }
 
     if (p->pattern == 0) {
@@ -774,6 +818,32 @@ extern "C" {
   }
 
   /*
+   * Returns a hash of names to capturing indices of groups.
+   *
+   * @return [Hash] a hash of names to capturing indices
+   */
+  static VALUE
+  re2_regexp_named_capturing_groups(VALUE self)
+  {
+    VALUE capturing_groups;
+    re2_pattern *p;
+    map<string, int> groups;
+    map<string, int>::iterator iterator;
+
+    Data_Get_Struct(self, re2_pattern, p);
+    groups = p->pattern->NamedCapturingGroups();
+    capturing_groups = rb_hash_new();
+
+    for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
+      rb_hash_aset(capturing_groups,
+          rb_str_new(iterator->first.data(), iterator->first.size()),
+          INT2FIX(iterator->second));
+    }
+
+    return capturing_groups;
+  }
+
+  /*
    * Match the pattern against the given +text+ and return either
    * a boolean (if no submatches are required) or a {RE2::MatchData}
    * instance.
@@ -836,13 +906,11 @@ extern "C" {
       n = p->pattern->NumberOfCapturingGroups();
     }
 
-    re2::StringPiece text_as_string_piece(StringValuePtr(text));
-
     if (n == 0) {
 #if defined(HAVE_ENDPOS_ARGUMENT)
-      matched = p->pattern->Match(text_as_string_piece, 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
+      matched = p->pattern->Match(StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
 #else
-      matched = p->pattern->Match(text_as_string_piece, 0, RE2::UNANCHORED, 0, 0);
+      matched = p->pattern->Match(StringValuePtr(text), 0, RE2::UNANCHORED, 0, 0);
 #endif
       return BOOL2RUBY(matched);
     } else {
@@ -852,10 +920,10 @@ extern "C" {
 
       matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
       Data_Get_Struct(matchdata, re2_matchdata, m);
-      m->matches = new (std::nothrow) re2::StringPiece[n];
+      m->matches = new (nothrow) re2::StringPiece[n];
       m->regexp = self;
-      m->string = rb_str_dup(text);
-      rb_str_freeze(m->string);
+      m->text = rb_str_dup(text);
+      rb_str_freeze(m->text);
 
       if (m->matches == 0) {
         rb_raise(rb_eNoMemError, "not enough memory to allocate StringPieces for matches");
@@ -864,9 +932,9 @@ extern "C" {
       m->number_of_matches = n;
 
 #if defined(HAVE_ENDPOS_ARGUMENT)
-      matched = p->pattern->Match(text_as_string_piece, 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, m->matches, n);
+      matched = p->pattern->Match(StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, m->matches, n);
 #else
-      matched = p->pattern->Match(text_as_string_piece, 0, RE2::UNANCHORED, m->matches, n);
+      matched = p->pattern->Match(StringValuePtr(text), 0, RE2::UNANCHORED, m->matches, n);
 #endif
 
       if (matched) {
@@ -920,19 +988,18 @@ extern "C" {
     re2_pattern *p;
 
     /* Convert all the inputs to be pumped into RE2::Replace. */
-    std::string str_as_string(StringValuePtr(str));
-    re2::StringPiece rewrite_as_string_piece(StringValuePtr(rewrite));
+    string str_as_string(StringValuePtr(str));
 
     /* Do the replacement. */
     if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
       Data_Get_Struct(pattern, re2_pattern, p);
-      RE2::Replace(&str_as_string, *p->pattern, rewrite_as_string_piece);
+      RE2::Replace(&str_as_string, *p->pattern, StringValuePtr(rewrite));
     } else {
-      RE2::Replace(&str_as_string, StringValuePtr(pattern), rewrite_as_string_piece);
+      RE2::Replace(&str_as_string, StringValuePtr(pattern), StringValuePtr(rewrite));
     }
 
     /* Save the replacement as a VALUE. */
-    repl = rb_str_new(str_as_string.c_str(), str_as_string.length());
+    repl = rb_str_new(str_as_string.data(), str_as_string.size());
 
     /* Replace the original string with the replacement. */
     if (RSTRING_LEN(str) != RSTRING_LEN(repl)) {
@@ -969,20 +1036,19 @@ extern "C" {
 
     /* Convert all the inputs to be pumped into RE2::GlobalReplace. */
     re2_pattern *p;
-    std::string str_as_string(StringValuePtr(str));
-    re2::StringPiece rewrite_as_string_piece(StringValuePtr(rewrite));
+    string str_as_string(StringValuePtr(str));
     VALUE repl;
 
     /* Do the replacement. */
     if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
       Data_Get_Struct(pattern, re2_pattern, p);
-      RE2::GlobalReplace(&str_as_string, *p->pattern, rewrite_as_string_piece);
+      RE2::GlobalReplace(&str_as_string, *p->pattern, StringValuePtr(rewrite));
     } else {
-      RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern), rewrite_as_string_piece);
+      RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern), StringValuePtr(rewrite));
     }
 
     /* Save the replacement as a VALUE. */
-    repl = rb_str_new(str_as_string.c_str(), str_as_string.length());
+    repl = rb_str_new(str_as_string.data(), str_as_string.size());
 
     /* Replace the original string with the replacement. */
     if (RSTRING_LEN(str) != RSTRING_LEN(repl)) {
@@ -1007,8 +1073,7 @@ extern "C" {
   re2_QuoteMeta(VALUE self, VALUE unquoted)
   {
     UNUSED(self);
-    re2::StringPiece unquoted_as_string_piece(StringValuePtr(unquoted));
-    std::string quoted_string = RE2::QuoteMeta(unquoted_as_string_piece);
+    string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
     return rb_str_new(quoted_string.data(), quoted_string.size());
   }
 
@@ -1038,6 +1103,7 @@ extern "C" {
     rb_define_method(re2_cRegexp, "program_size", RUBY_METHOD_FUNC(re2_regexp_program_size), 0);
     rb_define_method(re2_cRegexp, "options", RUBY_METHOD_FUNC(re2_regexp_options), 0);
     rb_define_method(re2_cRegexp, "number_of_capturing_groups", RUBY_METHOD_FUNC(re2_regexp_number_of_capturing_groups), 0);
+    rb_define_method(re2_cRegexp, "named_capturing_groups", RUBY_METHOD_FUNC(re2_regexp_named_capturing_groups), 0);
     rb_define_method(re2_cRegexp, "match", RUBY_METHOD_FUNC(re2_regexp_match), -1);
     rb_define_method(re2_cRegexp, "match?", RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
     rb_define_method(re2_cRegexp, "=~", RUBY_METHOD_FUNC(re2_regexp_match_query), 1);

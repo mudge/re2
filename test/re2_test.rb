@@ -121,9 +121,42 @@ class RE2Test < Test::Unit::TestCase
     assert_equal 2, RE2('a((b)c)').number_of_capturing_groups
   end
 
+  def test_named_capturing_groups
+    assert_equal(1, RE2('(?P<bob>a)').named_capturing_groups["bob"])
+    assert_equal(1, RE2('(?P<bob>a)(o)(?P<rob>e)').named_capturing_groups["bob"])
+    assert_equal(3, RE2('(?P<bob>a)(o)(?P<rob>e)').named_capturing_groups["rob"])
+  end
+
   def test_matching_all_subpatterns
     assert_equal ["woo", "o", "o"], RE2('w(o)(o)').match('woo').to_a
     assert_equal ["ab", nil, "a", "b"], RE2('(\d?)(a)(b)').match('ab').to_a
+  end
+
+  def test_fetching_matchdata_out_of_range
+    matchdata = RE2('(\d+)').match('bob 123')
+    assert_nil matchdata[2]
+    assert_nil matchdata[3]
+  end
+
+  def test_accessing_matches_by_name
+    matchdata = RE2('(?P<numbers>\d+)').match("bob 123")
+    assert_equal "123", matchdata["numbers"]
+    assert_equal "123", matchdata[:numbers]
+  end
+
+  def test_accessing_matches_by_name_with_multiple_groups
+    matchdata = RE2('(?P<name>\w+)(\s*)(?P<numbers>\d+)').match("bob 123")
+    assert_equal "bob", matchdata["name"]
+    assert_equal "bob", matchdata[:name]
+    assert_equal " ", matchdata[2]
+    assert_equal "123", matchdata["numbers"]
+    assert_equal "123", matchdata[:numbers]
+  end
+
+  def test_accessing_matches_by_incorrect_names
+    matchdata = RE2('(?P<numbers>\d+)').match("bob 123")
+    assert_nil matchdata["missing"]
+    assert_nil matchdata[:missing]
   end
 
   def test_matchdata
@@ -146,6 +179,7 @@ class RE2Test < Test::Unit::TestCase
     assert_equal "123", m.to_s
     assert_equal "123", m[0]
     assert_equal "123", m[1]
+    assert_nil m[4]
     assert_equal ["123"], m[0, 1]
     assert_equal ["123", "123"], m[0, 2]
     assert_equal ["123"], m[0...1]
