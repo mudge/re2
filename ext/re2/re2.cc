@@ -839,7 +839,11 @@ extern "C" {
     re2::StringPiece text_as_string_piece(StringValuePtr(text));
 
     if (n == 0) {
+#if defined(HAVE_ENDPOS_ARGUMENT)
       matched = p->pattern->Match(text_as_string_piece, 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
+#else
+      matched = p->pattern->Match(text_as_string_piece, 0, RE2::UNANCHORED, 0, 0);
+#endif
       return BOOL2RUBY(matched);
     } else {
 
@@ -859,7 +863,11 @@ extern "C" {
 
       m->number_of_matches = n;
 
+#if defined(HAVE_ENDPOS_ARGUMENT)
       matched = p->pattern->Match(text_as_string_piece, 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, m->matches, n);
+#else
+      matched = p->pattern->Match(text_as_string_piece, 0, RE2::UNANCHORED, m->matches, n);
+#endif
 
       if (matched) {
         return matchdata;
