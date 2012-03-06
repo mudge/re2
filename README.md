@@ -75,11 +75,11 @@ Features
 
 * Checking the options for an expression with `re2.options` or individually with `re2.case_sensitive?`
 
-* Performing in-place replacement with [`RE2::Replace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#335)
+* Performing in-place replacement with [`RE2.Replace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#335)
 
-* Performing in-place global replacement with [`RE2::GlobalReplace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#352)
+* Performing in-place global replacement with [`RE2.GlobalReplace(str, pattern, replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#352)
 
-* Escaping regular expressions with [`RE2::Regexp.escape(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377), `RE2::Regexp.quote(unquoted)` or `RE2::QuoteMeta(unquoted)`
+* Escaping regular expressions with [`RE2::Regexp.escape(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377), `RE2::Regexp.quote(unquoted)` or `RE2.QuoteMeta(unquoted)`
 
 Contact
 -------
