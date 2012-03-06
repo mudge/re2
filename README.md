@@ -30,33 +30,63 @@ Usage
 
 You can use re2 as a mostly drop-in replacement for Ruby's own [Regexp][] and [MatchData][] classes:
 
-    $ irb -rubygems
-    > require 're2'
-    > r = RE2::Regexp.compile('w(\d)(\d+)')
-     => #<RE2::Regexp /w(\d)(\d+)/>
-    > m = r.match("w1234")
-     => #<RE2::MatchData "w1234" 1:"1" 2:"234">
-    > m[1]
-     => "1"
-    > m.string
-     => "w1234"
-    > r =~ "w1234"
-     => true
-    > r !~ "bob"
-     => true
-    > r.match("bob")
-     => nil
+```console
+$ irb -rubygems
+> require 're2'
+> r = RE2::Regexp.compile('w(\d)(\d+)')
+=> #<RE2::Regexp /w(\d)(\d+)/>
+> m = r.match("w1234")
+=> #<RE2::MatchData "w1234" 1:"1" 2:"234">
+> m[1]
+=> "1"
+> m.string
+=> "w1234"
+> r =~ "w1234"
+=> true
+> r !~ "bob"
+=> true
+> r.match("bob")
+=> nil
+```
 
 As of 0.3.0, you can use named groups:
 
-    > r = RE2::Regexp.compile('(?P<name>\w+) (?P<age>\d+)')
-     => #<RE2::Regexp /(?P<name>\w+) (?P<age>\d+)/>
-    > m = r.match("Bob 40")
-     => #<RE2::MatchData "Bob 40" 1:"Bob" 2:"40">
-    > m[:name]
-     => "Bob"
-    > m["age"]
-     => "40"
+```console
+> r = RE2::Regexp.compile('(?P<name>\w+) (?P<age>\d+)')
+=> #<RE2::Regexp /(?P<name>\w+) (?P<age>\d+)/>
+> m = r.match("Bob 40")
+=> #<RE2::MatchData "Bob 40" 1:"Bob" 2:"40">
+> m[:name]
+=> "Bob"
+> m["age"]
+=> "40"
+```
+
+As of 0.4.0, you can mix `RE2::String` into strings to provide helpers from the opposite direction:
+
+```console
+> require "re2/string"
+> string = "My name is Robert Paulson"
+=> "My name is Robert Paulson"
+> string.extend(RE2::String)
+=> "My name is Robert Paulson"
+> string.re2_sub("Robert", "Dave")
+=> "My name is Dave Paulson"
+> string.re2_gsub("a", "e")
+=> "My neme is Deve Peulson"
+> string.re2_match('D(\S+)')
+=> #<RE2::MatchData "Deve" 1:"eve">
+> string.re2_escape
+=> "My\\ neme\\ is\\ Deve\\ Peulson"
+```
+
+If you want these available to all strings, you can simply reopen `String`:
+
+```ruby
+class String
+  include RE2::String
+end
+```
 
 Features
 --------

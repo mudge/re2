@@ -86,7 +86,7 @@ extern "C" {
    *
    * @return [String] a frozen copy of the passed string.
    * @example
-   *   m = RE2('(\d+)').match("bob 123")
+   *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.string  #=> "bob 123"
    */
   static VALUE
@@ -103,7 +103,7 @@ extern "C" {
    *
    * @return [Fixnum] the number of elements
    * @example
-   *   m = RE2('(\d+)').match("bob 123")
+   *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.size      #=> 2
    *   m.length    #=> 2
    */
@@ -121,7 +121,7 @@ extern "C" {
    *
    * @return [RE2::Regexp] the regexp used in the match
    * @example
-   *   m = RE2('(\d+)').match("bob 123")
+   *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.regexp    #=> #<RE2::Regexp /(\d+)/>
    */
   static VALUE
@@ -144,7 +144,7 @@ extern "C" {
    *
    * @return [Array<String, nil>] the array of matches
    * @example
-   *   m = RE2('(\d+)').match("bob 123")
+   *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.to_a    #=> ["123", "123"]
    */
   static VALUE
@@ -219,7 +219,7 @@ extern "C" {
    *   @param [Fixnum] index the index of the match to fetch
    *   @return [String, nil] the specified match
    *   @example
-   *     m = RE2('(\d+)').match("bob 123")
+   *     m = RE2::Regexp.new('(\d+)').match("bob 123")
    *     m[0]    #=> "123"
    *
    * @overload [](start, length)
@@ -229,7 +229,7 @@ extern "C" {
    *   @param [Fixnum] length the number of elements to fetch
    *   @return [Array<String, nil>] the specified matches
    *   @example
-   *     m = RE2('(\d+)').match("bob 123")
+   *     m = RE2::Regexp.new('(\d+)').match("bob 123")
    *     m[0, 1]    #=> ["123"]
    *
    * @overload [](range)
@@ -238,7 +238,7 @@ extern "C" {
    *   @param [Range] range the range of match indexes to fetch
    *   @return [Array<String, nil>] the specified matches
    *   @example
-   *     m = RE2('(\d+)').match("bob 123")
+   *     m = RE2::Regexp.new('(\d+)').match("bob 123")
    *     m[0..1]    #=> "[123", "123"]
    *
    * @overload [](name)
@@ -247,7 +247,7 @@ extern "C" {
    *   @param [String, Symbol] name the name of the match to fetch
    *   @return [String, nil] the specific match
    *   @example
-   *     m = RE2('(?P<number>\d+)').match("bob 123")
+   *     m = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
    *     m["number"] #=> "123"
    *     m[:number]  #=> "123"
    */
@@ -284,7 +284,7 @@ extern "C" {
    *
    * @return [String] a printable version of the match
    * @example
-   *   m = RE2('(\d+)').match("bob 123")
+   *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.inspect    #=> "#<RE2::MatchData \"123\" 1:\"123\">"
    */
   static VALUE
@@ -884,7 +884,7 @@ extern "C" {
    *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
    *   @example
    *     r = RE2::Regexp.new('w(o)(o)')
-   *     r.match('woo)    #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
+   *     r.match('woo')    #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
    *
    * @overload match(text, 0)
    *   Returns either true or false indicating whether a
@@ -984,6 +984,7 @@ extern "C" {
    * @param [String] str the string to modify
    * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
    * @param [String] rewrite the string to replace with
+   * @return [String] the resulting string
    * @example
    *   RE2.Replace("hello there", "hello", "howdy") #=> "howdy there"
    *   re2 = RE2.new("hel+o")
@@ -1033,6 +1034,7 @@ extern "C" {
    * @param [String] str the string to modify
    * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
    * @param [String] rewrite the string to replace with
+   * @return [String] the resulting string
    * @example
    *   RE2.GlobalReplace("hello there", "e", "i")   #=> "hillo thiri"
    *   re2 = RE2.new("oo?")
