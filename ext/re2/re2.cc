@@ -2,12 +2,13 @@
  * re2 (http://github.com/mudge/re2)
  * Ruby bindings to re2, an "efficient, principled regular expression library"
  *
- * Copyright (c) 2010, Paul Mucur (http://mucur.name)
+ * Copyright (c) 2010-2012, Paul Mucur (http://mudge.name)
  * Released under the BSD Licence, please see LICENSE.txt
  */
 
 #include <re2/re2.h>
 #include <string>
+#include <sstream>
 using namespace std;
 
 extern "C" {
@@ -17,12 +18,20 @@ extern "C" {
   #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
   #define UNUSED(x) ((void)x)
 
-  #if !defined(RSTRING_LEN)
-  #  define RSTRING_LEN(x) (RSTRING(x)->len)
+  #ifndef RSTRING_LEN
+    #define RSTRING_LEN(x) (RSTRING(x)->len)
   #endif
 
-  #if !defined(RSTRING_PTR)
-  #  define RSTRING_PTR(x) (RSTRING(x)->ptr)
+  #ifndef RSTRING_PTR
+    #define RSTRING_PTR(x) (RSTRING(x)->ptr)
+  #endif
+
+  #ifdef HAVE_ENDPOS_ARGUMENT
+    #define match(pattern, text, startpos, endpos, anchor, match, nmatch) \
+            (pattern->Match(text, startpos, endpos, anchor, match, nmatch))
+  #else
+    #define match(pattern, text, startpos, endpos, anchor, match, nmatch) \
+            (pattern->Match(text, startpos, anchor, match, nmatch))
   #endif
 
   typedef struct {
@@ -144,9 +153,11 @@ extern "C" {
     int i;
     re2_matchdata *m;
     re2::StringPiece match;
+    VALUE array;
 
     Data_Get_Struct(self, re2_matchdata, m);
-    VALUE array = rb_ary_new2(m->number_of_matches);
+
+    array = rb_ary_new2(m->number_of_matches);
     for (i = 0; i < m->number_of_matches; i++) {
       if (m->matches[i].empty()) {
         rb_ary_push(array, Qnil);
@@ -155,6 +166,7 @@ extern "C" {
         rb_ary_push(array, rb_str_new(match.data(), match.size()));
       }
     }
+
     return array;
   }
 
@@ -281,32 +293,33 @@ extern "C" {
     int i;
     re2_matchdata *m;
     VALUE match, result;
+    ostringstream output;
 
     Data_Get_Struct(self, re2_matchdata, m);
 
     result = rb_str_new("#<RE2::MatchData", 16);
 
+    output << "#<RE2::MatchData";
+
     for (i = 0; i < m->number_of_matches; i++) {
-      rb_str_cat(result, " ", 1);
+      output << " ";
 
       if (i > 0) {
-        char buf[sizeof(i)*3+1];
-        snprintf(buf, sizeof(buf), "%d", i);
-        rb_str_cat2(result, buf);
-        rb_str_cat(result, ":", 1);
+        output << i << ":";
       }
 
       match = re2_matchdata_nth_match(i, self);
 
       if (match == Qnil) {
-        rb_str_cat(result, "nil", 3);
+        output << "nil";
       } else {
-        rb_str_cat(result, "\"", 1);
-        rb_str_cat(result, RSTRING_PTR(match), RSTRING_LEN(match));
-        rb_str_cat(result, "\"", 1);
+        output << "\"" << StringValuePtr(match) << "\"";
       }
     }
-    rb_str_cat(result, ">", 1);
+
+    output << ">";
+
+    result = rb_str_new(output.str().data(), output.str().length());
 
     return result;
   }
@@ -459,11 +472,14 @@ extern "C" {
   re2_regexp_inspect(VALUE self)
   {
     re2_pattern *p;
-    VALUE result = rb_str_new("#<RE2::Regexp /", 15);
+    VALUE result;
+    ostringstream output;
 
     Data_Get_Struct(self, re2_pattern, p);
-    rb_str_cat(result, p->pattern->pattern().data(), p->pattern->pattern().size());
-    rb_str_cat(result, "/>", 2);
+
+    output << "#<RE2::Regexp /" << p->pattern->pattern() << "/>";
+
+    result = rb_str_new(output.str().data(), output.str().length());
 
     return result;
   }
@@ -706,30 +722,38 @@ extern "C" {
 
   /*
    * If the RE2 could not be created properly, returns an
-   * error string.
+   * error string otherwise returns nil.
    *
-   * @return [String] the error string
+   * @return [String, nil] the error string or nil
    */
   static VALUE
   re2_regexp_error(VALUE self)
   {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return rb_str_new(p->pattern->error().data(), p->pattern->error().size());
+    if (p->pattern->ok()) {
+      return Qnil;
+    } else {
+      return rb_str_new(p->pattern->error().data(), p->pattern->error().size());
+    }
   }
 
   /*
    * If the RE2 could not be created properly, returns
-   * the offending portion of the regexp.
+   * the offending portion of the regexp otherwise returns nil.
    *
-   * @return [String] the offending portion of the regexp
+   * @return [String, nil] the offending portion of the regexp or nil
    */
   static VALUE
   re2_regexp_error_arg(VALUE self)
   {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return rb_str_new(p->pattern->error_arg().data(), p->pattern->error_arg().size());
+    if (p->pattern->ok()) {
+      return Qnil;
+    } else {
+      return rb_str_new(p->pattern->error_arg().data(), p->pattern->error_arg().size());
+    }
   }
 
   /*
@@ -907,11 +931,7 @@ extern "C" {
     }
 
     if (n == 0) {
-#if defined(HAVE_ENDPOS_ARGUMENT)
-      matched = p->pattern->Match(StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
-#else
-      matched = p->pattern->Match(StringValuePtr(text), 0, RE2::UNANCHORED, 0, 0);
-#endif
+      matched = match(p->pattern, StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
       return BOOL2RUBY(matched);
     } else {
 
@@ -931,11 +951,7 @@ extern "C" {
 
       m->number_of_matches = n;
 
-#if defined(HAVE_ENDPOS_ARGUMENT)
-      matched = p->pattern->Match(StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, m->matches, n);
-#else
-      matched = p->pattern->Match(StringValuePtr(text), 0, RE2::UNANCHORED, m->matches, n);
-#endif
+      matched = match(p->pattern, StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, m->matches, n);
 
       if (matched) {
         return matchdata;
@@ -969,11 +985,11 @@ extern "C" {
    * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
    * @param [String] rewrite the string to replace with
    * @example
-   *   RE2::Replace("hello there", "hello", "howdy") #=> "howdy there"
+   *   RE2.Replace("hello there", "hello", "howdy") #=> "howdy there"
    *   re2 = RE2.new("hel+o")
-   *   RE2::Replace("hello there", re2, "yo")        #=> "yo there"
+   *   RE2.Replace("hello there", re2, "yo")        #=> "yo there"
    *   text = "Good morning"
-   *   RE2::Replace(text, "morn", "even")            #=> "Good evening"
+   *   RE2.Replace(text, "morn", "even")            #=> "Good evening"
    *   text                                          #=> "Good evening"
    */
   static VALUE
@@ -1018,11 +1034,11 @@ extern "C" {
    * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
    * @param [String] rewrite the string to replace with
    * @example
-   *   RE2::GlobalReplace("hello there", "e", "i")   #=> "hillo thiri"
+   *   RE2.GlobalReplace("hello there", "e", "i")   #=> "hillo thiri"
    *   re2 = RE2.new("oo?")
-   *   RE2::GlobalReplace("whoops-doops", re2, "e")  #=> "wheps-deps"
+   *   RE2.GlobalReplace("whoops-doops", re2, "e")  #=> "wheps-deps"
    *   text = "Good morning"
-   *   RE2::GlobalReplace(text, "o", "ee")           #=> "Geeeed meerning"
+   *   RE2.GlobalReplace(text, "o", "ee")           #=> "Geeeed meerning"
    *   text                                          #=> "Geeeed meerning"
    */
   static VALUE

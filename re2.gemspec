@@ -14,6 +14,13 @@ Gem::Specification.new do |s|
     "README.md",
     "Rakefile"
   ]
-  s.test_files = ["test/re2_test.rb"]
+  s.test_files = [
+    "spec/spec_helper.rb",
+    "spec/re2_spec.rb",
+    "spec/kernel_spec.rb",
+    "spec/re2/regexp_spec.rb",
+    "spec/re2/match_data_spec.rb"
+  ]
   s.add_development_dependency("rake-compiler")
+  s.add_development_dependency("minitest")
 end
