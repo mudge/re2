@@ -33,7 +33,7 @@ You can use re2 as a mostly drop-in replacement for Ruby's own [Regexp][] and [M
 ```console
 $ irb -rubygems
 > require 're2'
-> r = RE2::Regexp.compile('w(\d)(\d+)')
+> r = RE2::Regexp.new('w(\d)(\d+)')
 => #<RE2::Regexp /w(\d)(\d+)/>
 > m = r.match("w1234")
 => #<RE2::MatchData "w1234" 1:"1" 2:"234">
@@ -49,10 +49,24 @@ $ irb -rubygems
 => nil
 ```
 
+As `RE2::Regexp.new` (or `RE2::Regexp.compile`) can be quite verbose, a helper method has been defined against `Kernel` so you can use a shorter version to create regular expressions:
+
+```console
+> RE2('(\d+)')
+=> #<RE2::Regexp /(\d+)/>
+```
+
+Note the use of *single quotes* as double quotes will interpret `\d` as `d` as in the following example:
+
+```console
+> RE2("(\d+)")
+=> #<RE2::Regexp /(d+)/>
+```
+
 As of 0.3.0, you can use named groups:
 
 ```console
-> r = RE2::Regexp.compile('(?P<name>\w+) (?P<age>\d+)')
+> r = RE2::Regexp.new('(?P<name>\w+) (?P<age>\d+)')
 => #<RE2::Regexp /(?P<name>\w+) (?P<age>\d+)/>
 > m = r.match("Bob 40")
 => #<RE2::MatchData "Bob 40" 1:"Bob" 2:"40">
@@ -80,7 +94,7 @@ As of 0.4.0, you can mix `RE2::String` into strings to provide helpers from the 
 => "My\\ neme\\ is\\ Deve\\ Peulson"
 ```
 
-If you want these available to all strings, you can simply reopen `String`:
+If you want these available to all strings, you can reopen `String` like so:
 
 ```ruby
 class String
