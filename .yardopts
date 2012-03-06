@@ -1,1 +1,3 @@
---title "RE2: Ruby bindings to re2" "ext/**/*.cc"
+--title "RE2: Ruby bindings to re2"
+ext/**/*.cc
+lib/**/*.rb

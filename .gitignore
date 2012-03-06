@@ -6,3 +6,5 @@ mkmf.log
 conftest.dSYM
 tmp
 *.gem
+.yardoc
+doc
