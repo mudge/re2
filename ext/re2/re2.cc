@@ -177,12 +177,17 @@ extern "C" {
     re2::StringPiece match;
 
     Data_Get_Struct(self, re2_matchdata, m);
-    match = m->matches[nth];
 
-    if (nth >= m->number_of_matches || match.empty()) {
+    if (nth < 0 || nth >= m->number_of_matches) {
       return Qnil;
     } else {
-      return rb_str_new(match.data(), match.size());
+      match = m->matches[nth];
+
+      if (match.empty()) {
+        return Qnil;
+      } else {
+        return rb_str_new(match.data(), match.size());
+      }
     }
   }
 
