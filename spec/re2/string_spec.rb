@@ -11,7 +11,7 @@ describe RE2::String do
       "My name is Robert Paulson".re2_sub!('Robert', 'Crobert').must_equal("My name is Crobert Paulson")
     end
 
-    it "doe perform an in-place replacement" do
+    it "does perform an in-place replacement" do
       string = "My name is Robert Paulson"
       string.re2_sub!('Robert', 'Crobert').must_be_same_as(string)
     end
@@ -22,7 +22,7 @@ describe RE2::String do
       "My name is Robert Paulson".re2_gsub!('a', 'e').must_equal("My neme is Robert Peulson")
     end
 
-    it "doe perform an in-place replacement" do
+    it "does perform an in-place replacement" do
       string = "My name is Robert Paulson"
       string.re2_gsub!('a', 'e').must_be_same_as(string)
     end
