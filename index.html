@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>re2 by mudge</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>re2</h1>
+        <p>Ruby bindings to re2, an &quot;efficient, principled regular expression library&quot;.</p>
+        <p class="view"><a href="https://github.com/mudge/re2">View the Project on GitHub <small>mudge/re2</small></a></p>
+        <ul>
+          <li><a href="https://github.com/mudge/re2/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mudge/re2/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mudge/re2">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><a href="http://travis-ci.org/mudge/re2"><img src="https://secure.travis-ci.org/mudge/re2.png?branch=master" alt="Build Status"></a></p>
+
+<h3>Installation</h3>
+
+<p>You will need <a href="http://code.google.com/p/re2/">re2</a> installed as well as a C++ compiler such as <a href="http://gcc.gnu.org/">gcc</a> (on Debian and Ubuntu, this is provided by the <a href="http://packages.debian.org/build-essential">build-essential</a> package). If you are using Mac OS X, I recommend installing re2 with <a href="http://mxcl.github.com/homebrew">Homebrew</a> by running the following:</p>
+
+<pre><code>$ brew install --HEAD re2
+</code></pre>
+
+<p>If you are using Debian, you can install the <a href="http://packages.debian.org/search?keywords=libre2-dev">libre2-dev</a> package like so:</p>
+
+<pre><code>$ sudo apt-get install libre2-dev
+</code></pre>
+
+<p>If you are using a packaged Ruby distribution, make sure you also have the Ruby header files installed such as those provided by the <a href="http://packages.debian.org/ruby-dev">ruby-dev</a> package on Debian and Ubuntu.</p>
+
+<p>You can then install the library via RubyGems with <code>gem install re2</code> or <code>gem install re2 -- --with-re2-dir=/opt/local/re2</code> if re2 is not installed in the default location of <code>/usr/local/</code>.</p>
+
+<h3>Documentation</h3>
+
+<p>Full documentation automatically generated from the latest version is available at <a href="http://rubydoc.info/github/mudge/re2">http://rubydoc.info/github/mudge/re2</a>.</p>
+
+<p>Bear in mind that re2's regular expression syntax differs from PCRE, see the <a href="http://code.google.com/p/re2/wiki/Syntax">official syntax page</a> for more details.</p>
+
+<h3>Usage</h3>
+
+<p>You can use re2 as a mostly drop-in replacement for Ruby's own <a href="http://ruby-doc.org/core/classes/Regexp.html">Regexp</a> and <a href="http://ruby-doc.org/core/classes/MatchData.html">MatchData</a> classes:</p>
+
+<div class="highlight">
+<pre><span class="gp">$</span> irb -rubygems
+<span class="gp">&gt;</span> require <span class="s1">'re2'</span>
+<span class="gp">&gt;</span> <span class="nv">r</span> <span class="o">=</span> RE2::Regexp.new<span class="o">(</span><span class="s1">'w(\d)(\d+)'</span><span class="o">)</span>
+<span class="go">=&gt; #&lt;RE2::Regexp /w(\d)(\d+)/&gt;</span>
+<span class="gp">&gt;</span> <span class="nv">m</span> <span class="o">=</span> r.match<span class="o">(</span><span class="s2">"w1234"</span><span class="o">)</span>
+<span class="go">=&gt; #&lt;RE2::MatchData "w1234" 1:"1" 2:"234"&gt;</span>
+<span class="gp">&gt;</span> m<span class="o">[</span>1<span class="o">]</span>
+<span class="go">=&gt; "1"</span>
+<span class="gp">&gt;</span> m.string
+<span class="go">=&gt; "w1234"</span>
+<span class="gp">&gt;</span> <span class="nv">r</span> <span class="o">=</span>~ <span class="s2">"w1234"</span>
+<span class="go">=&gt; true</span>
+<span class="gp">&gt;</span> r !~ <span class="s2">"bob"</span>
+<span class="go">=&gt; true</span>
+<span class="gp">&gt;</span> r.match<span class="o">(</span><span class="s2">"bob"</span><span class="o">)</span>
+<span class="go">=&gt; nil</span>
+</pre>
+</div>
+
+
+<p>As <code>RE2::Regexp.new</code> (or <code>RE2::Regexp.compile</code>) can be quite verbose, a helper method has been defined against <code>Kernel</code> so you can use a shorter version to create regular expressions:</p>
+
+<div class="highlight">
+<pre><span class="gp">&gt;</span> RE2<span class="o">(</span><span class="s1">'(\d+)'</span><span class="o">)</span>
+<span class="go">=&gt; #&lt;RE2::Regexp /(\d+)/&gt;</span>
+</pre>
+</div>
+
+
+<p>Note the use of <em>single quotes</em> as double quotes will interpret <code>\d</code> as <code>d</code> as in the following example:</p>
+
+<div class="highlight">
+<pre><span class="gp">&gt;</span> RE2<span class="o">(</span><span class="s2">"(\d+)"</span><span class="o">)</span>
+<span class="go">=&gt; #&lt;RE2::Regexp /(d+)/&gt;</span>
+</pre>
+</div>
+
+
+<p>As of 0.3.0, you can use named groups:</p>
+
+<div class="highlight">
+<pre><span class="gp">&gt;</span> <span class="nv">r</span> <span class="o">=</span> RE2::Regexp.new<span class="o">(</span><span class="s1">'(?P&lt;name&gt;\w+) (?P&lt;age&gt;\d+)'</span><span class="o">)</span>
+<span class="go">=&gt; #&lt;RE2::Regexp /(?P&lt;name&gt;\w+) (?P&lt;age&gt;\d+)/&gt;</span>
+<span class="gp">&gt;</span> <span class="nv">m</span> <span class="o">=</span> r.match<span class="o">(</span><span class="s2">"Bob 40"</span><span class="o">)</span>
+<span class="go">=&gt; #&lt;RE2::MatchData "Bob 40" 1:"Bob" 2:"40"&gt;</span>
+<span class="gp">&gt;</span> m<span class="o">[</span>:name<span class="o">]</span>
+<span class="go">=&gt; "Bob"</span>
+<span class="gp">&gt;</span> m<span class="o">[</span><span class="s2">"age"</span><span class="o">]</span>
+<span class="go">=&gt; "40"</span>
+</pre>
+</div>
+
+
+<p>As of 0.4.0, you can mix <code>RE2::String</code> into strings to provide helpers from the opposite direction:</p>
+
+<div class="highlight">
+<pre><span class="gp">&gt;</span> require <span class="s2">"re2/string"</span>
+<span class="gp">&gt;</span> <span class="nv">string</span> <span class="o">=</span> <span class="s2">"My name is Robert Paulson"</span>
+<span class="go">=&gt; "My name is Robert Paulson"</span>
+<span class="gp">&gt;</span> string.extend<span class="o">(</span>RE2::String<span class="o">)</span>
+<span class="go">=&gt; "My name is Robert Paulson"</span>
+<span class="gp">&gt;</span> string.re2_sub<span class="o">(</span><span class="s2">"Robert"</span>, <span class="s2">"Dave"</span><span class="o">)</span>
+<span class="go">=&gt; "My name is Dave Paulson"</span>
+<span class="gp">&gt;</span> string.re2_gsub<span class="o">(</span><span class="s2">"a"</span>, <span class="s2">"e"</span><span class="o">)</span>
+<span class="go">=&gt; "My neme is Deve Peulson"</span>
+<span class="gp">&gt;</span> string.re2_match<span class="o">(</span><span class="s1">'D(\S+)'</span><span class="o">)</span>
+<span class="go">=&gt; #&lt;RE2::MatchData "Deve" 1:"eve"&gt;</span>
+<span class="gp">&gt;</span> string.re2_escape
+<span class="go">=&gt; "My\\ neme\\ is\\ Deve\\ Peulson"</span>
+</pre>
+</div>
+
+
+<p>If you want these available to all strings, you can reopen <code>String</code> like so:</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">String</span>
+  <span class="kp">include</span> <span class="no">RE2</span><span class="o">::</span><span class="nb">String</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<h3>Features</h3>
+
+<ul>
+<li><p>Pre-compiling regular expressions with <a href="http://code.google.com/p/re2/source/browse/re2/re2.h#96"><code>RE2::Regexp.new(re)</code></a>, <code>RE2::Regexp.compile(re)</code> or <code>RE2(re)</code> (including specifying options, e.g. <code>RE2::Regexp.new("pattern", :case_sensitive =&gt; false)</code></p></li>
+<li><p>Extracting matches with <code>re2.match(text)</code> (and an exact number of matches with <code>re2.match(text, number_of_matches)</code> such as <code>re2.match("123-234", 2)</code>)</p></li>
+<li><p>Extracting matches by name (both with strings and symbols)</p></li>
+<li><p>Checking for matches with <code>re2 =~ text</code>, <code>re2 === text</code> (for use in <code>case</code> statements) and <code>re2 !~ text</code></p></li>
+<li><p>Checking regular expression compilation with <code>re2.ok?</code>, <code>re2.error</code> and <code>re2.error_arg</code></p></li>
+<li><p>Checking regular expression "cost" with <code>re2.program_size</code></p></li>
+<li><p>Checking the options for an expression with <code>re2.options</code> or individually with <code>re2.case_sensitive?</code></p></li>
+<li><p>Performing in-place replacement with <a href="http://code.google.com/p/re2/source/browse/re2/re2.h#335"><code>RE2.Replace(str, pattern, replace)</code></a></p></li>
+<li><p>Performing in-place global replacement with <a href="http://code.google.com/p/re2/source/browse/re2/re2.h#352"><code>RE2.GlobalReplace(str, pattern, replace)</code></a></p></li>
+<li><p>Escaping regular expressions with <a href="http://code.google.com/p/re2/source/browse/re2/re2.h#377"><code>RE2::Regexp.escape(unquoted)</code></a>, <code>RE2::Regexp.quote(unquoted)</code> or <code>RE2.QuoteMeta(unquoted)</code></p></li>
+</ul><h3>Contact</h3>
+
+<p>All feedback should go to the mailing list: <a href="mailto:ruby.re2@librelist.com">ruby.re2@librelist.com</a></p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mudge">mudge</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
