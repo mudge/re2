@@ -7,7 +7,5 @@ rvm:
   - rbx-18mode
   - rbx-19mode
 before_install:
-  - hg clone https://re2.googlecode.com/hg re2
-  - cd re2
-  - sudo make install
-  - cd ..
+  - wget https://dl.dropbox.com/u/2175127/libre2-dev_2013.01.14_i386.deb
+  - sudo dpkg -i libre2-dev_2013.01.14_i386.deb
