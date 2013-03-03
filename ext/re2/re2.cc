@@ -7,14 +7,15 @@
  */
 
 #include <re2/re2.h>
+#include <ruby.h>
 #include <string>
 #include <sstream>
-using namespace std;
+using std::string;
+using std::ostringstream;
+using std::nothrow;
+using std::map;
 
 extern "C" {
-
-  #include <ruby.h>
-
   #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
   #define UNUSED(x) ((void)x)
 
@@ -51,34 +52,29 @@ extern "C" {
             id_max_mem, id_literal, id_never_nl, id_case_sensitive,
             id_perl_classes, id_word_boundary, id_one_line;
 
-  void re2_matchdata_mark(re2_matchdata* self)
-  {
+  void re2_matchdata_mark(re2_matchdata* self) {
     rb_gc_mark(self->regexp);
     rb_gc_mark(self->text);
   }
 
-  void re2_matchdata_free(re2_matchdata* self)
-  {
+  void re2_matchdata_free(re2_matchdata* self) {
     if (self->matches) {
       delete[] self->matches;
     }
     free(self);
   }
 
-  void
-  re2_regexp_free(re2_pattern* self)
-  {
+  void re2_regexp_free(re2_pattern* self) {
     if (self->pattern) {
       delete self->pattern;
     }
     free(self);
   }
 
-  static VALUE
-  re2_matchdata_allocate(VALUE klass)
-  {
+  static VALUE re2_matchdata_allocate(VALUE klass) {
     re2_matchdata *m;
-    return Data_Make_Struct(klass, re2_matchdata, re2_matchdata_mark, re2_matchdata_free, m);
+    return Data_Make_Struct(klass, re2_matchdata, re2_matchdata_mark,
+                            re2_matchdata_free, m);
   }
 
   /*
@@ -89,9 +85,7 @@ extern "C" {
    *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.string  #=> "bob 123"
    */
-  static VALUE
-  re2_matchdata_string(VALUE self)
-  {
+  static VALUE re2_matchdata_string(VALUE self) {
     re2_matchdata *m;
     Data_Get_Struct(self, re2_matchdata, m);
 
@@ -107,9 +101,7 @@ extern "C" {
    *   m.size      #=> 2
    *   m.length    #=> 2
    */
-  static VALUE
-  re2_matchdata_size(VALUE self)
-  {
+  static VALUE re2_matchdata_size(VALUE self) {
     re2_matchdata *m;
     Data_Get_Struct(self, re2_matchdata, m);
 
@@ -124,17 +116,13 @@ extern "C" {
    *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.regexp    #=> #<RE2::Regexp /(\d+)/>
    */
-  static VALUE
-  re2_matchdata_regexp(VALUE self)
-  {
+  static VALUE re2_matchdata_regexp(VALUE self) {
     re2_matchdata *m;
     Data_Get_Struct(self, re2_matchdata, m);
     return m->regexp;
   }
 
-  static VALUE
-  re2_regexp_allocate(VALUE klass)
-  {
+  static VALUE re2_regexp_allocate(VALUE klass) {
     re2_pattern *p;
     return Data_Make_Struct(klass, re2_pattern, 0, re2_regexp_free, p);
   }
@@ -147,9 +135,7 @@ extern "C" {
    *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.to_a    #=> ["123", "123"]
    */
-  static VALUE
-  re2_matchdata_to_a(VALUE self)
-  {
+  static VALUE re2_matchdata_to_a(VALUE self) {
     int i;
     re2_matchdata *m;
     re2::StringPiece match;
@@ -170,9 +156,7 @@ extern "C" {
     return array;
   }
 
-  static VALUE
-  re2_matchdata_nth_match(int nth, VALUE self)
-  {
+  static VALUE re2_matchdata_nth_match(int nth, VALUE self) {
     re2_matchdata *m;
     re2::StringPiece match;
 
@@ -191,9 +175,7 @@ extern "C" {
     }
   }
 
-  static VALUE
-  re2_matchdata_named_match(const char* name, VALUE self)
-  {
+  static VALUE re2_matchdata_named_match(const char* name, VALUE self) {
     int idx;
     re2_matchdata *m;
     re2_pattern *p;
@@ -256,9 +238,7 @@ extern "C" {
    *     m["number"] #=> "123"
    *     m[:number]  #=> "123"
    */
-  static VALUE
-  re2_matchdata_aref(int argc, VALUE *argv, VALUE self)
-  {
+  static VALUE re2_matchdata_aref(int argc, VALUE *argv, VALUE self) {
     VALUE idx, rest;
     rb_scan_args(argc, argv, "11", &idx, &rest);
 
@@ -278,9 +258,7 @@ extern "C" {
    *
    * @return [String] the entire matched string
    */
-  static VALUE
-  re2_matchdata_to_s(VALUE self)
-  {
+  static VALUE re2_matchdata_to_s(VALUE self) {
     return re2_matchdata_nth_match(0, self);
   }
 
@@ -292,9 +270,7 @@ extern "C" {
    *   m = RE2::Regexp.new('(\d+)').match("bob 123")
    *   m.inspect    #=> "#<RE2::MatchData \"123\" 1:\"123\">"
    */
-  static VALUE
-  re2_matchdata_inspect(VALUE self)
-  {
+  static VALUE re2_matchdata_inspect(VALUE self) {
     int i;
     re2_matchdata *m;
     VALUE match, result;
@@ -339,9 +315,7 @@ extern "C" {
    * @see RE2::Regexp.new
    *
    */
-  static VALUE
-  re2_re2(int argc, VALUE *argv, VALUE self)
-  {
+  static VALUE re2_re2(int argc, VALUE *argv, VALUE self) {
     UNUSED(self);
     return rb_class_new_instance(argc, argv, re2_cRegexp);
   }
@@ -358,7 +332,8 @@ extern "C" {
    *
    *   @param [String] pattern the pattern to compile
    *   @return [RE2::Regexp] an RE2::Regexp with the specified pattern
-   *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
+   *   @raise [NoMemoryError] if memory could not be allocated for the compiled
+   *                          pattern
    *
    * @overload initialize(pattern, options)
    *   Returns a new {RE2::Regexp} object with a compiled version of
@@ -380,11 +355,9 @@ extern "C" {
    *   @return [RE2::Regexp] an RE2::Regexp with the specified pattern and options
    *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
    */
-  static VALUE
-  re2_regexp_initialize(int argc, VALUE *argv, VALUE self)
-  {
+  static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
     VALUE pattern, options, utf8, posix_syntax, longest_match, log_errors,
-          max_mem, literal, never_nl, case_sensitive, perl_classes, 
+          max_mem, literal, never_nl, case_sensitive, perl_classes,
           word_boundary, one_line;
     re2_pattern *p;
 
@@ -453,9 +426,9 @@ extern "C" {
         re2_options.set_one_line(RTEST(one_line));
       }
 
-      p->pattern = new (nothrow) RE2(StringValuePtr(pattern), re2_options);
+      p->pattern = new(nothrow) RE2(StringValuePtr(pattern), re2_options);
     } else {
-      p->pattern = new (nothrow) RE2(StringValuePtr(pattern));
+      p->pattern = new(nothrow) RE2(StringValuePtr(pattern));
     }
 
     if (p->pattern == 0) {
@@ -473,9 +446,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?")
    *   re2.inspect    #=> "#<RE2::Regexp /woo?/>"
    */
-  static VALUE
-  re2_regexp_inspect(VALUE self)
-  {
+  static VALUE re2_regexp_inspect(VALUE self) {
     re2_pattern *p;
     VALUE result;
     ostringstream output;
@@ -497,12 +468,11 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?")
    *   re2.to_s    #=> "woo?"
    */
-  static VALUE
-  re2_regexp_to_s(VALUE self)
-  {
+  static VALUE re2_regexp_to_s(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return rb_str_new(p->pattern->pattern().data(), p->pattern->pattern().size());
+    return rb_str_new(p->pattern->pattern().data(),
+        p->pattern->pattern().size());
   }
 
   /*
@@ -514,9 +484,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?")
    *   re2.ok?    #=> true
    */
-  static VALUE
-  re2_regexp_ok(VALUE self)
-  {
+  static VALUE re2_regexp_ok(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->ok());
@@ -531,9 +499,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :utf8 => true)
    *   re2.utf8?    #=> true
    */
-  static VALUE
-  re2_regexp_utf8(VALUE self)
-  {
+  static VALUE re2_regexp_utf8(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().utf8());
@@ -548,9 +514,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :posix_syntax => true)
    *   re2.posix_syntax?    #=> true
    */
-  static VALUE
-  re2_regexp_posix_syntax(VALUE self)
-  {
+  static VALUE re2_regexp_posix_syntax(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().posix_syntax());
@@ -565,9 +529,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :longest_match => true)
    *   re2.longest_match?    #=> true
    */
-  static VALUE
-  re2_regexp_longest_match(VALUE self)
-  {
+  static VALUE re2_regexp_longest_match(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().longest_match());
@@ -582,9 +544,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :log_errors => true)
    *   re2.log_errors?    #=> true
    */
-  static VALUE
-  re2_regexp_log_errors(VALUE self)
-  {
+  static VALUE re2_regexp_log_errors(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().log_errors());
@@ -599,9 +559,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :max_mem => 1024)
    *   re2.max_mem    #=> 1024
    */
-  static VALUE
-  re2_regexp_max_mem(VALUE self)
-  {
+  static VALUE re2_regexp_max_mem(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return INT2FIX(p->pattern->options().max_mem());
@@ -616,9 +574,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :literal => true)
    *   re2.literal?    #=> true
    */
-  static VALUE
-  re2_regexp_literal(VALUE self)
-  {
+  static VALUE re2_regexp_literal(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().literal());
@@ -633,9 +589,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :never_nl => true)
    *   re2.never_nl?    #=> true
    */
-  static VALUE
-  re2_regexp_never_nl(VALUE self)
-  {
+  static VALUE re2_regexp_never_nl(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().never_nl());
@@ -650,9 +604,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :case_sensitive => true)
    *   re2.case_sensitive?    #=> true
    */
-  static VALUE
-  re2_regexp_case_sensitive(VALUE self)
-  {
+  static VALUE re2_regexp_case_sensitive(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().case_sensitive());
@@ -668,9 +620,7 @@ extern "C" {
    *   re2.case_insensitive?    #=> false
    *   re2.casefold?    #=> false
    */
-  static VALUE
-  re2_regexp_case_insensitive(VALUE self)
-  {
+  static VALUE re2_regexp_case_insensitive(VALUE self) {
     return BOOL2RUBY(re2_regexp_case_sensitive(self) != Qtrue);
   }
 
@@ -683,9 +633,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :perl_classes => true)
    *   re2.perl_classes?    #=> true
    */
-  static VALUE
-  re2_regexp_perl_classes(VALUE self)
-  {
+  static VALUE re2_regexp_perl_classes(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().perl_classes());
@@ -700,9 +648,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :word_boundary => true)
    *   re2.word_boundary?    #=> true
    */
-  static VALUE
-  re2_regexp_word_boundary(VALUE self)
-  {
+  static VALUE re2_regexp_word_boundary(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().word_boundary());
@@ -717,9 +663,7 @@ extern "C" {
    *   re2 = RE2::Regexp.new("woo?", :one_line => true)
    *   re2.one_line?    #=> true
    */
-  static VALUE
-  re2_regexp_one_line(VALUE self)
-  {
+  static VALUE re2_regexp_one_line(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return BOOL2RUBY(p->pattern->options().one_line());
@@ -731,9 +675,7 @@ extern "C" {
    *
    * @return [String, nil] the error string or nil
    */
-  static VALUE
-  re2_regexp_error(VALUE self)
-  {
+  static VALUE re2_regexp_error(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     if (p->pattern->ok()) {
@@ -749,15 +691,14 @@ extern "C" {
    *
    * @return [String, nil] the offending portion of the regexp or nil
    */
-  static VALUE
-  re2_regexp_error_arg(VALUE self)
-  {
+  static VALUE re2_regexp_error_arg(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     if (p->pattern->ok()) {
       return Qnil;
     } else {
-      return rb_str_new(p->pattern->error_arg().data(), p->pattern->error_arg().size());
+      return rb_str_new(p->pattern->error_arg().data(),
+                        p->pattern->error_arg().size());
     }
   }
 
@@ -768,9 +709,7 @@ extern "C" {
    *
    * @return [Fixnum] the regexp "cost"
    */
-  static VALUE
-  re2_regexp_program_size(VALUE self)
-  {
+  static VALUE re2_regexp_program_size(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
     return INT2FIX(p->pattern->ProgramSize());
@@ -782,9 +721,7 @@ extern "C" {
    *
    * @return [Hash] the options
    */
-  static VALUE
-  re2_regexp_options(VALUE self)
-  {
+  static VALUE re2_regexp_options(VALUE self) {
     VALUE options;
     re2_pattern *p;
 
@@ -837,9 +774,7 @@ extern "C" {
    *
    * @return [Fixnum] the number of capturing subpatterns
    */
-  static VALUE
-  re2_regexp_number_of_capturing_groups(VALUE self)
-  {
+  static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
     re2_pattern *p;
 
     Data_Get_Struct(self, re2_pattern, p);
@@ -851,9 +786,7 @@ extern "C" {
    *
    * @return [Hash] a hash of names to capturing indices
    */
-  static VALUE
-  re2_regexp_named_capturing_groups(VALUE self)
-  {
+  static VALUE re2_regexp_named_capturing_groups(VALUE self) {
     VALUE capturing_groups;
     re2_pattern *p;
     map<string, int> groups;
@@ -916,9 +849,7 @@ extern "C" {
    *     r.match('woo', 1) #=> #<RE2::MatchData "woo" 1:"o">
    *     r.match('woo', 3) #=> #<RE2::MatchData "woo" 1:"o" 2:"o" 3:nil>
    */
-  static VALUE
-  re2_regexp_match(int argc, VALUE *argv, VALUE self)
-  {
+  static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
     int n;
     bool matched;
     re2_pattern *p;
@@ -936,7 +867,8 @@ extern "C" {
     }
 
     if (n == 0) {
-      matched = match(p->pattern, StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
+      matched = match(p->pattern, StringValuePtr(text), 0,
+          static_cast<int>(RSTRING_LEN(text)), RE2::UNANCHORED, 0, 0);
       return BOOL2RUBY(matched);
     } else {
 
@@ -945,18 +877,21 @@ extern "C" {
 
       matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
       Data_Get_Struct(matchdata, re2_matchdata, m);
-      m->matches = new (nothrow) re2::StringPiece[n];
+      m->matches = new(nothrow) re2::StringPiece[n];
       m->regexp = self;
       m->text = rb_str_dup(text);
       rb_str_freeze(m->text);
 
       if (m->matches == 0) {
-        rb_raise(rb_eNoMemError, "not enough memory to allocate StringPieces for matches");
+        rb_raise(rb_eNoMemError,
+                 "not enough memory to allocate StringPieces for matches");
       }
 
       m->number_of_matches = n;
 
-      matched = match(p->pattern, StringValuePtr(text), 0, (int)RSTRING_LEN(text), RE2::UNANCHORED, m->matches, n);
+      matched = match(p->pattern, StringValuePtr(text), 0,
+                      static_cast<int>(RSTRING_LEN(text)),
+                      RE2::UNANCHORED, m->matches, n);
 
       if (matched) {
         return matchdata;
@@ -972,9 +907,7 @@ extern "C" {
    *
    * @return [Boolean] whether the match was successful
    */
-  static VALUE
-  re2_regexp_match_query(VALUE self, VALUE text)
-  {
+  static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
     VALUE argv[2];
     argv[0] = text;
     argv[1] = INT2FIX(0);
@@ -996,11 +929,10 @@ extern "C" {
    *   RE2.Replace("hello there", re2, "yo")        #=> "yo there"
    *   text = "Good morning"
    *   RE2.Replace(text, "morn", "even")            #=> "Good evening"
-   *   text                                          #=> "Good evening"
+   *   text                                         #=> "Good evening"
    */
-  static VALUE
-  re2_Replace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
-  {
+  static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
+      VALUE rewrite) {
 
     /* Look out for frozen strings. */
     rb_check_frozen(str);
@@ -1017,7 +949,8 @@ extern "C" {
       Data_Get_Struct(pattern, re2_pattern, p);
       RE2::Replace(&str_as_string, *p->pattern, StringValuePtr(rewrite));
     } else {
-      RE2::Replace(&str_as_string, StringValuePtr(pattern), StringValuePtr(rewrite));
+      RE2::Replace(&str_as_string, StringValuePtr(pattern),
+          StringValuePtr(rewrite));
     }
 
     /* Save the replacement as a VALUE. */
@@ -1048,9 +981,8 @@ extern "C" {
    *   RE2.GlobalReplace(text, "o", "ee")           #=> "Geeeed meerning"
    *   text                                          #=> "Geeeed meerning"
    */
-  static VALUE
-  re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern, VALUE rewrite)
-  {
+  static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
+                                 VALUE rewrite) {
 
     /* Look out for frozen strings. */
     rb_check_frozen(str);
@@ -1067,7 +999,8 @@ extern "C" {
       Data_Get_Struct(pattern, re2_pattern, p);
       RE2::GlobalReplace(&str_as_string, *p->pattern, StringValuePtr(rewrite));
     } else {
-      RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern), StringValuePtr(rewrite));
+      RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern),
+                         StringValuePtr(rewrite));
     }
 
     /* Save the replacement as a VALUE. */
@@ -1092,70 +1025,108 @@ extern "C" {
    * @example
    *   RE2::Regexp.escape("1.5-2.0?")    #=> "1\.5\-2\.0\?"
    */
-  static VALUE
-  re2_QuoteMeta(VALUE self, VALUE unquoted)
-  {
+  static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
     UNUSED(self);
     string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
     return rb_str_new(quoted_string.data(), quoted_string.size());
   }
 
-  void
-  Init_re2()
-  {
+  void Init_re2(void) {
     re2_mRE2 = rb_define_module("RE2");
     re2_cRegexp = rb_define_class_under(re2_mRE2, "Regexp", rb_cObject);
     re2_cMatchData = rb_define_class_under(re2_mRE2, "MatchData", rb_cObject);
 
     rb_define_alloc_func(re2_cRegexp, (VALUE (*)(VALUE))re2_regexp_allocate);
-    rb_define_alloc_func(re2_cMatchData, (VALUE (*)(VALUE))re2_matchdata_allocate);
+    rb_define_alloc_func(re2_cMatchData,
+        (VALUE (*)(VALUE))re2_matchdata_allocate);
 
-    rb_define_method(re2_cMatchData, "string", RUBY_METHOD_FUNC(re2_matchdata_string), 0);
-    rb_define_method(re2_cMatchData, "regexp", RUBY_METHOD_FUNC(re2_matchdata_regexp), 0);
-    rb_define_method(re2_cMatchData, "to_a", RUBY_METHOD_FUNC(re2_matchdata_to_a), 0);
-    rb_define_method(re2_cMatchData, "size", RUBY_METHOD_FUNC(re2_matchdata_size), 0);
-    rb_define_method(re2_cMatchData, "length", RUBY_METHOD_FUNC(re2_matchdata_size), 0);
-    rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref), -1);
-    rb_define_method(re2_cMatchData, "to_s", RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);
-    rb_define_method(re2_cMatchData, "inspect", RUBY_METHOD_FUNC(re2_matchdata_inspect), 0);
+    rb_define_method(re2_cMatchData, "string",
+        RUBY_METHOD_FUNC(re2_matchdata_string), 0);
+    rb_define_method(re2_cMatchData, "regexp",
+        RUBY_METHOD_FUNC(re2_matchdata_regexp), 0);
+    rb_define_method(re2_cMatchData, "to_a",
+        RUBY_METHOD_FUNC(re2_matchdata_to_a), 0);
+    rb_define_method(re2_cMatchData, "size",
+        RUBY_METHOD_FUNC(re2_matchdata_size), 0);
+    rb_define_method(re2_cMatchData, "length",
+        RUBY_METHOD_FUNC(re2_matchdata_size), 0);
+    rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
+        -1); rb_define_method(re2_cMatchData, "to_s",
+          RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);
+    rb_define_method(re2_cMatchData, "inspect",
+        RUBY_METHOD_FUNC(re2_matchdata_inspect), 0);
 
-    rb_define_method(re2_cRegexp, "initialize", RUBY_METHOD_FUNC(re2_regexp_initialize), -1);
+    rb_define_method(re2_cRegexp, "initialize",
+        RUBY_METHOD_FUNC(re2_regexp_initialize), -1);
     rb_define_method(re2_cRegexp, "ok?", RUBY_METHOD_FUNC(re2_regexp_ok), 0);
-    rb_define_method(re2_cRegexp, "error", RUBY_METHOD_FUNC(re2_regexp_error), 0);
-    rb_define_method(re2_cRegexp, "error_arg", RUBY_METHOD_FUNC(re2_regexp_error_arg), 0);
-    rb_define_method(re2_cRegexp, "program_size", RUBY_METHOD_FUNC(re2_regexp_program_size), 0);
-    rb_define_method(re2_cRegexp, "options", RUBY_METHOD_FUNC(re2_regexp_options), 0);
-    rb_define_method(re2_cRegexp, "number_of_capturing_groups", RUBY_METHOD_FUNC(re2_regexp_number_of_capturing_groups), 0);
-    rb_define_method(re2_cRegexp, "named_capturing_groups", RUBY_METHOD_FUNC(re2_regexp_named_capturing_groups), 0);
-    rb_define_method(re2_cRegexp, "match", RUBY_METHOD_FUNC(re2_regexp_match), -1);
-    rb_define_method(re2_cRegexp, "match?", RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
-    rb_define_method(re2_cRegexp, "=~", RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
-    rb_define_method(re2_cRegexp, "===", RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
+    rb_define_method(re2_cRegexp, "error", RUBY_METHOD_FUNC(re2_regexp_error),
+        0);
+    rb_define_method(re2_cRegexp, "error_arg",
+        RUBY_METHOD_FUNC(re2_regexp_error_arg), 0);
+    rb_define_method(re2_cRegexp, "program_size",
+        RUBY_METHOD_FUNC(re2_regexp_program_size), 0);
+    rb_define_method(re2_cRegexp, "options",
+        RUBY_METHOD_FUNC(re2_regexp_options), 0);
+    rb_define_method(re2_cRegexp, "number_of_capturing_groups",
+        RUBY_METHOD_FUNC(re2_regexp_number_of_capturing_groups), 0);
+    rb_define_method(re2_cRegexp, "named_capturing_groups",
+        RUBY_METHOD_FUNC(re2_regexp_named_capturing_groups), 0);
+    rb_define_method(re2_cRegexp, "match", RUBY_METHOD_FUNC(re2_regexp_match),
+        -1);
+    rb_define_method(re2_cRegexp, "match?",
+        RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
+    rb_define_method(re2_cRegexp, "=~",
+        RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
+    rb_define_method(re2_cRegexp, "===",
+        RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
     rb_define_method(re2_cRegexp, "to_s", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
-    rb_define_method(re2_cRegexp, "to_str", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
-    rb_define_method(re2_cRegexp, "pattern", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
-    rb_define_method(re2_cRegexp, "source", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
-    rb_define_method(re2_cRegexp, "inspect", RUBY_METHOD_FUNC(re2_regexp_inspect), 0);
-    rb_define_method(re2_cRegexp, "utf8?", RUBY_METHOD_FUNC(re2_regexp_utf8), 0);
-    rb_define_method(re2_cRegexp, "posix_syntax?", RUBY_METHOD_FUNC(re2_regexp_posix_syntax), 0);
-    rb_define_method(re2_cRegexp, "longest_match?", RUBY_METHOD_FUNC(re2_regexp_longest_match), 0);
-    rb_define_method(re2_cRegexp, "log_errors?", RUBY_METHOD_FUNC(re2_regexp_log_errors), 0);
-    rb_define_method(re2_cRegexp, "max_mem", RUBY_METHOD_FUNC(re2_regexp_max_mem), 0);
-    rb_define_method(re2_cRegexp, "literal?", RUBY_METHOD_FUNC(re2_regexp_literal), 0);
-    rb_define_method(re2_cRegexp, "never_nl?", RUBY_METHOD_FUNC(re2_regexp_never_nl), 0);
-    rb_define_method(re2_cRegexp, "case_sensitive?", RUBY_METHOD_FUNC(re2_regexp_case_sensitive), 0);
-    rb_define_method(re2_cRegexp, "case_insensitive?", RUBY_METHOD_FUNC(re2_regexp_case_insensitive), 0);
-    rb_define_method(re2_cRegexp, "casefold?", RUBY_METHOD_FUNC(re2_regexp_case_insensitive), 0);
-    rb_define_method(re2_cRegexp, "perl_classes?", RUBY_METHOD_FUNC(re2_regexp_perl_classes), 0);
-    rb_define_method(re2_cRegexp, "word_boundary?", RUBY_METHOD_FUNC(re2_regexp_word_boundary), 0);
-    rb_define_method(re2_cRegexp, "one_line?", RUBY_METHOD_FUNC(re2_regexp_one_line), 0);
+    rb_define_method(re2_cRegexp, "to_str", RUBY_METHOD_FUNC(re2_regexp_to_s),
+        0);
+    rb_define_method(re2_cRegexp, "pattern", RUBY_METHOD_FUNC(re2_regexp_to_s),
+        0);
+    rb_define_method(re2_cRegexp, "source", RUBY_METHOD_FUNC(re2_regexp_to_s),
+        0);
+    rb_define_method(re2_cRegexp, "inspect",
+        RUBY_METHOD_FUNC(re2_regexp_inspect), 0);
+    rb_define_method(re2_cRegexp, "utf8?", RUBY_METHOD_FUNC(re2_regexp_utf8),
+        0);
+    rb_define_method(re2_cRegexp, "posix_syntax?",
+        RUBY_METHOD_FUNC(re2_regexp_posix_syntax), 0);
+    rb_define_method(re2_cRegexp, "longest_match?",
+        RUBY_METHOD_FUNC(re2_regexp_longest_match), 0);
+    rb_define_method(re2_cRegexp, "log_errors?",
+        RUBY_METHOD_FUNC(re2_regexp_log_errors), 0);
+    rb_define_method(re2_cRegexp, "max_mem",
+        RUBY_METHOD_FUNC(re2_regexp_max_mem), 0);
+    rb_define_method(re2_cRegexp, "literal?",
+        RUBY_METHOD_FUNC(re2_regexp_literal), 0);
+    rb_define_method(re2_cRegexp, "never_nl?",
+        RUBY_METHOD_FUNC(re2_regexp_never_nl), 0);
+    rb_define_method(re2_cRegexp, "case_sensitive?",
+        RUBY_METHOD_FUNC(re2_regexp_case_sensitive), 0);
+    rb_define_method(re2_cRegexp, "case_insensitive?",
+        RUBY_METHOD_FUNC(re2_regexp_case_insensitive), 0);
+    rb_define_method(re2_cRegexp, "casefold?",
+        RUBY_METHOD_FUNC(re2_regexp_case_insensitive), 0);
+    rb_define_method(re2_cRegexp, "perl_classes?",
+        RUBY_METHOD_FUNC(re2_regexp_perl_classes), 0);
+    rb_define_method(re2_cRegexp, "word_boundary?",
+        RUBY_METHOD_FUNC(re2_regexp_word_boundary), 0);
+    rb_define_method(re2_cRegexp, "one_line?",
+        RUBY_METHOD_FUNC(re2_regexp_one_line), 0);
 
-    rb_define_module_function(re2_mRE2, "Replace", RUBY_METHOD_FUNC(re2_Replace), 3);
-    rb_define_module_function(re2_mRE2, "GlobalReplace", RUBY_METHOD_FUNC(re2_GlobalReplace), 3);
-    rb_define_module_function(re2_mRE2, "QuoteMeta", RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
-    rb_define_singleton_method(re2_cRegexp, "escape", RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
-    rb_define_singleton_method(re2_cRegexp, "quote", RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
-    rb_define_singleton_method(re2_cRegexp, "compile", RUBY_METHOD_FUNC(rb_class_new_instance), -1);
+    rb_define_module_function(re2_mRE2, "Replace",
+        RUBY_METHOD_FUNC(re2_Replace), 3);
+    rb_define_module_function(re2_mRE2, "GlobalReplace",
+        RUBY_METHOD_FUNC(re2_GlobalReplace), 3);
+    rb_define_module_function(re2_mRE2, "QuoteMeta",
+        RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
+    rb_define_singleton_method(re2_cRegexp, "escape",
+        RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
+    rb_define_singleton_method(re2_cRegexp, "quote",
+        RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
+    rb_define_singleton_method(re2_cRegexp, "compile",
+        RUBY_METHOD_FUNC(rb_class_new_instance), -1);
 
     rb_define_global_function("RE2", RUBY_METHOD_FUNC(re2_re2), -1);
 
