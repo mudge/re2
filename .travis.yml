@@ -6,4 +6,8 @@ rvm:
   - ree
   - rbx-18mode
   - rbx-19mode
-before_install: sudo apt-get install libre2-dev
+before_install:
+  - hg clone https://re2.googlecode.com/hg re2
+  - cd re2
+  - sudo make install
+  - cd ..
