@@ -12,7 +12,7 @@ Debian and Ubuntu, this is provided by the [build-essential][] package). If
 you are using Mac OS X, I recommend installing re2 with [Homebrew][] by
 running the following:
 
-    $ brew install --HEAD https://raw.github.com/Homebrew/homebrew-headonly/master/re2.rb
+    $ brew install re2
 
 If you are using Debian, you can install the [libre2-dev][] package like so:
 
