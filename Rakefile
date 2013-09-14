@@ -1,9 +1,7 @@
 require 'rake/extensiontask'
 require 'rake/testtask'
 
-Rake::ExtensionTask.new('re2') do |e|
-  # e.config_options << "--with-re2-dir=/opt/local/re2"
-end
+Rake::ExtensionTask.new('re2')
 
 Rake::TestTask.new do |t|
   t.libs << "spec"
