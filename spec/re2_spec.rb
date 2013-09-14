@@ -36,6 +36,14 @@ describe RE2 do
 
       proc { RE2.Replace(frozen_name, "o", "a") }.must_raise(TypeError, RuntimeError)
     end
+
+    if String.method_defined?(:encoding)
+      it "preserves the original string's encoding" do
+        original = "Foo"
+        replacement = RE2.Replace(original, "oo", "ah")
+        original.encoding.must_equal(replacement.encoding)
+      end
+    end
   end
 
   describe "#GlobalReplace" do

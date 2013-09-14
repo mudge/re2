@@ -16,6 +16,20 @@ using std::nothrow;
 using std::map;
 
 extern "C" {
+  #ifdef HAVE_RUBY_ENCODING_H
+    #include <ruby/encoding.h>
+    #define ENCODED_STR_NEW(str, length, encoding) \
+      ({ \
+       VALUE _string = rb_str_new((const char *)str, (long)length); \
+       int _enc = rb_enc_find_index((int)encoding); \
+       rb_enc_associate_index(_string, _enc); \
+       _string; \
+       })
+  #else
+    #define ENCODED_STR_NEW(str, length, encoding) \
+      rb_str_new((const char *)str, (long)length)
+  #endif
+
   #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
   #define UNUSED(x) ((void)x)
 
@@ -138,10 +152,12 @@ extern "C" {
   static VALUE re2_matchdata_to_a(VALUE self) {
     int i;
     re2_matchdata *m;
+    re2_pattern *p;
     re2::StringPiece match;
     VALUE array;
 
     Data_Get_Struct(self, re2_matchdata, m);
+    Data_Get_Struct(m->regexp, re2_pattern, p);
 
     array = rb_ary_new2(m->number_of_matches);
     for (i = 0; i < m->number_of_matches; i++) {
@@ -149,7 +165,8 @@ extern "C" {
         rb_ary_push(array, Qnil);
       } else {
         match = m->matches[i];
-        rb_ary_push(array, rb_str_new(match.data(), match.size()));
+        rb_ary_push(array, ENCODED_STR_NEW(match.data(), match.size(),
+              p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1"));
       }
     }
 
@@ -158,9 +175,11 @@ extern "C" {
 
   static VALUE re2_matchdata_nth_match(int nth, VALUE self) {
     re2_matchdata *m;
+    re2_pattern *p;
     re2::StringPiece match;
 
     Data_Get_Struct(self, re2_matchdata, m);
+    Data_Get_Struct(m->regexp, re2_pattern, p);
 
     if (nth < 0 || nth >= m->number_of_matches) {
       return Qnil;
@@ -170,7 +189,8 @@ extern "C" {
       if (match.empty()) {
         return Qnil;
       } else {
-        return rb_str_new(match.data(), match.size());
+        return ENCODED_STR_NEW(match.data(), match.size(),
+            p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
       }
     }
   }
@@ -273,12 +293,12 @@ extern "C" {
   static VALUE re2_matchdata_inspect(VALUE self) {
     int i;
     re2_matchdata *m;
+    re2_pattern *p;
     VALUE match, result;
     ostringstream output;
 
     Data_Get_Struct(self, re2_matchdata, m);
-
-    result = rb_str_new("#<RE2::MatchData", 16);
+    Data_Get_Struct(m->regexp, re2_pattern, p);
 
     output << "#<RE2::MatchData";
 
@@ -300,7 +320,8 @@ extern "C" {
 
     output << ">";
 
-    result = rb_str_new(output.str().data(), output.str().length());
+    result = ENCODED_STR_NEW(output.str().data(), output.str().length(),
+        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
 
     return result;
   }
@@ -455,7 +476,8 @@ extern "C" {
 
     output << "#<RE2::Regexp /" << p->pattern->pattern() << "/>";
 
-    result = rb_str_new(output.str().data(), output.str().length());
+    result = ENCODED_STR_NEW(output.str().data(), output.str().length(),
+        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
 
     return result;
   }
@@ -471,8 +493,9 @@ extern "C" {
   static VALUE re2_regexp_to_s(VALUE self) {
     re2_pattern *p;
     Data_Get_Struct(self, re2_pattern, p);
-    return rb_str_new(p->pattern->pattern().data(),
-        p->pattern->pattern().size());
+    return ENCODED_STR_NEW(p->pattern->pattern().data(),
+        p->pattern->pattern().size(),
+        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
   }
 
   /*
@@ -697,8 +720,9 @@ extern "C" {
     if (p->pattern->ok()) {
       return Qnil;
     } else {
-      return rb_str_new(p->pattern->error_arg().data(),
-                        p->pattern->error_arg().size());
+      return ENCODED_STR_NEW(p->pattern->error_arg().data(),
+          p->pattern->error_arg().size(),
+          p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
     }
   }
 
@@ -798,7 +822,8 @@ extern "C" {
 
     for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
       rb_hash_aset(capturing_groups,
-          rb_str_new(iterator->first.data(), iterator->first.size()),
+          ENCODED_STR_NEW(iterator->first.data(), iterator->first.size(),
+            p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1"),
           INT2FIX(iterator->second));
     }
 

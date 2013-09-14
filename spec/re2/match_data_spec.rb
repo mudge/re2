@@ -68,6 +68,22 @@ describe RE2::MatchData do
       md["missing"].must_be_nil
       md[:missing].must_be_nil
     end
+
+    if String.method_defined?(:encoding)
+      it "returns UTF-8 encoded strings by default" do
+        md = RE2::Regexp.new('(?P<name>\S+)').match("bob")
+        md[0].encoding.name.must_equal("UTF-8")
+        md["name"].encoding.name.must_equal("UTF-8")
+        md[:name].encoding.name.must_equal("UTF-8")
+      end
+
+      it "returns Latin 1 strings encoding when utf-8 is false" do
+        md = RE2::Regexp.new('(?P<name>\S+)', :utf8 => false).match('bob')
+        md[0].encoding.name.must_equal("ISO-8859-1")
+        md["name"].encoding.name.must_equal("ISO-8859-1")
+        md[:name].encoding.name.must_equal("ISO-8859-1")
+      end
+    end
   end
 
   describe "#string" do
