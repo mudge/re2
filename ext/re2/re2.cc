@@ -184,7 +184,7 @@ extern "C" {
     Data_Get_Struct(self, re2_consumer, c);
     Data_Get_Struct(c->regexp, re2_pattern, p);
 
-    RE2::Arg argv[c->argc];
+    vector<RE2::Arg> argv(c->argc);
     vector<RE2::Arg*> args(c->argc);
     vector<string> matches(c->argc);
 
