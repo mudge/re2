@@ -2,7 +2,7 @@
  * re2 (http://github.com/mudge/re2)
  * Ruby bindings to re2, an "efficient, principled regular expression library"
  *
- * Copyright (c) 2010-2012, Paul Mucur (http://mudge.name)
+ * Copyright (c) 2010-2013, Paul Mucur (http://mudge.name)
  * Released under the BSD Licence, please see LICENSE.txt
  */
 
@@ -59,7 +59,13 @@ extern "C" {
     VALUE regexp, text;
   } re2_matchdata;
 
-  VALUE re2_mRE2, re2_cRegexp, re2_cMatchData;
+  typedef struct {
+    re2::StringPiece input;
+    int argc;
+    VALUE regexp, text;
+  } re2_consumer;
+
+  VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cConsumer;
 
   /* Symbols used in RE2 options. */
   static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
@@ -78,6 +84,15 @@ extern "C" {
     free(self);
   }
 
+  void re2_consumer_mark(re2_consumer* self) {
+    rb_gc_mark(self->regexp);
+    rb_gc_mark(self->text);
+  }
+
+  void re2_consumer_free(re2_consumer* self) {
+    free(self);
+  }
+
   void re2_regexp_free(re2_pattern* self) {
     if (self->pattern) {
       delete self->pattern;
@@ -88,7 +103,13 @@ extern "C" {
   static VALUE re2_matchdata_allocate(VALUE klass) {
     re2_matchdata *m;
     return Data_Make_Struct(klass, re2_matchdata, re2_matchdata_mark,
-                            re2_matchdata_free, m);
+        re2_matchdata_free, m);
+  }
+
+  static VALUE re2_consumer_allocate(VALUE klass) {
+    re2_consumer *c;
+    return Data_Make_Struct(klass, re2_consumer, re2_consumer_mark,
+        re2_consumer_free, c);
   }
 
   /*
@@ -104,6 +125,88 @@ extern "C" {
     Data_Get_Struct(self, re2_matchdata, m);
 
     return m->text;
+  }
+
+  /*
+   * Returns the string passed into the consumer.
+   *
+   * @return [String] the original string.
+   * @example
+   *   c = RE2::Regexp.new('(\d+)').consume("foo")
+   *   c.string #=> "foo"
+   */
+  static VALUE re2_consumer_string(VALUE self) {
+    re2_consumer *c;
+    Data_Get_Struct(self, re2_consumer, c);
+
+    return c->text;
+  }
+
+  /*
+   * Rewind the consumer to the start of the string.
+   *
+   * @example
+   *   c = RE2::Regexp.new('(\d+)').consume("1 2 3")
+   *   e = c.to_enum
+   *   e.next #=> ["1"]
+   *   e.next #=> ["2"]
+   *   c.rewind
+   *   e.next #=> ["1"]
+   */
+  static VALUE re2_consumer_rewind(VALUE self) {
+    re2_consumer *c;
+    Data_Get_Struct(self, re2_consumer, c);
+    re2::StringPiece input(RSTRING_PTR(c->text));
+
+    c->input = input;
+
+    return self;
+  }
+
+  /*
+   * Scan the given text incrementally for matches, returning an array of
+   * matches on each subsequent call. Returns nil if no matches are found.
+   *
+   * @return [Array<String>] the matches.
+   * @example
+   *   c = RE2::Regexp.new('(\w+)').consume("Foo bar baz")
+   *   c.consume #=> ["Foo"]
+   *   c.consume #=> ["bar"]
+   */
+  static VALUE re2_consumer_consume(VALUE self) {
+    int i;
+    re2_pattern *p;
+    re2_consumer *c;
+    VALUE result;
+
+    Data_Get_Struct(self, re2_consumer, c);
+    Data_Get_Struct(c->regexp, re2_pattern, p);
+
+    RE2::Arg argv[c->argc];
+    RE2::Arg* args[c->argc];
+    string matches[c->argc];
+
+    for (i = 0; i < c->argc; i++) {
+      args[i] = &argv[i];
+      argv[i] = &matches[i];
+    }
+
+    if (RE2::FindAndConsumeN(&c->input, *p->pattern, args, c->argc)) {
+      result = rb_ary_new2(c->argc);
+      for (i = 0; i < c->argc; i++) {
+        if (matches[i].empty()) {
+          rb_ary_push(result, Qnil);
+        } else {
+          rb_ary_push(result, ENCODED_STR_NEW(matches[i].data(),
+                matches[i].size(),
+                p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1"));
+        }
+      }
+    } else {
+      result = Qnil;
+    }
+
+    return result;
   }
 
   /*
@@ -134,6 +237,21 @@ extern "C" {
     re2_matchdata *m;
     Data_Get_Struct(self, re2_matchdata, m);
     return m->regexp;
+  }
+
+  /*
+   * Returns the {RE2::Regexp} used in the consumer.
+   *
+   * @return [RE2::Regexp] the regexp used in the consumer
+   * @example
+   *   c = RE2::Regexp.new('(\d+)').consume("bob 123")
+   *   c.regexp    #=> #<RE2::Regexp /(\d+)/>
+   */
+  static VALUE re2_consumer_regexp(VALUE self) {
+    re2_consumer *c;
+    Data_Get_Struct(self, re2_consumer, c);
+
+    return c->regexp;
   }
 
   static VALUE re2_regexp_allocate(VALUE klass) {
@@ -941,7 +1059,30 @@ extern "C" {
   }
 
   /*
-   * Replaces the first occurrence +pattern+ in +str+ with 
+   * Returns a {RE2::Consumer} for scanning the given text incrementally.
+   *
+   * @example
+   *   c = RE2::Regexp.new('(\w+)').consume("Foo bar baz")
+   */
+  static VALUE re2_regexp_consume(VALUE self, VALUE text) {
+    re2_pattern *p;
+    re2_consumer *c;
+    VALUE consumer;
+    re2::StringPiece input(RSTRING_PTR(text));
+
+    Data_Get_Struct(self, re2_pattern, p);
+    consumer = rb_class_new_instance(0, 0, re2_cConsumer);
+    Data_Get_Struct(consumer, re2_consumer, c);
+    c->input = input;
+    c->regexp = self;
+    c->text = text;
+    c->argc = p->pattern->NumberOfCapturingGroups();
+
+    return consumer;
+  }
+
+  /*
+   * Replaces the first occurrence +pattern+ in +str+ with
    * +rewrite+ <i>in place</i>.
    *
    * @param [String] str the string to modify
@@ -991,7 +1132,7 @@ extern "C" {
   }
 
   /*
-   * Replaces every occurrence of +pattern+ in +str+ with 
+   * Replaces every occurrence of +pattern+ in +str+ with
    * +rewrite+ <i>in place</i>.
    *
    * @param [String] str the string to modify
@@ -1060,10 +1201,13 @@ extern "C" {
     re2_mRE2 = rb_define_module("RE2");
     re2_cRegexp = rb_define_class_under(re2_mRE2, "Regexp", rb_cObject);
     re2_cMatchData = rb_define_class_under(re2_mRE2, "MatchData", rb_cObject);
+    re2_cConsumer = rb_define_class_under(re2_mRE2, "Consumer", rb_cObject);
 
     rb_define_alloc_func(re2_cRegexp, (VALUE (*)(VALUE))re2_regexp_allocate);
     rb_define_alloc_func(re2_cMatchData,
         (VALUE (*)(VALUE))re2_matchdata_allocate);
+    rb_define_alloc_func(re2_cConsumer,
+        (VALUE (*)(VALUE))re2_consumer_allocate);
 
     rb_define_method(re2_cMatchData, "string",
         RUBY_METHOD_FUNC(re2_matchdata_string), 0);
@@ -1080,6 +1224,15 @@ extern "C" {
           RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);
     rb_define_method(re2_cMatchData, "inspect",
         RUBY_METHOD_FUNC(re2_matchdata_inspect), 0);
+
+    rb_define_method(re2_cConsumer, "string",
+        RUBY_METHOD_FUNC(re2_consumer_string), 0);
+    rb_define_method(re2_cConsumer, "regexp",
+        RUBY_METHOD_FUNC(re2_consumer_regexp), 0);
+    rb_define_method(re2_cConsumer, "consume",
+        RUBY_METHOD_FUNC(re2_consumer_consume), 0);
+    rb_define_method(re2_cConsumer, "rewind",
+        RUBY_METHOD_FUNC(re2_consumer_rewind), 0);
 
     rb_define_method(re2_cRegexp, "initialize",
         RUBY_METHOD_FUNC(re2_regexp_initialize), -1);
@@ -1104,6 +1257,7 @@ extern "C" {
         RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
     rb_define_method(re2_cRegexp, "===",
         RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
+    rb_define_method(re2_cRegexp, "consume", RUBY_METHOD_FUNC(re2_regexp_consume), 1);
     rb_define_method(re2_cRegexp, "to_s", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
     rb_define_method(re2_cRegexp, "to_str", RUBY_METHOD_FUNC(re2_regexp_to_s),
         0);

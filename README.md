@@ -117,6 +117,28 @@ class String
 end
 ```
 
+As of 0.5.0, you can use `RE2::Regexp#consume` to incrementally scan text for
+matches (similar in purpose to Ruby's
+[`String#scan`](http://ruby-doc.org/core-2.0.0/String.html#method-i-scan)).
+Calling `consume` will return an `RE2::Consumer` which is
+[enumerable](http://ruby-doc.org/core-2.0.0/Enumerable.html) meaning you can
+use `each` to iterate through the matches (and even use
+[`Enumerator::Lazy`](http://ruby-doc.org/core-2.0/Enumerator/Lazy.html)):
+
+```ruby
+re = RE2('(\w+)')
+consumer = re.consume("It is a truth universally acknowledged")
+consumer.each do |match|
+  puts match
+end
+
+consumer.rewind
+
+enum = consumer.to_enum
+enum.next #=> ["It"]
+enum.next #=> ["is"]
+```
+
 Features
 --------
 
@@ -132,6 +154,8 @@ Features
 
 * Checking for matches with `re2 =~ text`, `re2 === text` (for use in `case`
   statements) and `re2 !~ text`
+
+* Incrementally scanning text with `re2.consume(text)`
 
 * Checking regular expression compilation with `re2.ok?`, `re2.error` and
   `re2.error_arg`

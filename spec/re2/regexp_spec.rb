@@ -391,4 +391,13 @@ describe RE2::Regexp do
       groups["rob"].must_equal(3)
     end
   end
+
+  describe "#consume" do
+    it "returns a consumer" do
+      r = RE2::Regexp.new('(\w+)')
+      consumer = r.consume("It is a truth universally acknowledged")
+
+      consumer.must_be_instance_of(RE2::Consumer)
+    end
+  end
 end
