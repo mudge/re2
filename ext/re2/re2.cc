@@ -10,10 +10,12 @@
 #include <ruby.h>
 #include <string>
 #include <sstream>
+#include <vector>
 using std::string;
 using std::ostringstream;
 using std::nothrow;
 using std::map;
+using std::vector;
 
 extern "C" {
   #ifdef HAVE_RUBY_ENCODING_H
@@ -183,15 +185,15 @@ extern "C" {
     Data_Get_Struct(c->regexp, re2_pattern, p);
 
     RE2::Arg argv[c->argc];
-    RE2::Arg* args[c->argc];
-    string matches[c->argc];
+    vector<RE2::Arg*> args(c->argc);
+    vector<string> matches(c->argc);
 
     for (i = 0; i < c->argc; i++) {
       args[i] = &argv[i];
       argv[i] = &matches[i];
     }
 
-    if (RE2::FindAndConsumeN(&c->input, *p->pattern, args, c->argc)) {
+    if (RE2::FindAndConsumeN(&c->input, *p->pattern, &args[0], c->argc)) {
       result = rb_ary_new2(c->argc);
       for (i = 0; i < c->argc; i++) {
         if (matches[i].empty()) {

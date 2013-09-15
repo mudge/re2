@@ -72,7 +72,7 @@ describe RE2::Consumer do
       if defined?(Enumerator)
         consumer.each.must_be_kind_of(Enumerator)
       elsif defined?(Enumerable::Enumerator)
-        consumer.each.must_be_kind_of(Enumerator)
+        consumer.each.must_be_kind_of(Enumerable::Enumerator)
       end
     end
   end
