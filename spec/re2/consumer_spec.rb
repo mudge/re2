@@ -67,7 +67,13 @@ describe RE2::Consumer do
     it "returns an enumerator when not given a block" do
       r = RE2::Regexp.new('(\d)')
       consumer = r.consume("There are 1 some 2 numbers 3")
-      consumer.each.must_be_kind_of(Enumerator)
+
+      # Prior to Ruby 1.9, Enumerator was within Enumerable.
+      if defined?(Enumerator)
+        consumer.each.must_be_kind_of(Enumerator)
+      elsif defined?(Enumerable::Enumerator)
+        consumer.each.must_be_kind_of(Enumerator)
+      end
     end
   end
 
