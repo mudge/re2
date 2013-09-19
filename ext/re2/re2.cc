@@ -22,11 +22,11 @@ extern "C" {
     #include <ruby/encoding.h>
     #define ENCODED_STR_NEW(str, length, encoding) \
       ({ \
-       VALUE _string = rb_str_new((const char *)str, (long)length); \
-       int _enc = rb_enc_find_index((int)encoding); \
-       rb_enc_associate_index(_string, _enc); \
-       _string; \
-       })
+        VALUE _string = rb_str_new(str, length); \
+        int _enc = rb_enc_find_index(encoding); \
+        rb_enc_associate_index(_string, _enc); \
+        _string; \
+      })
   #else
     #define ENCODED_STR_NEW(str, length, encoding) \
       rb_str_new((const char *)str, (long)length)
@@ -62,8 +62,8 @@ extern "C" {
   } re2_matchdata;
 
   typedef struct {
-    re2::StringPiece input;
-    int argc;
+    re2::StringPiece *input;
+    int number_of_capturing_groups;
     VALUE regexp, text;
   } re2_consumer;
 
@@ -92,6 +92,9 @@ extern "C" {
   }
 
   void re2_consumer_free(re2_consumer* self) {
+    if (self->input) {
+      delete self->input;
+    }
     free(self);
   }
 
@@ -158,9 +161,8 @@ extern "C" {
   static VALUE re2_consumer_rewind(VALUE self) {
     re2_consumer *c;
     Data_Get_Struct(self, re2_consumer, c);
-    re2::StringPiece input(RSTRING_PTR(c->text));
 
-    c->input = input;
+    c->input = new(nothrow) re2::StringPiece(StringValuePtr(c->text));
 
     return self;
   }
@@ -184,18 +186,20 @@ extern "C" {
     Data_Get_Struct(self, re2_consumer, c);
     Data_Get_Struct(c->regexp, re2_pattern, p);
 
-    vector<RE2::Arg> argv(c->argc);
-    vector<RE2::Arg*> args(c->argc);
-    vector<string> matches(c->argc);
+    vector<RE2::Arg> argv(c->number_of_capturing_groups);
+    vector<RE2::Arg*> args(c->number_of_capturing_groups);
+    vector<string> matches(c->number_of_capturing_groups);
 
-    for (i = 0; i < c->argc; i++) {
-      args[i] = &argv[i];
+    for (i = 0; i < c->number_of_capturing_groups; i++) {
+      matches[i] = "";
       argv[i] = &matches[i];
+      args[i] = &argv[i];
     }
 
-    if (RE2::FindAndConsumeN(&c->input, *p->pattern, &args[0], c->argc)) {
-      result = rb_ary_new2(c->argc);
-      for (i = 0; i < c->argc; i++) {
+    if (RE2::FindAndConsumeN(c->input, *p->pattern, &args[0],
+          c->number_of_capturing_groups)) {
+      result = rb_ary_new2(c->number_of_capturing_groups);
+      for (i = 0; i < c->number_of_capturing_groups; i++) {
         if (matches[i].empty()) {
           rb_ary_push(result, Qnil);
         } else {
@@ -1070,15 +1074,15 @@ extern "C" {
     re2_pattern *p;
     re2_consumer *c;
     VALUE consumer;
-    re2::StringPiece input(RSTRING_PTR(text));
 
     Data_Get_Struct(self, re2_pattern, p);
     consumer = rb_class_new_instance(0, 0, re2_cConsumer);
     Data_Get_Struct(consumer, re2_consumer, c);
-    c->input = input;
+
+    c->input = new(nothrow) re2::StringPiece(StringValuePtr(text));
     c->regexp = self;
     c->text = text;
-    c->argc = p->pattern->NumberOfCapturingGroups();
+    c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
 
     return consumer;
   }
@@ -1259,7 +1263,8 @@ extern "C" {
         RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
     rb_define_method(re2_cRegexp, "===",
         RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
-    rb_define_method(re2_cRegexp, "consume", RUBY_METHOD_FUNC(re2_regexp_consume), 1);
+    rb_define_method(re2_cRegexp, "consume",
+        RUBY_METHOD_FUNC(re2_regexp_consume), 1);
     rb_define_method(re2_cRegexp, "to_s", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
     rb_define_method(re2_cRegexp, "to_str", RUBY_METHOD_FUNC(re2_regexp_to_s),
         0);
