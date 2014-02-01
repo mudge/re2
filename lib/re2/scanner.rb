@@ -1,10 +1,10 @@
 module RE2
-  class Consumer
+  class Scanner
     include Enumerable
 
     def each
       if block_given?
-        while matches = consume
+        while matches = scan
           yield matches
         end
       else

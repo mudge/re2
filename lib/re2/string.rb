@@ -1,28 +1,13 @@
 # re2 (http://github.com/mudge/re2)
 # Ruby bindings to re2, an "efficient, principled regular expression library"
 #
-# Copyright (c) 2010-2013, Paul Mucur (http://mudge.name)
+# Copyright (c) 2010-2014, Paul Mucur (http://mudge.name)
 # Released under the BSD Licence, please see LICENSE.txt
 
 require "re2"
 
 module RE2
   module String
-
-    # Replaces the first occurrence +pattern+ with +rewrite+ <i>in place</i>.
-    #
-    # @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
-    # @param [String] rewrite the string to replace with
-    # @example
-    #   "hello there".re2_sub!("hello", "howdy") #=> "howdy there"
-    #   re2 = RE2.new("hel+o")
-    #   "hello there".re2_sub!(re2, "yo")        #=> "yo there"
-    #   text = "Good morning"
-    #   text.re2_sub!("morn", "even")            #=> "Good evening"
-    #   text                                     #=> "Good evening"
-    def re2_sub!(*args)
-      RE2.Replace(self, *args)
-    end
 
     # Replaces the first occurrence +pattern+ with +rewrite+ and returns a new
     # string.
@@ -37,22 +22,7 @@ module RE2
     #   text.re2_sub("morn", "even")            #=> "Good evening"
     #   text                                    #=> "Good morning"
     def re2_sub(*args)
-      dup.re2_sub!(*args)
-    end
-
-    # Replaces every occurrence of +pattern+ with +rewrite+ <i>in place</i>.
-    #
-    # @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
-    # @param [String] rewrite the string to replace with
-    # @example
-    #   "hello there".re2_gsub!("e", "i")   #=> "hillo thiri"
-    #   re2 = RE2.new("oo?")
-    #   "whoops-doops".re2_gsub!(re2, "e")  #=> "wheps-deps"
-    #   text = "Good morning"
-    #   text.re2_gsub!("o", "ee")           #=> "Geeeed meerning"
-    #   text                                #=> "Geeeed meerning"
-    def re2_gsub!(*args)
-      RE2.GlobalReplace(self, *args)
+      RE2.Replace(self, *args)
     end
 
     # Replaces every occurrence of +pattern+ with +rewrite+ and return a new string.
@@ -67,7 +37,7 @@ module RE2
     #   text.re2_gsub("o", "ee")           #=> "Geeeed meerning"
     #   text                               #=> "Good morning"
     def re2_gsub(*args)
-      dup.re2_gsub!(*args)
+      RE2.GlobalReplace(self, *args)
     end
 
     # Match the pattern and return either a boolean (if no submatches are required)

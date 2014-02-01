@@ -90,51 +90,24 @@ As of 0.3.0, you can use named groups:
 => "40"
 ```
 
-As of 0.4.0, you can mix `RE2::String` into strings to provide helpers from
-the opposite direction:
-
-```console
-> require "re2/string"
-> string = "My name is Robert Paulson"
-=> "My name is Robert Paulson"
-> string.extend(RE2::String)
-=> "My name is Robert Paulson"
-> string.re2_sub("Robert", "Dave")
-=> "My name is Dave Paulson"
-> string.re2_gsub("a", "e")
-=> "My neme is Deve Peulson"
-> string.re2_match('D(\S+)')
-=> #<RE2::MatchData "Deve" 1:"eve">
-> string.re2_escape
-=> "My\\ neme\\ is\\ Deve\\ Peulson"
-```
-
-If you want these available to all strings, you can reopen `String` like so:
-
-```ruby
-class String
-  include RE2::String
-end
-```
-
-As of 0.5.0, you can use `RE2::Regexp#consume` to incrementally scan text for
+As of 0.6.0, you can use `RE2::Regexp#scan` to incrementally scan text for
 matches (similar in purpose to Ruby's
 [`String#scan`](http://ruby-doc.org/core-2.0.0/String.html#method-i-scan)).
-Calling `consume` will return an `RE2::Consumer` which is
+Calling `scan` will return an `RE2::Scanner` which is
 [enumerable](http://ruby-doc.org/core-2.0.0/Enumerable.html) meaning you can
 use `each` to iterate through the matches (and even use
 [`Enumerator::Lazy`](http://ruby-doc.org/core-2.0/Enumerator/Lazy.html)):
 
 ```ruby
 re = RE2('(\w+)')
-consumer = re.consume("It is a truth universally acknowledged")
-consumer.each do |match|
+scanner = re.scan("It is a truth universally acknowledged")
+scanner.each do |match|
   puts match
 end
 
-consumer.rewind
+scanner.rewind
 
-enum = consumer.to_enum
+enum = scanner.to_enum
 enum.next #=> ["It"]
 enum.next #=> ["is"]
 ```
@@ -155,7 +128,7 @@ Features
 * Checking for matches with `re2 =~ text`, `re2 === text` (for use in `case`
   statements) and `re2 !~ text`
 
-* Incrementally scanning text with `re2.consume(text)`
+* Incrementally scanning text with `re2.scan(text)`
 
 * Checking regular expression compilation with `re2.ok?`, `re2.error` and
   `re2.error_arg`
@@ -165,16 +138,15 @@ Features
 * Checking the options for an expression with `re2.options` or individually
   with `re2.case_sensitive?`
 
-* Performing in-place replacement with [`RE2.Replace(str, pattern,
-  replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#335)
+* Performing a single string replacement with `pattern.replace(replacement,
+  original)`
 
-* Performing in-place global replacement with [`RE2.GlobalReplace(str,
-  pattern,
-  replace)`](http://code.google.com/p/re2/source/browse/re2/re2.h#352)
+* Performing a global string replacement with
+  `pattern.replace_all(replacement, original)`
 
 * Escaping regular expressions with
-  [`RE2::Regexp.escape(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377),
-  `RE2::Regexp.quote(unquoted)` or `RE2.QuoteMeta(unquoted)`
+  [`RE2.escape(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377) and
+  `RE2.quote(unquoted)`
 
 Contact
 -------

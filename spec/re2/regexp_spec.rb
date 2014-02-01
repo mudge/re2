@@ -392,12 +392,12 @@ describe RE2::Regexp do
     end
   end
 
-  describe "#consume" do
-    it "returns a consumer" do
+  describe "#scan" do
+    it "returns a scanner" do
       r = RE2::Regexp.new('(\w+)')
-      consumer = r.consume("It is a truth universally acknowledged")
+      scanner = r.scan("It is a truth universally acknowledged")
 
-      consumer.must_be_instance_of(RE2::Consumer)
+      scanner.must_be_instance_of(RE2::Scanner)
     end
   end
 end

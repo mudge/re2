@@ -6,28 +6,6 @@ class String
 end
 
 describe RE2::String do
-  describe "#re2_sub!" do
-    it "delegates to RE2.Replace to perform replacement" do
-      "My name is Robert Paulson".re2_sub!('Robert', 'Crobert').must_equal("My name is Crobert Paulson")
-    end
-
-    it "does perform an in-place replacement" do
-      string = "My name is Robert Paulson"
-      string.re2_sub!('Robert', 'Crobert').must_be_same_as(string)
-    end
-  end
-
-  describe "#re2_gsub!" do
-    it "delegates to RE2.GlobalReplace to perform replacement" do
-      "My name is Robert Paulson".re2_gsub!('a', 'e').must_equal("My neme is Robert Peulson")
-    end
-
-    it "does perform an in-place replacement" do
-      string = "My name is Robert Paulson"
-      string.re2_gsub!('a', 'e').must_be_same_as(string)
-    end
-  end
-
   describe "#re2_sub" do
     it "delegates to RE2.Replace to perform replacement" do
       "My name is Robert Paulson".re2_sub('Robert', 'Crobert').must_equal("My name is Crobert Paulson")
