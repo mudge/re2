@@ -6,8 +6,7 @@ rvm:
   - 2.0.0
   - 2.1.0
   - ree
-  - rbx-18mode
-  - rbx-19mode
+  - rbx
 before_install:
   - wget https://dl.dropbox.com/u/2175127/libre2-dev_20130802_amd64.deb
   - sudo dpkg -i libre2-dev_20130802_amd64.deb
