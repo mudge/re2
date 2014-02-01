@@ -4,6 +4,9 @@ re2 [![Build Status](https://secure.travis-ci.org/mudge/re2.png?branch=master)](
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
+**Current version:** 0.6.0  
+**Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, Rubinius 2.2
+
 Installation
 ------------
 
