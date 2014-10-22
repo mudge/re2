@@ -224,6 +224,49 @@ static VALUE re2_scanner_scan(VALUE self) {
 }
 
 /*
+ * Retrieve a matchdata by index or name.
+ */
+re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
+  int id;
+  re2_matchdata *m;
+  re2_pattern *p;
+  map<string, int> groups;
+  string name;
+  re2::StringPiece *match;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
+
+  if (TYPE(idx) == T_FIXNUM) {
+    id = FIX2INT(idx);
+  } else {
+    if (TYPE(idx) == T_SYMBOL) {
+      name = rb_id2name(SYM2ID(idx));
+    } else {
+      name = StringValuePtr(idx);
+    }
+
+    groups = p->pattern->NamedCapturingGroups();
+
+    if (groups.count(name) == 1) {
+      id = groups[name];
+    } else {
+      return NULL;
+    }
+  }
+
+  if (id >= 0 && id < m->number_of_matches) {
+    match = m->matches + id;
+
+    if (!match->empty()) {
+      return match;
+    }
+  }
+
+  return NULL;
+}
+
+/*
  * Returns the number of elements in the match array (including nils).
  *
  * @return [Fixnum] the number of elements
@@ -237,6 +280,52 @@ static VALUE re2_matchdata_size(VALUE self) {
   Data_Get_Struct(self, re2_matchdata, m);
 
   return INT2FIX(m->number_of_matches);
+}
+
+/*
+ * Returns the start offset of the given matchdata entry.
+ *
+ * @return [Fixnum] the start offset
+ * @example
+ *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
+ *   m.begin(0)  #=> 1
+ *   m.begin(1)  #=> 4
+ */
+static VALUE re2_matchdata_begin(VALUE self, VALUE idx) {
+  re2_matchdata *m;
+  re2::StringPiece *match;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+
+  match = re2_matchdata_find_match(idx, self);
+  if (match == NULL) {
+    return Qnil;
+  }
+
+  return INT2NUM(match->data() - StringValuePtr(m->text));
+}
+
+/*
+ * Returns the end offset of the given matchdata entry.
+ *
+ * @return [Fixnum] the end offset
+ * @example
+ *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
+ *   m.end(0)  #=> 9
+ *   m.end(1)  #=> 7
+ */
+static VALUE re2_matchdata_end(VALUE self, VALUE idx) {
+  re2_matchdata *m;
+  re2::StringPiece *match;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+
+  match = re2_matchdata_find_match(idx, self);
+  if (match == NULL) {
+    return Qnil;
+  }
+
+  return INT2NUM(match->data() - StringValuePtr(m->text) + match->size());
 }
 
 /*
@@ -1216,6 +1305,10 @@ void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
   rb_define_method(re2_cMatchData, "length",
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
+  rb_define_method(re2_cMatchData, "begin",
+      RUBY_METHOD_FUNC(re2_matchdata_begin), 1);
+  rb_define_method(re2_cMatchData, "end",
+      RUBY_METHOD_FUNC(re2_matchdata_end), 1);
   rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
       -1); rb_define_method(re2_cMatchData, "to_s",
         RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);
