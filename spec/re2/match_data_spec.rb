@@ -159,4 +159,24 @@ describe RE2::MatchData do
       m3.must_equal("56")
     end
   end
+
+  describe "#begin/#end" do
+    it "returns the correct begin and end offsets for the whole match" do
+      md = RE2::Regexp.new('(wo{2})').match('a woo')
+      md.begin(0).must_equal(2)
+      md.end(0).must_equal(5)
+    end
+
+    it "returns the correct begin and end offsets for a named submatch" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foo')
+      md.begin('foo').must_equal(2)
+      md.end(:foo).must_equal(5)
+    end
+
+    it "correctly finds the offset with multibyte characters" do
+      md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
+      md.begin(0).must_equal(4)
+      md.end(0).must_equal(8)
+    end
+  end
 end
