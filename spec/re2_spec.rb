@@ -1,9 +1,9 @@
 require "spec_helper"
 
 describe RE2 do
-  describe "#Regexp" do
-    it "returns the correct begin and end offsets for a match" do
-      re = RE2::Regexp.new('wo{2}')
+  describe "#MatchData" do
+    it "returns the correct begin and end offsets for the whole match" do
+      re = RE2::Regexp.new('(wo{2})')
       md = re.match('a woo')
       md.begin(0).must_equal(2)
       md.end(0).must_equal(5)

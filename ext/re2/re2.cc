@@ -256,7 +256,7 @@ re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
   }
 
   if (id >= 0 && id < m->number_of_matches) {
-    match = m->matches + id;
+    match = &m->matches[id];
 
     if (!match->empty()) {
       return match;
@@ -1139,8 +1139,8 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
 
     m->number_of_matches = n;
 
-    matched = match(p->pattern, StringValuePtr(text), 0,
-                    static_cast<int>(RSTRING_LEN(text)),
+    matched = match(p->pattern, StringValuePtr(m->text), 0,
+                    static_cast<int>(RSTRING_LEN(m->text)),
                     RE2::UNANCHORED, m->matches, n);
 
     if (matched) {
