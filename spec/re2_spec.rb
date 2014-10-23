@@ -1,6 +1,22 @@
 require "spec_helper"
 
 describe RE2 do
+  describe "#MatchData" do
+    it "returns the correct begin and end offsets for the whole match" do
+      re = RE2::Regexp.new('(wo{2})')
+      md = re.match('a woo')
+      md.begin(0).must_equal(2)
+      md.end(0).must_equal(5)
+    end
+
+    it "returns the correct begin and end offsets for a named submatch" do
+      re = RE2::Regexp.new('(?P<foo>fo{2})')
+      md = re.match('a foo')
+      md.begin('foo').must_equal(2)
+      md.end(:foo).must_equal(5)
+    end
+  end
+
   describe "#Replace" do
     it "only replaces the first occurrence of the pattern" do
       RE2.Replace("woo", "o", "a").must_equal("wao")
@@ -77,4 +93,3 @@ describe RE2 do
     end
   end
 end
-
