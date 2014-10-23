@@ -1105,6 +1105,8 @@ extern "C" {
 
     rb_scan_args(argc, argv, "11", &text, &number_of_matches);
 
+    text = StringValue(text);
+
     Data_Get_Struct(self, re2_pattern, p);
 
     if (RTEST(number_of_matches)) {
@@ -1136,8 +1138,8 @@ extern "C" {
 
       m->number_of_matches = n;
 
-      matched = match(p->pattern, StringValuePtr(text), 0,
-                      static_cast<int>(RSTRING_LEN(text)),
+      matched = match(p->pattern, StringValuePtr(m->text), 0,
+                      static_cast<int>(RSTRING_LEN(m->text)),
                       RE2::UNANCHORED, m->matches, n);
 
       if (matched) {
