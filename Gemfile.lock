@@ -220,9 +220,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  minitest (~> 5.4.2)
+  minitest (~> 5.4)
   psych
   racc
-  rake-compiler (~> 0.9.3)
+  rake-compiler (~> 0.9)
   re2!
   rubysl (~> 2.0)

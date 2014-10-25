@@ -27,6 +27,6 @@ Gem::Specification.new do |s|
     "spec/re2/string_spec.rb",
     "spec/re2/scanner_spec.rb"
   ]
-  s.add_development_dependency("rake-compiler", "~> 0.9.3")
-  s.add_development_dependency("minitest", "~> 5.4.2")
+  s.add_development_dependency("rake-compiler", "~> 0.9")
+  s.add_development_dependency("minitest", "~> 5.4")
 end
