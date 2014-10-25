@@ -1017,6 +1017,9 @@ extern "C" {
 
     rb_scan_args(argc, argv, "11", &text, &number_of_matches);
 
+    /* Ensure text is a string. */
+    text = StringValue(text);
+
     Data_Get_Struct(self, re2_pattern, p);
 
     if (RTEST(number_of_matches)) {

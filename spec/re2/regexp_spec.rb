@@ -264,6 +264,10 @@ describe RE2::Regexp do
       re.match("My age is 99", 0).must_equal(false)
     end
 
+    it "raises an exception when given nil" do
+      lambda { re.match(nil) }.must_raise(TypeError)
+    end
+
     describe "with a specific number of matches under the total in the pattern" do
       subject { re.match("My name is Robert Paulson", 1) }
 
