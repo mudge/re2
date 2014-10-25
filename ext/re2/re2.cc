@@ -286,7 +286,7 @@ extern "C" {
     int i;
     re2_matchdata *m;
     re2_pattern *p;
-    re2::StringPiece match;
+    re2::StringPiece *match;
     VALUE array;
 
     Data_Get_Struct(self, re2_matchdata, m);
@@ -294,11 +294,12 @@ extern "C" {
 
     array = rb_ary_new2(m->number_of_matches);
     for (i = 0; i < m->number_of_matches; i++) {
-      if (m->matches[i].empty()) {
+      match = &m->matches[i];
+
+      if (match->empty()) {
         rb_ary_push(array, Qnil);
       } else {
-        match = m->matches[i];
-        rb_ary_push(array, ENCODED_STR_NEW(match.data(), match.size(),
+        rb_ary_push(array, ENCODED_STR_NEW(match->data(), match->size(),
               p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1"));
       }
     }
@@ -309,7 +310,7 @@ extern "C" {
   static VALUE re2_matchdata_nth_match(int nth, VALUE self) {
     re2_matchdata *m;
     re2_pattern *p;
-    re2::StringPiece match;
+    re2::StringPiece *match;
 
     Data_Get_Struct(self, re2_matchdata, m);
     Data_Get_Struct(m->regexp, re2_pattern, p);
@@ -317,12 +318,12 @@ extern "C" {
     if (nth < 0 || nth >= m->number_of_matches) {
       return Qnil;
     } else {
-      match = m->matches[nth];
+      match = &m->matches[nth];
 
-      if (match.empty()) {
+      if (match->empty()) {
         return Qnil;
       } else {
-        return ENCODED_STR_NEW(match.data(), match.size(),
+        return ENCODED_STR_NEW(match->data(), match->size(),
             p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
       }
     }
