@@ -69,6 +69,11 @@ describe RE2::MatchData do
       md[:missing].must_be_nil
     end
 
+    it "raises an error if given an inappropriate index" do
+      md = RE2::Regexp.new('(\d+)').match("bob 123")
+      lambda { md[nil] }.must_raise(TypeError)
+    end
+
     if String.method_defined?(:encoding)
       it "returns UTF-8 encoded strings by default" do
         md = RE2::Regexp.new('(?P<name>\S+)').match("bob")

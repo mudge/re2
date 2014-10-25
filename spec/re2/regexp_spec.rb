@@ -11,6 +11,10 @@ describe RE2::Regexp do
       re = RE2::Regexp.new('woo', :case_sensitive => false)
       re.must_be_instance_of(RE2::Regexp)
     end
+
+    it "raises an error if given an inappropriate type" do
+      lambda { RE2::Regexp.new(nil) }.must_raise(TypeError)
+    end
   end
 
   describe "#compile" do
@@ -266,6 +270,10 @@ describe RE2::Regexp do
 
     it "raises an exception when given nil" do
       lambda { re.match(nil) }.must_raise(TypeError)
+    end
+
+    it "raises an exception when given an inappropriate number of matches" do
+      lambda { re.match("My name is Robert Paulson", {}) }.must_raise(TypeError)
     end
 
     describe "with a specific number of matches under the total in the pattern" do
