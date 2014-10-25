@@ -1,0 +1,630 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Module: RE2
+  
+    &mdash; RE2: Ruby bindings to re2
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!RE2.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index (R)</a> &raquo;
+    
+    
+    <span class="title">RE2</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Module: RE2
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">ext/re2/re2.cc<span class="defines">,<br />
+  lib/re2/string.rb,<br /> lib/re2/scanner.rb</span>
+</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span>
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="RE2/MatchData.html" title="RE2::MatchData (class)">MatchData</a></span>, <span class='object_link'><a href="RE2/Regexp.html" title="RE2::Regexp (class)">Regexp</a></span>, <span class='object_link'><a href="RE2/Scanner.html" title="RE2::Scanner (class)">Scanner</a></span>
+    
+  
+</p>
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#GlobalReplace-class_method" title="GlobalReplace (class method)">+ (String) <strong>GlobalReplace</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Return a copy of <code>str</code> with <code>pattern</code> replaced by
+<code>rewrite</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#QuoteMeta-class_method" title="QuoteMeta (class method)">+ (String) <strong>QuoteMeta</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a version of str with all potentially meaningful regexp characters
+escaped.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#Replace-class_method" title="Replace (class method)">+ (String) <strong>Replace</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a copy of <code>str</code> with the first occurrence
+<code>pattern</code> replaced with <code>rewrite</code>.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="GlobalReplace-class_method">
+  
+    + (<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>) <strong>GlobalReplace</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Return a copy of <code>str</code> with <code>pattern</code> replaced by
+<code>rewrite</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>oo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='const'>RE2</span><span class='period'>.</span><span class='const'>GlobalReplace</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>whoops-doops</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_re2'>re2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>e</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='comment'>#=&gt; &quot;wheps-deps&quot;
+</span><span class='const'>RE2</span><span class='period'>.</span><span class='const'>GlobalReplace</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello there</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>e</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>i</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>   <span class='comment'>#=&gt; &quot;hillo thiri&quot;</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>str</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the string to modify</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>pattern</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>, <tt><span class='object_link'><a href="RE2/Regexp.html" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a regexp matching text to be replaced</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>rewrite</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the string to replace with</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the resulting string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1152
+1153
+1154
+1155
+1156
+1157
+1158
+1159
+1160
+1161
+1162
+1163
+1164
+1165
+1166
+1167
+1168
+1169
+1170
+1171
+1172
+1173
+1174</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1152</span>
+
+static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
+                               VALUE rewrite) {
+  UNUSED(self);
+
+  /* Convert all the inputs to be pumped into RE2::GlobalReplace. */
+  re2_pattern *p;
+  string str_as_string(StringValuePtr(str));
+
+  /* Do the replacement. */
+  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
+    Data_Get_Struct(pattern, re2_pattern, p);
+    RE2::GlobalReplace(&amp;str_as_string, *p-&gt;pattern, StringValuePtr(rewrite));
+
+    return ENCODED_STR_NEW(str_as_string.data(), str_as_string.size(),
+        p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+  } else {
+    RE2::GlobalReplace(&amp;str_as_string, StringValuePtr(pattern),
+                       StringValuePtr(rewrite));
+
+    return ENCODED_STR_NEW2(str_as_string.data(), str_as_string.size(),
+        pattern);
+  }
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="QuoteMeta-class_method">
+  
+    + (<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>) <strong>QuoteMeta</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a version of str with all potentially meaningful regexp characters
+escaped. The returned string, used as a regular expression, will exactly
+match the original string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.5-2.0?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &quot;1\.5\-2\.0\?&quot;</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>unquoted</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the unquoted string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the escaped string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1186
+1187
+1188
+1189
+1190</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1186</span>
+
+static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
+  UNUSED(self);
+  string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+  return rb_str_new(quoted_string.data(), quoted_string.size());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="Replace-class_method">
+  
+    + (<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>) <strong>Replace</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a copy of <code>str</code> with the first occurrence
+<code>pattern</code> replaced with <code>rewrite</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='const'>RE2</span><span class='period'>.</span><span class='const'>Replace</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello there</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>howdy</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; &quot;howdy there&quot;
+</span><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hel+o</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='const'>RE2</span><span class='period'>.</span><span class='const'>Replace</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello there</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_re2'>re2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yo</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>        <span class='comment'>#=&gt; &quot;yo there&quot;</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>str</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the string to modify</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>pattern</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>, <tt><span class='object_link'><a href="RE2/Regexp.html" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a regexp matching text to be replaced</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>rewrite</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the string to replace with</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RE2/String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the resulting string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1115
+1116
+1117
+1118
+1119
+1120
+1121
+1122
+1123
+1124
+1125
+1126
+1127
+1128
+1129
+1130
+1131
+1132
+1133
+1134
+1135
+1136
+1137
+1138</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1115</span>
+
+static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
+    VALUE rewrite) {
+  UNUSED(self);
+  re2_pattern *p;
+
+  /* Convert all the inputs to be pumped into RE2::Replace. */
+  string str_as_string(StringValuePtr(str));
+
+  /* Do the replacement. */
+  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
+    Data_Get_Struct(pattern, re2_pattern, p);
+    RE2::Replace(&amp;str_as_string, *p-&gt;pattern, StringValuePtr(rewrite));
+
+    return ENCODED_STR_NEW(str_as_string.data(), str_as_string.size(),
+        p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+  } else {
+    RE2::Replace(&amp;str_as_string, StringValuePtr(pattern),
+        StringValuePtr(rewrite));
+
+    return ENCODED_STR_NEW2(str_as_string.data(), str_as_string.size(),
+        pattern);
+  }
+
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sat Oct 25 20:13:55 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.3).
+</div>
+
+  </body>
+</html>

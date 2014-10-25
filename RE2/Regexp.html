@@ -1,0 +1,4475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: RE2::Regexp
+  
+    &mdash; RE2: Ruby bindings to re2
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!RE2/Regexp.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span>
+     &raquo; 
+    <span class="title">Regexp</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: RE2::Regexp
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">RE2::Regexp</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">ext/re2/re2.cc</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#compile-class_method" title="compile (class method)">+ (Object) <strong>compile</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#escape-class_method" title="escape (class method)">+ (String) <strong>escape</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a version of str with all potentially meaningful regexp characters
+escaped.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#quote-class_method" title="quote (class method)">+ (String) <strong>quote</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a version of str with all potentially meaningful regexp characters
+escaped.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%3D%3D%3D-instance_method" title="#=== (instance method)">- (Boolean) <strong>===</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns true or false to indicate a successful match.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%3D%7E-instance_method" title="#=~ (instance method)">- (Boolean) <strong>=~</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns true or false to indicate a successful match.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#case_insensitive%3F-instance_method" title="#case_insensitive? (instance method)">- (Boolean) <strong>case_insensitive?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the case_sensitive option set to false.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#case_sensitive%3F-instance_method" title="#case_sensitive? (instance method)">- (Boolean) <strong>case_sensitive?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the case_sensitive option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#casefold%3F-instance_method" title="#casefold? (instance method)">- (Boolean) <strong>casefold?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the case_sensitive option set to false.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#error-instance_method" title="#error (instance method)">- (String<sup>?</sup>) <strong>error</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>If the RE2 could not be created properly, returns an error string otherwise
+returns nil.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#error_arg-instance_method" title="#error_arg (instance method)">- (String<sup>?</sup>) <strong>error_arg</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>If the RE2 could not be created properly, returns the offending portion of
+the regexp otherwise returns nil.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (RE2::Regexp) <strong>initialize</strong> </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a new <span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span> object with a compiled version of
+<code>pattern</code> stored inside.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">- (String) <strong>inspect</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a printable version of the regular expression <code>re2</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#literal%3F-instance_method" title="#literal? (instance method)">- (Boolean) <strong>literal?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the literal option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#log_errors%3F-instance_method" title="#log_errors? (instance method)">- (Boolean) <strong>log_errors?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the log_errors option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#longest_match%3F-instance_method" title="#longest_match? (instance method)">- (Boolean) <strong>longest_match?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the longest_match option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match-instance_method" title="#match (instance method)">- (Boolean, RE2::MatchData) <strong>match</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Match the pattern against the given <code>text</code> and return either a
+boolean (if no submatches are required) or a <span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">MatchData</a></span> instance.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match%3F-instance_method" title="#match? (instance method)">- (Boolean) <strong>match?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns true or false to indicate a successful match.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#max_mem-instance_method" title="#max_mem (instance method)">- (Fixnum) <strong>max_mem</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the max_mem setting for the regular expression <code>re2</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#named_capturing_groups-instance_method" title="#named_capturing_groups (instance method)">- (Hash) <strong>named_capturing_groups</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a hash of names to capturing indices of groups.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#never_nl%3F-instance_method" title="#never_nl? (instance method)">- (Boolean) <strong>never_nl?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the never_nl option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#number_of_capturing_groups-instance_method" title="#number_of_capturing_groups (instance method)">- (Fixnum) <strong>number_of_capturing_groups</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the number of capturing subpatterns, or -1 if the regexp wasn&#39;t
+valid on construction.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ok%3F-instance_method" title="#ok? (instance method)">- (Boolean) <strong>ok?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+successfully or not.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#one_line%3F-instance_method" title="#one_line? (instance method)">- (Boolean) <strong>one_line?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the one_line option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#options-instance_method" title="#options (instance method)">- (Hash) <strong>options</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a hash of the options currently set for <code>re2</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pattern-instance_method" title="#pattern (instance method)">- (String) <strong>pattern</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#perl_classes%3F-instance_method" title="#perl_classes? (instance method)">- (Boolean) <strong>perl_classes?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the perl_classes option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#posix_syntax%3F-instance_method" title="#posix_syntax? (instance method)">- (Boolean) <strong>posix_syntax?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the posix_syntax option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#program_size-instance_method" title="#program_size (instance method)">- (Fixnum) <strong>program_size</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the program size, a very approximate measure of a regexp&#39;s
+“cost”.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#scan-instance_method" title="#scan (instance method)">- (Object) <strong>scan</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a <span class='object_link'><a href="Scanner.html" title="RE2::Scanner (class)">Scanner</a></span> for scanning the given text incrementally.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#source-instance_method" title="#source (instance method)">- (String) <strong>source</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_s-instance_method" title="#to_s (instance method)">- (String) <strong>to_s</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_str-instance_method" title="#to_str (instance method)">- (String) <strong>to_str</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#utf8%3F-instance_method" title="#utf8? (instance method)">- (Boolean) <strong>utf8?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the utf8 option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#word_boundary%3F-instance_method" title="#word_boundary? (instance method)">- (Boolean) <strong>word_boundary?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the word_boundary option set to true.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    
+      <span class="overload">- (<tt><span class='object_link'><a href="" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>) <strong>initialize</strong>(pattern) </span>
+    
+      <span class="overload">- (<tt><span class='object_link'><a href="" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>) <strong>initialize</strong>(pattern, options) </span>
+    
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new <span class='object_link'><a href="" title="RE2::Regexp (class)">RE2::Regexp</a></span> object with a compiled version of
+<code>pattern</code> stored inside.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <p class="tag_title">Overloads:</p>
+  <ul class="overload">
+    
+      
+      <li class="overload_item">
+        <span class="signature">- (<tt><span class='object_link'><a href="" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>) <strong>initialize</strong>(pattern) </span>
+        <div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new <span class='object_link'><a href="" title="RE2::Regexp (class)">RE2::Regexp</a></span> object with a compiled version of
+<code>pattern</code> stored inside with the default options.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>pattern</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the pattern to compile</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>NoMemoryError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if memory could not be allocated for the compiled pattern</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+      </li>
+    
+      
+      <li class="overload_item">
+        <span class="signature">- (<tt><span class='object_link'><a href="" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>) <strong>initialize</strong>(pattern, options) </span>
+        <div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new <span class='object_link'><a href="" title="RE2::Regexp (class)">RE2::Regexp</a></span> object with a compiled version of
+<code>pattern</code> stored inside with the specified options.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>pattern</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the pattern to compile</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the options with which to compile the pattern</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:utf8</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>true</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>text and pattern are UTF-8; otherwise Latin-1</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:posix_syntax</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>restrict regexps to POSIX egrep syntax</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:longest_match</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>search for longest match, not first match</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:log_errors</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>true</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>log syntax and execution errors to ERROR</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:max_mem</span>
+          <span class="type">(<tt>Fixnum</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>approx. max memory footprint of RE2</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:literal</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>interpret string as literal, not regexp</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:never_nl</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>never match n, even if it is in regexp</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:case_sensitive</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>true</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>match is case-sensitive (regexp can override with (?i) unless in
+posix_syntax mode)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:perl_classes</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>allow Perl&#39;s d s w D S W when in posix_syntax mode</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:word_boundary</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>allow b B (word boundary and not) when in posix_syntax mode</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:one_line</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>^ and $ only match beginning and end of text when in posix_syntax mode</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>NoMemoryError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if memory could not be allocated for the compiled pattern</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+      </li>
+    
+  </ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 512</span>
+
+static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
+  VALUE pattern, options, utf8, posix_syntax, longest_match, log_errors,
+        max_mem, literal, never_nl, case_sensitive, perl_classes,
+        word_boundary, one_line;
+  re2_pattern *p;
+
+  rb_scan_args(argc, argv, &quot;11&quot;, &amp;pattern, &amp;options);
+  Data_Get_Struct(self, re2_pattern, p);
+
+  if (RTEST(options)) {
+    if (TYPE(options) != T_HASH) {
+      rb_raise(rb_eArgError, &quot;options should be a hash&quot;);
+    }
+
+    RE2::Options re2_options;
+
+    utf8 = rb_hash_aref(options, ID2SYM(id_utf8));
+    if (!NIL_P(utf8)) {
+      re2_options.set_utf8(RTEST(utf8));
+    }
+
+    posix_syntax = rb_hash_aref(options, ID2SYM(id_posix_syntax));
+    if (!NIL_P(posix_syntax)) {
+      re2_options.set_posix_syntax(RTEST(posix_syntax));
+    }
+
+    longest_match = rb_hash_aref(options, ID2SYM(id_longest_match));
+    if (!NIL_P(longest_match)) {
+      re2_options.set_longest_match(RTEST(longest_match));
+    }
+
+    log_errors = rb_hash_aref(options, ID2SYM(id_log_errors));
+    if (!NIL_P(log_errors)) {
+      re2_options.set_log_errors(RTEST(log_errors));
+    }
+
+    max_mem = rb_hash_aref(options, ID2SYM(id_max_mem));
+    if (!NIL_P(max_mem)) {
+      re2_options.set_max_mem(NUM2INT(max_mem));
+    }
+
+    literal = rb_hash_aref(options, ID2SYM(id_literal));
+    if (!NIL_P(literal)) {
+      re2_options.set_literal(RTEST(literal));
+    }
+
+    never_nl = rb_hash_aref(options, ID2SYM(id_never_nl));
+    if (!NIL_P(never_nl)) {
+      re2_options.set_never_nl(RTEST(never_nl));
+    }
+
+    case_sensitive = rb_hash_aref(options, ID2SYM(id_case_sensitive));
+    if (!NIL_P(case_sensitive)) {
+      re2_options.set_case_sensitive(RTEST(case_sensitive));
+    }
+
+    perl_classes = rb_hash_aref(options, ID2SYM(id_perl_classes));
+    if (!NIL_P(perl_classes)) {
+      re2_options.set_perl_classes(RTEST(perl_classes));
+    }
+
+    word_boundary = rb_hash_aref(options, ID2SYM(id_word_boundary));
+    if (!NIL_P(word_boundary)) {
+      re2_options.set_word_boundary(RTEST(word_boundary));
+    }
+
+    one_line = rb_hash_aref(options, ID2SYM(id_one_line));
+    if (!NIL_P(one_line)) {
+      re2_options.set_one_line(RTEST(one_line));
+    }
+
+    p-&gt;pattern = new(nothrow) RE2(StringValuePtr(pattern), re2_options);
+  } else {
+    p-&gt;pattern = new(nothrow) RE2(StringValuePtr(pattern));
+  }
+
+  if (p-&gt;pattern == 0) {
+    rb_raise(rb_eNoMemError, &quot;not enough memory to allocate RE2 object&quot;);
+  }
+
+  return self;
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="compile-class_method">
+  
+    + (<tt>Object</tt>) <strong>compile</strong> 
+  
+
+  
+
+  
+</h3>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="escape-class_method">
+  
+    + (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>) <strong>escape</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a version of str with all potentially meaningful regexp characters
+escaped. The returned string, used as a regular expression, will exactly
+match the original string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.5-2.0?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &quot;1\.5\-2\.0\?&quot;</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>unquoted</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the unquoted string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the escaped string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1186
+1187
+1188
+1189
+1190</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1186</span>
+
+static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
+  UNUSED(self);
+  string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+  return rb_str_new(quoted_string.data(), quoted_string.size());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="quote-class_method">
+  
+    + (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>) <strong>quote</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a version of str with all potentially meaningful regexp characters
+escaped. The returned string, used as a regular expression, will exactly
+match the original string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.5-2.0?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &quot;1\.5\-2\.0\?&quot;</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>unquoted</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the unquoted string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the escaped string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1186
+1187
+1188
+1189
+1190</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1186</span>
+
+static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
+  UNUSED(self);
+  string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+  return rb_str_new(quoted_string.data(), quoted_string.size());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="===-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>===</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns true or false to indicate a successful match. Equivalent to
+<tt>re2.match(text, 0)</tt>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether the match was successful</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1071
+1072
+1073
+1074
+1075
+1076
+1077</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1071</span>
+
+static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
+  VALUE argv[2];
+  argv[0] = text;
+  argv[1] = INT2FIX(0);
+
+  return re2_regexp_match(2, argv, self);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="=~-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>=~</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns true or false to indicate a successful match. Equivalent to
+<tt>re2.match(text, 0)</tt>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether the match was successful</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1071
+1072
+1073
+1074
+1075
+1076
+1077</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1071</span>
+
+static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
+  VALUE argv[2];
+  argv[0] = text;
+  argv[1] = INT2FIX(0);
+
+  return re2_regexp_match(2, argv, self);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="case_insensitive?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>case_insensitive?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the case_sensitive option set to false.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_case_insensitive?'>case_insensitive?</span>    <span class='comment'>#=&gt; false
+</span><span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_casefold?'>casefold?</span>    <span class='comment'>#=&gt; false</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the inverse of the case_sensitive option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+779
+780
+781</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 779</span>
+
+<span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
+  <span class='kw'>return</span> <span class='const'>BOOL2RUBY</span><span class='lparen'>(</span><span class='id identifier rubyid_re2_regexp_case_sensitive'>re2_regexp_case_sensitive</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='op'>!=</span> <span class='const'>Qtrue</span><span class='rparen'>)</span><span class='semicolon'>;</span>
+<span class='rbrace'>}</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="case_sensitive?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>case_sensitive?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the case_sensitive option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_case_sensitive?'>case_sensitive?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the case_sensitive option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+763
+764
+765
+766
+767</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 763</span>
+
+static VALUE re2_regexp_case_sensitive(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().case_sensitive());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="casefold?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>casefold?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the case_sensitive option set to false.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_case_insensitive?'>case_insensitive?</span>    <span class='comment'>#=&gt; false
+</span><span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_casefold?'>casefold?</span>    <span class='comment'>#=&gt; false</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the inverse of the case_sensitive option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+779
+780
+781</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 779</span>
+
+<span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
+  <span class='kw'>return</span> <span class='const'>BOOL2RUBY</span><span class='lparen'>(</span><span class='id identifier rubyid_re2_regexp_case_sensitive'>re2_regexp_case_sensitive</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='op'>!=</span> <span class='const'>Qtrue</span><span class='rparen'>)</span><span class='semicolon'>;</span>
+<span class='rbrace'>}</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="error-instance_method">
+  
+    - (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt><sup>?</sup>) <strong>error</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>If the RE2 could not be created properly, returns an error string otherwise
+returns nil.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the error string or nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+834
+835
+836
+837
+838
+839
+840
+841
+842</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 834</span>
+
+static VALUE re2_regexp_error(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  if (p-&gt;pattern-&gt;ok()) {
+    return Qnil;
+  } else {
+    return rb_str_new(p-&gt;pattern-&gt;error().data(), p-&gt;pattern-&gt;error().size());
+  }
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="error_arg-instance_method">
+  
+    - (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt><sup>?</sup>) <strong>error_arg</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>If the RE2 could not be created properly, returns the offending portion of
+the regexp otherwise returns nil.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the offending portion of the regexp or nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+850
+851
+852
+853
+854
+855
+856
+857
+858
+859
+860</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 850</span>
+
+static VALUE re2_regexp_error_arg(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  if (p-&gt;pattern-&gt;ok()) {
+    return Qnil;
+  } else {
+    return ENCODED_STR_NEW(p-&gt;pattern-&gt;error_arg().data(),
+        p-&gt;pattern-&gt;error_arg().size(),
+        p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+  }
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    - (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>) <strong>inspect</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a printable version of the regular expression <code>re2</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span>    <span class='comment'>#=&gt; &quot;#&lt;RE2::Regexp /woo?/&gt;&quot;</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a printable version of the regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+603
+604
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 603</span>
+
+static VALUE re2_regexp_inspect(VALUE self) {
+  re2_pattern *p;
+  VALUE result;
+  ostringstream output;
+
+  Data_Get_Struct(self, re2_pattern, p);
+
+  output &lt;&lt; &quot;#&lt;RE2::Regexp /&quot; &lt;&lt; p-&gt;pattern-&gt;pattern() &lt;&lt; &quot;/&gt;&quot;;
+
+  result = ENCODED_STR_NEW(output.str().data(), output.str().length(),
+      p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+
+  return result;
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="literal?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>literal?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the literal option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:literal</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_literal?'>literal?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the literal option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+733
+734
+735
+736
+737</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 733</span>
+
+static VALUE re2_regexp_literal(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().literal());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="log_errors?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>log_errors?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the log_errors option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:log_errors</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_log_errors?'>log_errors?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the log_errors option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+703
+704
+705
+706
+707</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 703</span>
+
+static VALUE re2_regexp_log_errors(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().log_errors());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="longest_match?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>longest_match?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the longest_match option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:longest_match</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_longest_match?'>longest_match?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the longest_match option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+688
+689
+690
+691
+692</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 688</span>
+
+static VALUE re2_regexp_longest_match(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().longest_match());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="match-instance_method">
+  
+    
+      <span class="overload">- (<tt><span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">RE2::MatchData</a></span></tt>) <strong>match</strong>(text) </span>
+    
+      <span class="overload">- (<tt>Boolean</tt>) <strong>match</strong>(text, 0) </span>
+    
+      <span class="overload">- (<tt><span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">RE2::MatchData</a></span></tt>) <strong>match</strong>(text, number_of_matches) </span>
+    
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Match the pattern against the given <code>text</code> and return either a
+boolean (if no submatches are required) or a <span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">MatchData</a></span> instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <p class="tag_title">Overloads:</p>
+  <ul class="overload">
+    
+      
+      <li class="overload_item">
+        <span class="signature">- (<tt><span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">RE2::MatchData</a></span></tt>) <strong>match</strong>(text) </span>
+        <div class="docstring">
+  <div class="discussion">
+    
+<p>Returns an <span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">MatchData</a></span> containing the matching pattern and all
+subpatterns resulting from looking for the regexp in <code>text</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; #&lt;RE2::MatchData &quot;woo&quot; 1:&quot;o&quot; 2:&quot;o&quot;&gt;</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>text</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the text to search</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">RE2::MatchData</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the matches</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>NoMemoryError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if there was not enough memory to allocate the matches</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+      </li>
+    
+      
+      <li class="overload_item">
+        <span class="signature">- (<tt>Boolean</tt>) <strong>match</strong>(text, 0) </span>
+        <div class="docstring">
+  <div class="discussion">
+    
+<p>Returns either true or false indicating whether a successful match was
+made.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bob</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='comment'>#=&gt; false</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>text</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the text to search</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether the match was successful</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>NoMemoryError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if there was not enough memory to allocate the matches</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+      </li>
+    
+      
+      <li class="overload_item">
+        <span class="signature">- (<tt><span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">RE2::MatchData</a></span></tt>) <strong>match</strong>(text, number_of_matches) </span>
+        <div class="docstring">
+  <div class="discussion">
+    
+<p>See <tt>match(text)</tt> but with a specific number of matches returned (padded
+with nils if necessary).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='comment'>#=&gt; #&lt;RE2::MatchData &quot;woo&quot; 1:&quot;o&quot;&gt;
+</span><span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>3</span><span class='rparen'>)</span> <span class='comment'>#=&gt; #&lt;RE2::MatchData &quot;woo&quot; 1:&quot;o&quot; 2:&quot;o&quot; 3:nil&gt;</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>text</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the text to search</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>number_of_matches</span>
+      
+      
+        <span class='type'>(<tt>Fixnum</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the number of matches to return</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">RE2::MatchData</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the matches</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>NoMemoryError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if there was not enough memory to allocate the matches</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+      </li>
+    
+  </ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>, <tt><span class='object_link'><a href="MatchData.html" title="RE2::MatchData (class)">RE2::MatchData</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1010
+1011
+1012
+1013
+1014
+1015
+1016
+1017
+1018
+1019
+1020
+1021
+1022
+1023
+1024
+1025
+1026
+1027
+1028
+1029
+1030
+1031
+1032
+1033
+1034
+1035
+1036
+1037
+1038
+1039
+1040
+1041
+1042
+1043
+1044
+1045
+1046
+1047
+1048
+1049
+1050
+1051
+1052
+1053
+1054
+1055
+1056
+1057
+1058
+1059
+1060
+1061
+1062
+1063</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1010</span>
+
+static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
+  int n;
+  bool matched;
+  re2_pattern *p;
+  re2_matchdata *m;
+  VALUE text, number_of_matches, matchdata;
+
+  rb_scan_args(argc, argv, &quot;11&quot;, &amp;text, &amp;number_of_matches);
+
+  /* Ensure text is a string. */
+  text = StringValue(text);
+
+  Data_Get_Struct(self, re2_pattern, p);
+
+  if (RTEST(number_of_matches)) {
+    n = NUM2INT(number_of_matches);
+  } else {
+    n = p-&gt;pattern-&gt;NumberOfCapturingGroups();
+  }
+
+  if (n == 0) {
+    matched = match(p-&gt;pattern, StringValuePtr(text), 0,
+        static_cast&lt;int&gt;(RSTRING_LEN(text)), RE2::UNANCHORED, 0, 0);
+    return BOOL2RUBY(matched);
+  } else {
+
+    /* Because match returns the whole match as well. */
+    n += 1;
+
+    matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
+    Data_Get_Struct(matchdata, re2_matchdata, m);
+    m-&gt;matches = new(nothrow) re2::StringPiece[n];
+    m-&gt;regexp = self;
+    m-&gt;text = rb_str_dup(text);
+    rb_str_freeze(m-&gt;text);
+
+    if (m-&gt;matches == 0) {
+      rb_raise(rb_eNoMemError,
+               &quot;not enough memory to allocate StringPieces for matches&quot;);
+    }
+
+    m-&gt;number_of_matches = n;
+
+    matched = match(p-&gt;pattern, StringValuePtr(text), 0,
+                    static_cast&lt;int&gt;(RSTRING_LEN(text)),
+                    RE2::UNANCHORED, m-&gt;matches, n);
+
+    if (matched) {
+      return matchdata;
+    } else {
+      return Qnil;
+    }
+  }
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="match?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>match?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns true or false to indicate a successful match. Equivalent to
+<tt>re2.match(text, 0)</tt>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether the match was successful</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1071
+1072
+1073
+1074
+1075
+1076
+1077</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1071</span>
+
+static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
+  VALUE argv[2];
+  argv[0] = text;
+  argv[1] = INT2FIX(0);
+
+  return re2_regexp_match(2, argv, self);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="max_mem-instance_method">
+  
+    - (<tt>Fixnum</tt>) <strong>max_mem</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the max_mem setting for the regular expression <code>re2</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:max_mem</span> <span class='op'>=&gt;</span> <span class='int'>1024</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_max_mem'>max_mem</span>    <span class='comment'>#=&gt; 1024</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Fixnum</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the max_mem option</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+718
+719
+720
+721
+722</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 718</span>
+
+static VALUE re2_regexp_max_mem(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return INT2FIX(p-&gt;pattern-&gt;options().max_mem());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="named_capturing_groups-instance_method">
+  
+    - (<tt>Hash</tt>) <strong>named_capturing_groups</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a hash of names to capturing indices of groups.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a hash of names to capturing indices</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+946
+947
+948
+949
+950
+951
+952
+953
+954
+955
+956
+957
+958
+959
+960
+961
+962
+963
+964</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 946</span>
+
+static VALUE re2_regexp_named_capturing_groups(VALUE self) {
+  VALUE capturing_groups;
+  re2_pattern *p;
+  map&lt;string, int&gt; groups;
+  map&lt;string, int&gt;::iterator iterator;
+
+  Data_Get_Struct(self, re2_pattern, p);
+  groups = p-&gt;pattern-&gt;NamedCapturingGroups();
+  capturing_groups = rb_hash_new();
+
+  for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
+    rb_hash_aset(capturing_groups,
+        ENCODED_STR_NEW(iterator-&gt;first.data(), iterator-&gt;first.size(),
+          p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;),
+        INT2FIX(iterator-&gt;second));
+  }
+
+  return capturing_groups;
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="never_nl?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>never_nl?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the never_nl option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:never_nl</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_never_nl?'>never_nl?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the never_nl option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+748
+749
+750
+751
+752</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 748</span>
+
+static VALUE re2_regexp_never_nl(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().never_nl());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="number_of_capturing_groups-instance_method">
+  
+    - (<tt>Fixnum</tt>) <strong>number_of_capturing_groups</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the number of capturing subpatterns, or -1 if the regexp wasn&#39;t
+valid on construction. The overall match ($0) does not count: if the regexp
+is “(a)(b)”, returns 2.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Fixnum</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the number of capturing subpatterns</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+934
+935
+936
+937
+938
+939</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 934</span>
+
+static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
+  re2_pattern *p;
+
+  Data_Get_Struct(self, re2_pattern, p);
+  return INT2FIX(p-&gt;pattern-&gt;NumberOfCapturingGroups());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ok?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>ok?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+successfully or not.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_ok?'>ok?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether or not compilation was successful</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+643
+644
+645
+646
+647</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 643</span>
+
+static VALUE re2_regexp_ok(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;ok());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="one_line?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>one_line?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the one_line option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:one_line</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_one_line?'>one_line?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the one_line option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+822
+823
+824
+825
+826</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 822</span>
+
+static VALUE re2_regexp_one_line(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().one_line());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="options-instance_method">
+  
+    - (<tt>Hash</tt>) <strong>options</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a hash of the options currently set for <code>re2</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+881
+882
+883
+884
+885
+886
+887
+888
+889
+890
+891
+892
+893
+894
+895
+896
+897
+898
+899
+900
+901
+902
+903
+904
+905
+906
+907
+908
+909
+910
+911
+912
+913
+914
+915
+916
+917
+918
+919
+920
+921
+922
+923
+924
+925</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 881</span>
+
+static VALUE re2_regexp_options(VALUE self) {
+  VALUE options;
+  re2_pattern *p;
+
+  Data_Get_Struct(self, re2_pattern, p);
+  options = rb_hash_new();
+
+  rb_hash_aset(options, ID2SYM(id_utf8),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().utf8()));
+
+  rb_hash_aset(options, ID2SYM(id_posix_syntax),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().posix_syntax()));
+
+  rb_hash_aset(options, ID2SYM(id_longest_match),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().longest_match()));
+
+  rb_hash_aset(options, ID2SYM(id_log_errors),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().log_errors()));
+
+  rb_hash_aset(options, ID2SYM(id_max_mem),
+      INT2FIX(p-&gt;pattern-&gt;options().max_mem()));
+
+  rb_hash_aset(options, ID2SYM(id_literal),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().literal()));
+
+  rb_hash_aset(options, ID2SYM(id_never_nl),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().never_nl()));
+
+  rb_hash_aset(options, ID2SYM(id_case_sensitive),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().case_sensitive()));
+
+  rb_hash_aset(options, ID2SYM(id_perl_classes),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().perl_classes()));
+
+  rb_hash_aset(options, ID2SYM(id_word_boundary),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().word_boundary()));
+
+  rb_hash_aset(options, ID2SYM(id_one_line),
+      BOOL2RUBY(p-&gt;pattern-&gt;options().one_line()));
+
+  /* This is a read-only hash after all... */
+  rb_obj_freeze(options);
+
+  return options;
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pattern-instance_method">
+  
+    - (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>) <strong>pattern</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a string version of the regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+626
+627
+628
+629
+630
+631
+632</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+
+static VALUE re2_regexp_to_s(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+      p-&gt;pattern-&gt;pattern().size(),
+      p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="perl_classes?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>perl_classes?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the perl_classes option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:perl_classes</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_perl_classes?'>perl_classes?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the perl_classes option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+792
+793
+794
+795
+796</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 792</span>
+
+static VALUE re2_regexp_perl_classes(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().perl_classes());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="posix_syntax?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>posix_syntax?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the posix_syntax option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:posix_syntax</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_posix_syntax?'>posix_syntax?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the posix_syntax option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+673
+674
+675
+676
+677</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 673</span>
+
+static VALUE re2_regexp_posix_syntax(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().posix_syntax());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="program_size-instance_method">
+  
+    - (<tt>Fixnum</tt>) <strong>program_size</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the program size, a very approximate measure of a regexp&#39;s
+“cost”. Larger numbers are more expensive than smaller numbers.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Fixnum</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the regexp “cost”</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+869
+870
+871
+872
+873</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 869</span>
+
+static VALUE re2_regexp_program_size(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return INT2FIX(p-&gt;pattern-&gt;ProgramSize());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="scan-instance_method">
+  
+    - (<tt>Object</tt>) <strong>scan</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a <span class='object_link'><a href="Scanner.html" title="RE2::Scanner (class)">Scanner</a></span> for scanning the given text incrementally.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_c'>c</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(\w+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Foo bar baz</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1085
+1086
+1087
+1088
+1089
+1090
+1091
+1092
+1093
+1094
+1095
+1096
+1097
+1098
+1099
+1100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1085</span>
+
+static VALUE re2_regexp_scan(VALUE self, VALUE text) {
+  re2_pattern *p;
+  re2_scanner *c;
+  VALUE scanner;
+
+  Data_Get_Struct(self, re2_pattern, p);
+  scanner = rb_class_new_instance(0, 0, re2_cScanner);
+  Data_Get_Struct(scanner, re2_scanner, c);
+
+  c-&gt;input = new(nothrow) re2::StringPiece(StringValuePtr(text));
+  c-&gt;regexp = self;
+  c-&gt;text = text;
+  c-&gt;number_of_capturing_groups = p-&gt;pattern-&gt;NumberOfCapturingGroups();
+
+  return scanner;
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="source-instance_method">
+  
+    - (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>) <strong>source</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a string version of the regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+626
+627
+628
+629
+630
+631
+632</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+
+static VALUE re2_regexp_to_s(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+      p-&gt;pattern-&gt;pattern().size(),
+      p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    - (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>) <strong>to_s</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a string version of the regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+626
+627
+628
+629
+630
+631
+632</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+
+static VALUE re2_regexp_to_s(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+      p-&gt;pattern-&gt;pattern().size(),
+      p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_str-instance_method">
+  
+    - (<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>) <strong>to_str</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a string version of the regular expression <code>re2</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a string version of the regular expression</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+626
+627
+628
+629
+630
+631
+632</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+
+static VALUE re2_regexp_to_s(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+      p-&gt;pattern-&gt;pattern().size(),
+      p-&gt;pattern-&gt;options().utf8() ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="utf8?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>utf8?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the utf8 option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:utf8</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_utf8?'>utf8?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the utf8 option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+658
+659
+660
+661
+662</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 658</span>
+
+static VALUE re2_regexp_utf8(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().utf8());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="word_boundary?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>word_boundary?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns whether or not the regular expression <code>re2</code> was compiled
+with the word_boundary option set to true.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:word_boundary</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_word_boundary?'>word_boundary?</span>    <span class='comment'>#=&gt; true</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the word_boundary option</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+807
+808
+809
+810
+811</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 807</span>
+
+static VALUE re2_regexp_word_boundary(VALUE self) {
+  re2_pattern *p;
+  Data_Get_Struct(self, re2_pattern, p);
+  return BOOL2RUBY(p-&gt;pattern-&gt;options().word_boundary());
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sat Oct 25 20:13:56 2014 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.4 (ruby-2.1.3).
+</div>
+
+  </body>
+</html>
