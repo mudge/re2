@@ -1,10 +1,10 @@
-re2 [![Build Status](https://secure.travis-ci.org/mudge/re2.png?branch=master)](http://travis-ci.org/mudge/re2)
+re2 [![Build Status](https://travis-ci.org/mudge/re2.svg?branch=master)](http://travis-ci.org/mudge/re2)
 ===
 
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 0.6.0  
+**Current version:** 0.6.1
 **Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, Rubinius 2.2
 
 Installation
@@ -161,7 +161,7 @@ All feedback should go to the mailing list: <mailto:ruby.re2@librelist.com>
   [ruby-dev]: http://packages.debian.org/ruby-dev
   [build-essential]: http://packages.debian.org/build-essential
   [Regexp]: http://ruby-doc.org/core/classes/Regexp.html
-  [MatchData]: http://ruby-doc.org/core/classes/MatchData.html 
+  [MatchData]: http://ruby-doc.org/core/classes/MatchData.html
   [Homebrew]: http://mxcl.github.com/homebrew
   [libre2-dev]: http://packages.debian.org/search?keywords=libre2-dev
   [official syntax page]: http://code.google.com/p/re2/wiki/Syntax

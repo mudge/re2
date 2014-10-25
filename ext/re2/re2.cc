@@ -397,7 +397,7 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, VALUE self) {
 
   if (TYPE(idx) == T_STRING) {
     return re2_matchdata_named_match(StringValuePtr(idx), self);
-  } else if (TYPE(idx) == T_SYMBOL) {
+  } else if (SYMBOL_P(idx)) {
     return re2_matchdata_named_match(rb_id2name(SYM2ID(idx)), self);
   } else if (!NIL_P(rest) || !FIXNUM_P(idx) || FIX2INT(idx) < 0) {
     return rb_ary_aref(argc, argv, re2_matchdata_to_a(self));
