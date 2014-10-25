@@ -33,7 +33,7 @@ Documentation
 -------------
 
 Full documentation automatically generated from the latest version is
-available at <http://rubydoc.info/github/mudge/re2>.
+available at <http://mudge.name/re2/>.
 
 Bear in mind that re2's regular expression syntax differs from PCRE, see the
 [official syntax page][] for more details.
