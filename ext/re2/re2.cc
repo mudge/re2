@@ -17,72 +17,72 @@ using std::nothrow;
 using std::map;
 using std::vector;
 
+#ifdef HAVE_RUBY_ENCODING_H
+  #include <ruby/encoding.h>
+  #define ENCODED_STR_NEW(str, length, encoding) \
+    ({ \
+      VALUE _string = rb_str_new(str, length); \
+      int _enc = rb_enc_find_index(encoding); \
+      rb_enc_associate_index(_string, _enc); \
+      _string; \
+    })
+  #define ENCODED_STR_NEW2(str, length, str2) \
+    ({ \
+      VALUE _string = rb_str_new(str, length); \
+      int _enc = rb_enc_get_index(str2); \
+      rb_enc_associate_index(_string, _enc); \
+      _string; \
+    })
+#else
+  #define ENCODED_STR_NEW(str, length, encoding) \
+    rb_str_new((const char *)str, (long)length)
+  #define ENCODED_STR_NEW2(str, length, str2) \
+    rb_str_new((const char *)str, (long)length)
+#endif
+
+#define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
+#define UNUSED(x) ((void)x)
+
+#ifndef RSTRING_LEN
+  #define RSTRING_LEN(x) (RSTRING(x)->len)
+#endif
+
+#ifndef RSTRING_PTR
+  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
+#endif
+
+#ifdef HAVE_ENDPOS_ARGUMENT
+  #define match(pattern, text, startpos, endpos, anchor, match, nmatch) \
+          (pattern->Match(text, startpos, endpos, anchor, match, nmatch))
+#else
+  #define match(pattern, text, startpos, endpos, anchor, match, nmatch) \
+          (pattern->Match(text, startpos, anchor, match, nmatch))
+#endif
+
+typedef struct {
+  RE2 *pattern;
+} re2_pattern;
+
+typedef struct {
+  re2::StringPiece *matches;
+  int number_of_matches;
+  VALUE regexp, text;
+} re2_matchdata;
+
+typedef struct {
+  re2::StringPiece *input;
+  int number_of_capturing_groups;
+  VALUE regexp, text;
+} re2_scanner;
+
+VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner;
+
+/* Symbols used in RE2 options. */
+static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
+          id_max_mem, id_literal, id_never_nl, id_case_sensitive,
+          id_perl_classes, id_word_boundary, id_one_line;
+
 extern "C" {
-  #ifdef HAVE_RUBY_ENCODING_H
-    #include <ruby/encoding.h>
-    #define ENCODED_STR_NEW(str, length, encoding) \
-      ({ \
-        VALUE _string = rb_str_new(str, length); \
-        int _enc = rb_enc_find_index(encoding); \
-        rb_enc_associate_index(_string, _enc); \
-        _string; \
-      })
-    #define ENCODED_STR_NEW2(str, length, str2) \
-      ({ \
-        VALUE _string = rb_str_new(str, length); \
-        int _enc = rb_enc_get_index(str2); \
-        rb_enc_associate_index(_string, _enc); \
-        _string; \
-      })
-  #else
-    #define ENCODED_STR_NEW(str, length, encoding) \
-      rb_str_new((const char *)str, (long)length)
-    #define ENCODED_STR_NEW2(str, length, str2) \
-      rb_str_new((const char *)str, (long)length)
-  #endif
-
-  #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
-  #define UNUSED(x) ((void)x)
-
-  #ifndef RSTRING_LEN
-    #define RSTRING_LEN(x) (RSTRING(x)->len)
-  #endif
-
-  #ifndef RSTRING_PTR
-    #define RSTRING_PTR(x) (RSTRING(x)->ptr)
-  #endif
-
-  #ifdef HAVE_ENDPOS_ARGUMENT
-    #define match(pattern, text, startpos, endpos, anchor, match, nmatch) \
-            (pattern->Match(text, startpos, endpos, anchor, match, nmatch))
-  #else
-    #define match(pattern, text, startpos, endpos, anchor, match, nmatch) \
-            (pattern->Match(text, startpos, anchor, match, nmatch))
-  #endif
-
-  typedef struct {
-    RE2 *pattern;
-  } re2_pattern;
-
-  typedef struct {
-    re2::StringPiece *matches;
-    int number_of_matches;
-    VALUE regexp, text;
-  } re2_matchdata;
-
-  typedef struct {
-    re2::StringPiece *input;
-    int number_of_capturing_groups;
-    VALUE regexp, text;
-  } re2_scanner;
-
-  VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner;
-
-  /* Symbols used in RE2 options. */
-  static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
-            id_max_mem, id_literal, id_never_nl, id_case_sensitive,
-            id_perl_classes, id_word_boundary, id_one_line;
-
   void re2_matchdata_mark(re2_matchdata* self) {
     rb_gc_mark(self->regexp);
     rb_gc_mark(self->text);
