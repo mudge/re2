@@ -237,10 +237,10 @@ re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
-  if (TYPE(idx) == T_FIXNUM) {
+  if (FIXNUM_P(idx)) {
     id = FIX2INT(idx);
   } else {
-    if (TYPE(idx) == T_SYMBOL) {
+    if (SYMBOL_P(idx)) {
       name = rb_id2name(SYM2ID(idx));
     } else {
       name = StringValuePtr(idx);
@@ -293,16 +293,23 @@ static VALUE re2_matchdata_size(VALUE self) {
  */
 static VALUE re2_matchdata_begin(VALUE self, VALUE idx) {
   re2_matchdata *m;
+  re2_pattern *p;
   re2::StringPiece *match;
+  VALUE str;
 
   Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
 
   match = re2_matchdata_find_match(idx, self);
   if (match == NULL) {
     return Qnil;
   }
 
-  return INT2NUM(match->data() - StringValuePtr(m->text));
+  str = ENCODED_STR_NEW(StringValuePtr(m->text),
+        match->data() - StringValuePtr(m->text),
+        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
+
+  return rb_str_length(str);
 }
 
 /*
@@ -316,16 +323,23 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE idx) {
  */
 static VALUE re2_matchdata_end(VALUE self, VALUE idx) {
   re2_matchdata *m;
+  re2_pattern *p;
   re2::StringPiece *match;
+  VALUE str;
 
   Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
 
   match = re2_matchdata_find_match(idx, self);
   if (match == NULL) {
     return Qnil;
   }
 
-  return INT2NUM(match->data() - StringValuePtr(m->text) + match->size());
+  str = ENCODED_STR_NEW(StringValuePtr(m->text),
+        match->data() - StringValuePtr(m->text) + match->size(),
+        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
+
+  return rb_str_length(str);
 }
 
 /*
