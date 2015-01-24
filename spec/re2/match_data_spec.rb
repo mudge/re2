@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require "spec_helper"
 
 describe RE2::MatchData do
@@ -160,23 +162,47 @@ describe RE2::MatchData do
     end
   end
 
-  describe "#begin/#end" do
-    it "returns the correct begin and end offsets for the whole match" do
-      md = RE2::Regexp.new('(wo{2})').match('a woo')
-      md.begin(0).must_equal(2)
-      md.end(0).must_equal(5)
+  describe "#begin" do
+    it "returns the offset of the start of a match by index" do
+      md = RE2::Regexp.new('(wo{2})').match('a woohoo')
+      md.string[md.begin(0)..-1].must_equal('woohoo')
     end
 
-    it "returns the correct begin and end offsets for a named submatch" do
-      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foo')
-      md.begin('foo').must_equal(2)
-      md.end(:foo).must_equal(5)
+    it "returns the offset of the start of a match by string name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[md.begin('foo')..-1].must_equal('foobar')
     end
 
-    it "correctly finds the offset with multibyte characters" do
-      md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
-      md.begin(0).must_equal(4)
-      md.end(0).must_equal(8)
+    it "returns the offset of the start of a match by symbol name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[md.begin(:foo)..-1].must_equal('foobar')
+    end
+
+    it "returns the offset despite multibyte characters" do
+      md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
+      md.string[md.begin(0)..-1].must_equal('Ruby')
+    end
+  end
+
+  describe "#end" do
+    it "returns the offset of the character following the end of a match" do
+      md = RE2::Regexp.new('(wo{2})').match('a woohoo')
+      md.string[0...md.end(0)].must_equal('a woo')
+    end
+
+    it "returns the offset of a match by string name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[0...md.end('foo')].must_equal('a foo')
+    end
+
+    it "returns the offset of a match by symbol name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[0...md.end(:foo)].must_equal('a foo')
+    end
+
+    it "returns the offset despite multibyte characters" do
+      md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
+      md.string[0...md.end(0)].must_equal('I ♥ Ruby')
     end
   end
 end

@@ -8,6 +8,7 @@
 
 #include <re2/re2.h>
 #include <ruby.h>
+#include <stdint.h>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -16,6 +17,17 @@ using std::ostringstream;
 using std::nothrow;
 using std::map;
 using std::vector;
+
+#define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
+#define UNUSED(x) ((void)x)
+
+#ifndef RSTRING_LEN
+  #define RSTRING_LEN(x) (RSTRING(x)->len)
+#endif
+
+#ifndef RSTRING_PTR
+  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
+#endif
 
 #ifdef HAVE_RUBY_ENCODING_H
   #include <ruby/encoding.h>
@@ -40,15 +52,20 @@ using std::vector;
     rb_str_new((const char *)str, (long)length)
 #endif
 
-#define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
-#define UNUSED(x) ((void)x)
-
-#ifndef RSTRING_LEN
-  #define RSTRING_LEN(x) (RSTRING(x)->len)
-#endif
-
-#ifndef RSTRING_PTR
-  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
+#ifdef HAVE_RB_STR_SUBLEN
+  #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+     LONG2NUM(rb_str_sublen(str, offset))
+#else
+  #ifdef HAVE_RUBY_ENCODING_H
+    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+      ({ \
+        VALUE _string = ENCODED_STR_NEW(RSTRING_PTR(str), offset, encoding); \
+        rb_str_length(_string); \
+      })
+  #else
+    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+      LONG2NUM(offset)
+  #endif
 #endif
 
 #ifdef HAVE_ENDPOS_ARGUMENT
@@ -283,63 +300,64 @@ static VALUE re2_matchdata_size(VALUE self) {
 }
 
 /*
- * Returns the start offset of the given matchdata entry.
+ * Returns the offset of the start of the nth element of the matchdata.
  *
- * @return [Fixnum] the start offset
+ * @param [Fixnum, String, Symbol] n the name or number of the match
+ * @return [Fixnum] the offset of the start of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
  *   m.begin(0)  #=> 1
  *   m.begin(1)  #=> 4
  */
-static VALUE re2_matchdata_begin(VALUE self, VALUE idx) {
+static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
   re2_matchdata *m;
   re2_pattern *p;
   re2::StringPiece *match;
-  VALUE str;
+  long offset;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
-  match = re2_matchdata_find_match(idx, self);
+  match = re2_matchdata_find_match(n, self);
   if (match == NULL) {
     return Qnil;
+  } else {
+    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text));
+
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
   }
-
-  str = ENCODED_STR_NEW(StringValuePtr(m->text),
-        match->data() - StringValuePtr(m->text),
-        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
-
-  return rb_str_length(str);
 }
 
 /*
- * Returns the end offset of the given matchdata entry.
+ * Returns the offset of the character following the end of the nth element of the matchdata.
  *
- * @return [Fixnum] the end offset
+ * @param [Fixnum, String, Symbol] n the name or number of the match
+ * @return [Fixnum] the offset of the character following the end of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
  *   m.end(0)  #=> 9
  *   m.end(1)  #=> 7
  */
-static VALUE re2_matchdata_end(VALUE self, VALUE idx) {
+static VALUE re2_matchdata_end(VALUE self, VALUE n) {
   re2_matchdata *m;
   re2_pattern *p;
   re2::StringPiece *match;
-  VALUE str;
+  long offset;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
-  match = re2_matchdata_find_match(idx, self);
+  match = re2_matchdata_find_match(n, self);
+
   if (match == NULL) {
     return Qnil;
+  } else {
+    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size();
+
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
   }
-
-  str = ENCODED_STR_NEW(StringValuePtr(m->text),
-        match->data() - StringValuePtr(m->text) + match->size(),
-        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
-
-  return rb_str_length(str);
 }
 
 /*

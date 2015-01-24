@@ -11,6 +11,9 @@ incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 $CFLAGS << " -Wall -Wextra -funroll-loops"
 
 have_library("stdc++")
+have_header("stdint.h")
+have_func("rb_str_sublen")
+
 if have_library("re2")
 
   # Determine which version of re2 the user has installed.
