@@ -8,6 +8,7 @@
 
 #include <re2/re2.h>
 #include <ruby.h>
+#include <stdint.h>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -283,63 +284,60 @@ static VALUE re2_matchdata_size(VALUE self) {
 }
 
 /*
- * Returns the start offset of the given matchdata entry.
+ * Returns the input string up until the start of the given matchdata entry.
  *
- * @return [Fixnum] the start offset
+ * @param [Fixnum, String, Symbol] n the name or number of the match
+ * @return [String] the string up until the start of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
- *   m.begin(0)  #=> 1
- *   m.begin(1)  #=> 4
+ *   m.until_begin(0)  #=> "b"
+ *   m.until_begin(1)  #=> "bob "
  */
-static VALUE re2_matchdata_begin(VALUE self, VALUE idx) {
+static VALUE re2_matchdata_until_begin(VALUE self, VALUE n) {
   re2_matchdata *m;
   re2_pattern *p;
   re2::StringPiece *match;
-  VALUE str;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
-  match = re2_matchdata_find_match(idx, self);
+  match = re2_matchdata_find_match(n, self);
   if (match == NULL) {
     return Qnil;
+  } else {
+    return ENCODED_STR_NEW(StringValuePtr(m->text),
+           reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)),
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
   }
-
-  str = ENCODED_STR_NEW(StringValuePtr(m->text),
-        match->data() - StringValuePtr(m->text),
-        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
-
-  return rb_str_length(str);
 }
 
 /*
- * Returns the end offset of the given matchdata entry.
+ * Returns the input string up until the end of the given matchdata entry.
  *
- * @return [Fixnum] the end offset
+ * @param [Fixnum, String, Symbol] n the name or number of the match
+ * @return [String] the string up until the end of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
- *   m.end(0)  #=> 9
- *   m.end(1)  #=> 7
+ *   m.until_end(0)  #=> "bob 123 b"
+ *   m.until_end(1)  #=> "bob 123"
  */
-static VALUE re2_matchdata_end(VALUE self, VALUE idx) {
+static VALUE re2_matchdata_until_end(VALUE self, VALUE n) {
   re2_matchdata *m;
   re2_pattern *p;
   re2::StringPiece *match;
-  VALUE str;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
-  match = re2_matchdata_find_match(idx, self);
+  match = re2_matchdata_find_match(n, self);
+
   if (match == NULL) {
     return Qnil;
+  } else {
+    return ENCODED_STR_NEW(StringValuePtr(m->text),
+           reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size(),
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
   }
-
-  str = ENCODED_STR_NEW(StringValuePtr(m->text),
-        match->data() - StringValuePtr(m->text) + match->size(),
-        p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
-
-  return rb_str_length(str);
 }
 
 /*
@@ -1319,10 +1317,10 @@ void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
   rb_define_method(re2_cMatchData, "length",
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
-  rb_define_method(re2_cMatchData, "begin",
-      RUBY_METHOD_FUNC(re2_matchdata_begin), 1);
-  rb_define_method(re2_cMatchData, "end",
-      RUBY_METHOD_FUNC(re2_matchdata_end), 1);
+  rb_define_method(re2_cMatchData, "until_begin",
+      RUBY_METHOD_FUNC(re2_matchdata_until_begin), 1);
+  rb_define_method(re2_cMatchData, "until_end",
+      RUBY_METHOD_FUNC(re2_matchdata_until_end), 1);
   rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
       -1); rb_define_method(re2_cMatchData, "to_s",
         RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);

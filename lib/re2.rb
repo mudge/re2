@@ -5,3 +5,4 @@
 # Released under the BSD Licence, please see LICENSE.txt
 require "re2.so"
 require "re2/scanner"
+require "re2/match_data"
