@@ -1315,91 +1315,91 @@ posix_syntax mode)</p>
       <pre class="lines">
 
 
-512
-513
-514
-515
-516
-517
-518
-519
-520
-521
-522
-523
-524
-525
-526
-527
-528
-529
-530
-531
-532
-533
-534
-535
-536
-537
-538
-539
-540
-541
-542
-543
-544
-545
-546
-547
-548
-549
-550
-551
-552
-553
-554
-555
-556
-557
-558
-559
-560
-561
-562
-563
-564
-565
-566
-567
-568
-569
-570
-571
-572
-573
-574
-575
-576
-577
-578
-579
-580
-581
-582
-583
-584
-585
-586
-587
-588
-589
-590
-591
-592
-593</pre>
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659
+660
+661
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703
+704
+705
+706
+707
+708
+709
+710
+711
+712
+713
+714</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 512</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 633</span>
 
 static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
   VALUE pattern, options, utf8, posix_syntax, longest_match, log_errors,
@@ -1581,14 +1581,14 @@ match the original string.</p>
       <pre class="lines">
 
 
-1186
-1187
-1188
-1189
-1190</pre>
+1307
+1308
+1309
+1310
+1311</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1186</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1307</span>
 
 static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   UNUSED(self);
@@ -1674,14 +1674,14 @@ match the original string.</p>
       <pre class="lines">
 
 
-1186
-1187
-1188
-1189
-1190</pre>
+1307
+1308
+1309
+1310
+1311</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1186</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1307</span>
 
 static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   UNUSED(self);
@@ -1744,16 +1744,16 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
       <pre class="lines">
 
 
-1071
-1072
-1073
-1074
-1075
-1076
-1077</pre>
+1192
+1193
+1194
+1195
+1196
+1197
+1198</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1071</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1192</span>
 
 static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
   VALUE argv[2];
@@ -1812,16 +1812,16 @@ static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-1071
-1072
-1073
-1074
-1075
-1076
-1077</pre>
+1192
+1193
+1194
+1195
+1196
+1197
+1198</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1071</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1192</span>
 
 static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
   VALUE argv[2];
@@ -1899,12 +1899,12 @@ with the case_sensitive option set to false.</p>
       <pre class="lines">
 
 
-779
-780
-781</pre>
+900
+901
+902</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 779</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 900</span>
 
 <span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
   <span class='kw'>return</span> <span class='const'>BOOL2RUBY</span><span class='lparen'>(</span><span class='id identifier rubyid_re2_regexp_case_sensitive'>re2_regexp_case_sensitive</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='op'>!=</span> <span class='const'>Qtrue</span><span class='rparen'>)</span><span class='semicolon'>;</span>
@@ -1977,14 +1977,14 @@ with the case_sensitive option set to true.</p>
       <pre class="lines">
 
 
-763
-764
-765
-766
-767</pre>
+884
+885
+886
+887
+888</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 763</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 884</span>
 
 static VALUE re2_regexp_case_sensitive(VALUE self) {
   re2_pattern *p;
@@ -2060,12 +2060,12 @@ with the case_sensitive option set to false.</p>
       <pre class="lines">
 
 
-779
-780
-781</pre>
+900
+901
+902</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 779</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 900</span>
 
 <span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
   <span class='kw'>return</span> <span class='const'>BOOL2RUBY</span><span class='lparen'>(</span><span class='id identifier rubyid_re2_regexp_case_sensitive'>re2_regexp_case_sensitive</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='op'>!=</span> <span class='const'>Qtrue</span><span class='rparen'>)</span><span class='semicolon'>;</span>
@@ -2120,18 +2120,18 @@ returns nil.</p>
       <pre class="lines">
 
 
-834
-835
-836
-837
-838
-839
-840
-841
-842</pre>
+955
+956
+957
+958
+959
+960
+961
+962
+963</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 834</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 955</span>
 
 static VALUE re2_regexp_error(VALUE self) {
   re2_pattern *p;
@@ -2192,20 +2192,20 @@ the regexp otherwise returns nil.</p>
       <pre class="lines">
 
 
-850
-851
-852
-853
-854
-855
-856
-857
-858
-859
-860</pre>
+971
+972
+973
+974
+975
+976
+977
+978
+979
+980
+981</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 850</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 971</span>
 
 static VALUE re2_regexp_error_arg(VALUE self) {
   re2_pattern *p;
@@ -2276,23 +2276,23 @@ static VALUE re2_regexp_error_arg(VALUE self) {
       <pre class="lines">
 
 
-603
-604
-605
-606
-607
-608
-609
-610
-611
-612
-613
-614
-615
-616</pre>
+724
+725
+726
+727
+728
+729
+730
+731
+732
+733
+734
+735
+736
+737</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 603</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 724</span>
 
 static VALUE re2_regexp_inspect(VALUE self) {
   re2_pattern *p;
@@ -2376,14 +2376,14 @@ with the literal option set to true.</p>
       <pre class="lines">
 
 
-733
-734
-735
-736
-737</pre>
+854
+855
+856
+857
+858</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 733</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 854</span>
 
 static VALUE re2_regexp_literal(VALUE self) {
   re2_pattern *p;
@@ -2458,14 +2458,14 @@ with the log_errors option set to true.</p>
       <pre class="lines">
 
 
-703
-704
-705
-706
-707</pre>
+824
+825
+826
+827
+828</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 703</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 824</span>
 
 static VALUE re2_regexp_log_errors(VALUE self) {
   re2_pattern *p;
@@ -2540,14 +2540,14 @@ with the longest_match option set to true.</p>
       <pre class="lines">
 
 
-688
-689
-690
-691
-692</pre>
+809
+810
+811
+812
+813</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 688</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 809</span>
 
 static VALUE re2_regexp_longest_match(VALUE self) {
   re2_pattern *p;
@@ -2877,63 +2877,63 @@ with nils if necessary).</p>
       <pre class="lines">
 
 
-1010
-1011
-1012
-1013
-1014
-1015
-1016
-1017
-1018
-1019
-1020
-1021
-1022
-1023
-1024
-1025
-1026
-1027
-1028
-1029
-1030
-1031
-1032
-1033
-1034
-1035
-1036
-1037
-1038
-1039
-1040
-1041
-1042
-1043
-1044
-1045
-1046
-1047
-1048
-1049
-1050
-1051
-1052
-1053
-1054
-1055
-1056
-1057
-1058
-1059
-1060
-1061
-1062
-1063</pre>
+1131
+1132
+1133
+1134
+1135
+1136
+1137
+1138
+1139
+1140
+1141
+1142
+1143
+1144
+1145
+1146
+1147
+1148
+1149
+1150
+1151
+1152
+1153
+1154
+1155
+1156
+1157
+1158
+1159
+1160
+1161
+1162
+1163
+1164
+1165
+1166
+1167
+1168
+1169
+1170
+1171
+1172
+1173
+1174
+1175
+1176
+1177
+1178
+1179
+1180
+1181
+1182
+1183
+1184</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1010</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1131</span>
 
 static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
   int n;
@@ -2978,8 +2978,8 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
 
     m-&gt;number_of_matches = n;
 
-    matched = match(p-&gt;pattern, StringValuePtr(text), 0,
-                    static_cast&lt;int&gt;(RSTRING_LEN(text)),
+    matched = match(p-&gt;pattern, StringValuePtr(m-&gt;text), 0,
+                    static_cast&lt;int&gt;(RSTRING_LEN(m-&gt;text)),
                     RE2::UNANCHORED, m-&gt;matches, n);
 
     if (matched) {
@@ -3048,16 +3048,16 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
       <pre class="lines">
 
 
-1071
-1072
-1073
-1074
-1075
-1076
-1077</pre>
+1192
+1193
+1194
+1195
+1196
+1197
+1198</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1071</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1192</span>
 
 static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
   VALUE argv[2];
@@ -3124,14 +3124,14 @@ static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-718
-719
-720
-721
-722</pre>
+839
+840
+841
+842
+843</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 718</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 839</span>
 
 static VALUE re2_regexp_max_mem(VALUE self) {
   re2_pattern *p;
@@ -3187,28 +3187,28 @@ static VALUE re2_regexp_max_mem(VALUE self) {
       <pre class="lines">
 
 
-946
-947
-948
-949
-950
-951
-952
-953
-954
-955
-956
-957
-958
-959
-960
-961
-962
-963
-964</pre>
+1067
+1068
+1069
+1070
+1071
+1072
+1073
+1074
+1075
+1076
+1077
+1078
+1079
+1080
+1081
+1082
+1083
+1084
+1085</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 946</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1067</span>
 
 static VALUE re2_regexp_named_capturing_groups(VALUE self) {
   VALUE capturing_groups;
@@ -3297,14 +3297,14 @@ with the never_nl option set to true.</p>
       <pre class="lines">
 
 
-748
-749
-750
-751
-752</pre>
+869
+870
+871
+872
+873</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 748</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 869</span>
 
 static VALUE re2_regexp_never_nl(VALUE self) {
   re2_pattern *p;
@@ -3362,15 +3362,15 @@ is “(a)(b)”, returns 2.</p>
       <pre class="lines">
 
 
-934
-935
-936
-937
-938
-939</pre>
+1055
+1056
+1057
+1058
+1059
+1060</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 934</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1055</span>
 
 static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
   re2_pattern *p;
@@ -3446,14 +3446,14 @@ successfully or not.</p>
       <pre class="lines">
 
 
-643
-644
-645
-646
-647</pre>
+764
+765
+766
+767
+768</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 643</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 764</span>
 
 static VALUE re2_regexp_ok(VALUE self) {
   re2_pattern *p;
@@ -3528,14 +3528,14 @@ with the one_line option set to true.</p>
       <pre class="lines">
 
 
-822
-823
-824
-825
-826</pre>
+943
+944
+945
+946
+947</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 822</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 943</span>
 
 static VALUE re2_regexp_one_line(VALUE self) {
   re2_pattern *p;
@@ -3591,54 +3591,54 @@ static VALUE re2_regexp_one_line(VALUE self) {
       <pre class="lines">
 
 
-881
-882
-883
-884
-885
-886
-887
-888
-889
-890
-891
-892
-893
-894
-895
-896
-897
-898
-899
-900
-901
-902
-903
-904
-905
-906
-907
-908
-909
-910
-911
-912
-913
-914
-915
-916
-917
-918
-919
-920
-921
-922
-923
-924
-925</pre>
+1002
+1003
+1004
+1005
+1006
+1007
+1008
+1009
+1010
+1011
+1012
+1013
+1014
+1015
+1016
+1017
+1018
+1019
+1020
+1021
+1022
+1023
+1024
+1025
+1026
+1027
+1028
+1029
+1030
+1031
+1032
+1033
+1034
+1035
+1036
+1037
+1038
+1039
+1040
+1041
+1042
+1043
+1044
+1045
+1046</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 881</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1002</span>
 
 static VALUE re2_regexp_options(VALUE self) {
   VALUE options;
@@ -3743,16 +3743,16 @@ static VALUE re2_regexp_options(VALUE self) {
       <pre class="lines">
 
 
-626
-627
-628
-629
-630
-631
-632</pre>
+747
+748
+749
+750
+751
+752
+753</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 747</span>
 
 static VALUE re2_regexp_to_s(VALUE self) {
   re2_pattern *p;
@@ -3829,14 +3829,14 @@ with the perl_classes option set to true.</p>
       <pre class="lines">
 
 
-792
-793
-794
-795
-796</pre>
+913
+914
+915
+916
+917</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 792</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 913</span>
 
 static VALUE re2_regexp_perl_classes(VALUE self) {
   re2_pattern *p;
@@ -3911,14 +3911,14 @@ with the posix_syntax option set to true.</p>
       <pre class="lines">
 
 
-673
-674
-675
-676
-677</pre>
+794
+795
+796
+797
+798</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 673</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 794</span>
 
 static VALUE re2_regexp_posix_syntax(VALUE self) {
   re2_pattern *p;
@@ -3975,14 +3975,14 @@ static VALUE re2_regexp_posix_syntax(VALUE self) {
       <pre class="lines">
 
 
-869
-870
-871
-872
-873</pre>
+990
+991
+992
+993
+994</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 869</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 990</span>
 
 static VALUE re2_regexp_program_size(VALUE self) {
   re2_pattern *p;
@@ -4028,25 +4028,25 @@ static VALUE re2_regexp_program_size(VALUE self) {
       <pre class="lines">
 
 
-1085
-1086
-1087
-1088
-1089
-1090
-1091
-1092
-1093
-1094
-1095
-1096
-1097
-1098
-1099
-1100</pre>
+1206
+1207
+1208
+1209
+1210
+1211
+1212
+1213
+1214
+1215
+1216
+1217
+1218
+1219
+1220
+1221</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1085</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1206</span>
 
 static VALUE re2_regexp_scan(VALUE self, VALUE text) {
   re2_pattern *p;
@@ -4122,16 +4122,16 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-626
-627
-628
-629
-630
-631
-632</pre>
+747
+748
+749
+750
+751
+752
+753</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 747</span>
 
 static VALUE re2_regexp_to_s(VALUE self) {
   re2_pattern *p;
@@ -4198,16 +4198,16 @@ static VALUE re2_regexp_to_s(VALUE self) {
       <pre class="lines">
 
 
-626
-627
-628
-629
-630
-631
-632</pre>
+747
+748
+749
+750
+751
+752
+753</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 747</span>
 
 static VALUE re2_regexp_to_s(VALUE self) {
   re2_pattern *p;
@@ -4274,16 +4274,16 @@ static VALUE re2_regexp_to_s(VALUE self) {
       <pre class="lines">
 
 
-626
-627
-628
-629
-630
-631
-632</pre>
+747
+748
+749
+750
+751
+752
+753</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 626</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 747</span>
 
 static VALUE re2_regexp_to_s(VALUE self) {
   re2_pattern *p;
@@ -4360,14 +4360,14 @@ with the utf8 option set to true.</p>
       <pre class="lines">
 
 
-658
-659
-660
-661
-662</pre>
+779
+780
+781
+782
+783</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 658</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 779</span>
 
 static VALUE re2_regexp_utf8(VALUE self) {
   re2_pattern *p;
@@ -4442,14 +4442,14 @@ with the word_boundary option set to true.</p>
       <pre class="lines">
 
 
-807
-808
-809
-810
-811</pre>
+928
+929
+930
+931
+932</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 807</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 928</span>
 
 static VALUE re2_regexp_word_boundary(VALUE self) {
   re2_pattern *p;
@@ -4466,7 +4466,7 @@ static VALUE re2_regexp_word_boundary(VALUE self) {
 </div>
 
     <div id="footer">
-  Generated on Sat Oct 25 22:12:31 2014 by
+  Generated on Sun Jan 25 15:58:06 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.3).
 </div>

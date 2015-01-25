@@ -66,7 +66,7 @@
 <p>A Ruby binding to <a href="http://code.google.com/p/re2/">re2</a>, an &quot;efficient, principled regular expression
 library&quot;.</p>
 
-<p><strong>Current version:</strong> 0.6.1<br>
+<p><strong>Current version:</strong> 0.7.0<br>
 <strong>Supported Ruby versions:</strong> 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, Rubinius 2.2</p>
 
 <h2>Installation</h2>
@@ -115,6 +115,10 @@ available at <a href="http://mudge.name/re2/">http://mudge.name/re2/</a>.</p>
 =&gt; &quot;1&quot;
 &gt; m.string
 =&gt; &quot;w1234&quot;
+&gt; m.begin(1)
+=&gt; 1
+&gt; m.end(1)
+=&gt; 2
 &gt; r =~ &quot;w1234&quot;
 =&gt; true
 &gt; r !~ &quot;bob&quot;
@@ -198,13 +202,18 @@ original)</code></p></li>
 <code>RE2.quote(unquoted)</code></p></li>
 </ul>
 
+<h2>Contributions</h2>
+
+<p>Thanks to <a href="https://github.com/driskell">Jason Woods</a> who contributed the
+original implementations of <code>RE2::MatchData#begin</code> and <code>RE2::MatchData#end</code>.</p>
+
 <h2>Contact</h2>
 
 <p>All feedback should go to the mailing list: <a href="mailto:ruby.re2@librelist.com">ruby.re2@librelist.com</a></p>
 </div></div>
 
     <div id="footer">
-  Generated on Sat Oct 25 22:12:29 2014 by
+  Generated on Sun Jan 25 15:58:04 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.3).
 </div>
