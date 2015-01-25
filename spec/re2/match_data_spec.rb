@@ -182,6 +182,26 @@ describe RE2::MatchData do
       md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
       md.string[md.begin(0)..-1].must_equal('Ruby')
     end
+
+    it "returns nil for non-existent numerical matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.begin(10).must_be_nil
+    end
+
+    it "returns nil for negative numerical matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.begin(-4).must_be_nil
+    end
+
+    it "returns nil for non-existent named matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.begin('foo').must_be_nil
+    end
+
+    it "returns nil for non-existent symbol named matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.begin(:foo).must_be_nil
+    end
   end
 
   describe "#end" do
@@ -203,6 +223,26 @@ describe RE2::MatchData do
     it "returns the offset despite multibyte characters" do
       md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
       md.string[0...md.end(0)].must_equal('I ♥ Ruby')
+    end
+
+    it "returns nil for non-existent numerical matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.end(10).must_be_nil
+    end
+
+    it "returns nil for negative numerical matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.end(-4).must_be_nil
+    end
+
+    it "returns nil for non-existent named matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.end('foo').must_be_nil
+    end
+
+    it "returns nil for non-existent symbol named matches" do
+      md = RE2::Regexp.new('(\d)').match('123')
+      md.end(:foo).must_be_nil
     end
   end
 end
