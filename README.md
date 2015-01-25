@@ -4,7 +4,7 @@ re2 [![Build Status](https://travis-ci.org/mudge/re2.svg?branch=master)](http://
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 0.6.1  
+**Current version:** 0.7.0  
 **Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, Rubinius 2.2
 
 Installation
@@ -55,6 +55,10 @@ $ irb -rubygems
 => "1"
 > m.string
 => "w1234"
+> m.begin(1)
+=> 1
+> m.end(1)
+=> 2
 > r =~ "w1234"
 => true
 > r !~ "bob"
@@ -150,6 +154,12 @@ Features
 * Escaping regular expressions with
   [`RE2.escape(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377) and
   `RE2.quote(unquoted)`
+
+Contributions
+-------------
+
+Thanks to [Jason Woods](https://github.com/driskell) who contributed the
+original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`.
 
 Contact
 -------
