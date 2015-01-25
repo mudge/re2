@@ -34,15 +34,24 @@ using std::vector;
       rb_enc_associate_index(_string, _enc); \
       _string; \
     })
-  #define ENCODED_STR_SUBLEN(str, offset) \
-     LONG2NUM(rb_str_sublen(str, offset))
 #else
   #define ENCODED_STR_NEW(str, length, encoding) \
     rb_str_new((const char *)str, (long)length)
   #define ENCODED_STR_NEW2(str, length, str2) \
     rb_str_new((const char *)str, (long)length)
-  #define ENCODED_STR_SUBLEN(str, offset) \
-    LONG2NUM(offset)
+#endif
+
+#ifdef HAVE_RB_STR_SUBLEN
+  #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+     LONG2NUM(rb_str_sublen(str, offset))
+#else
+  #ifdef HAVE_RUBY_ENCODING_H
+    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+      rb_str_length(ENCODED_STR_NEW(StringValuePtr(str), offset, encoding))
+  #else
+    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+      LONG2NUM(offset)
+  #endif
 #endif
 
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
@@ -312,7 +321,8 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
   } else {
     offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text));
 
-    return ENCODED_STR_SUBLEN(StringValue(m->text), offset);
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
   }
 }
 
@@ -342,7 +352,8 @@ static VALUE re2_matchdata_end(VALUE self, VALUE n) {
   } else {
     offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size();
 
-    return ENCODED_STR_SUBLEN(StringValue(m->text), offset);
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
   }
 }
 

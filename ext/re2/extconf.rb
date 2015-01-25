@@ -39,6 +39,24 @@ SRC
     end
   end
 
+  # Determine whether the user has a version of Ruby with rb_str_sublen.
+  # This is present in MRI Ruby > 1.8 but missing from Rubinius so we can't
+  # just use HAVE_RUBY_ENCODING_H.
+  checking_for("rb_str_sublen") do
+    test_rb_str_sublen = <<SRC
+#include <ruby.h>
+
+int main() {
+  VALUE str = rb_str_new("abc", 3);
+  rb_str_sublen(str, 1);
+}
+SRC
+
+    if try_compile(test_rb_str_sublen)
+      $defs.push("-DHAVE_RB_STR_SUBLEN")
+    end
+  end
+
   create_makefile("re2")
 else
   abort "You must have re2 installed and specified with --with-re2-dir, please see http://code.google.com/p/re2/wiki/Install"
