@@ -77,4 +77,3 @@ describe RE2 do
     end
   end
 end
-

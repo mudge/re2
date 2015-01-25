@@ -8,6 +8,7 @@
 
 #include <re2/re2.h>
 #include <ruby.h>
+#include <stdint.h>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -16,6 +17,17 @@ using std::ostringstream;
 using std::nothrow;
 using std::map;
 using std::vector;
+
+#define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
+#define UNUSED(x) ((void)x)
+
+#ifndef RSTRING_LEN
+  #define RSTRING_LEN(x) (RSTRING(x)->len)
+#endif
+
+#ifndef RSTRING_PTR
+  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
+#endif
 
 #ifdef HAVE_RUBY_ENCODING_H
   #include <ruby/encoding.h>
@@ -40,15 +52,20 @@ using std::vector;
     rb_str_new((const char *)str, (long)length)
 #endif
 
-#define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
-#define UNUSED(x) ((void)x)
-
-#ifndef RSTRING_LEN
-  #define RSTRING_LEN(x) (RSTRING(x)->len)
-#endif
-
-#ifndef RSTRING_PTR
-  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
+#ifdef HAVE_RB_STR_SUBLEN
+  #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+     LONG2NUM(rb_str_sublen(str, offset))
+#else
+  #ifdef HAVE_RUBY_ENCODING_H
+    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+      ({ \
+        VALUE _string = ENCODED_STR_NEW(RSTRING_PTR(str), offset, encoding); \
+        rb_str_length(_string); \
+      })
+  #else
+    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
+      LONG2NUM(offset)
+  #endif
 #endif
 
 #ifdef HAVE_ENDPOS_ARGUMENT
@@ -224,6 +241,49 @@ static VALUE re2_scanner_scan(VALUE self) {
 }
 
 /*
+ * Retrieve a matchdata by index or name.
+ */
+re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
+  int id;
+  re2_matchdata *m;
+  re2_pattern *p;
+  map<string, int> groups;
+  string name;
+  re2::StringPiece *match;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
+
+  if (FIXNUM_P(idx)) {
+    id = FIX2INT(idx);
+  } else {
+    if (SYMBOL_P(idx)) {
+      name = rb_id2name(SYM2ID(idx));
+    } else {
+      name = StringValuePtr(idx);
+    }
+
+    groups = p->pattern->NamedCapturingGroups();
+
+    if (groups.count(name) == 1) {
+      id = groups[name];
+    } else {
+      return NULL;
+    }
+  }
+
+  if (id >= 0 && id < m->number_of_matches) {
+    match = &m->matches[id];
+
+    if (!match->empty()) {
+      return match;
+    }
+  }
+
+  return NULL;
+}
+
+/*
  * Returns the number of elements in the match array (including nils).
  *
  * @return [Fixnum] the number of elements
@@ -237,6 +297,67 @@ static VALUE re2_matchdata_size(VALUE self) {
   Data_Get_Struct(self, re2_matchdata, m);
 
   return INT2FIX(m->number_of_matches);
+}
+
+/*
+ * Returns the offset of the start of the nth element of the matchdata.
+ *
+ * @param [Fixnum, String, Symbol] n the name or number of the match
+ * @return [Fixnum] the offset of the start of the match
+ * @example
+ *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
+ *   m.begin(0)  #=> "1"
+ *   m.begin(1)  #=> "4"
+ */
+static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
+  re2_matchdata *m;
+  re2_pattern *p;
+  re2::StringPiece *match;
+  long offset;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
+
+  match = re2_matchdata_find_match(n, self);
+  if (match == NULL) {
+    return Qnil;
+  } else {
+    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text));
+
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
+  }
+}
+
+/*
+ * Returns the offset of the character following the end of the nth element of the matchdata.
+ *
+ * @param [Fixnum, String, Symbol] n the name or number of the match
+ * @return [Fixnum] the offset of the character following the end of the match
+ * @example
+ *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
+ *   m.end(0)  #=> "9"
+ *   m.end(1)  #=> "7"
+ */
+static VALUE re2_matchdata_end(VALUE self, VALUE n) {
+  re2_matchdata *m;
+  re2_pattern *p;
+  re2::StringPiece *match;
+  long offset;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
+
+  match = re2_matchdata_find_match(n, self);
+
+  if (match == NULL) {
+    return Qnil;
+  } else {
+    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size();
+
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
+           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
+  }
 }
 
 /*
@@ -1050,8 +1171,8 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
 
     m->number_of_matches = n;
 
-    matched = match(p->pattern, StringValuePtr(text), 0,
-                    static_cast<int>(RSTRING_LEN(text)),
+    matched = match(p->pattern, StringValuePtr(m->text), 0,
+                    static_cast<int>(RSTRING_LEN(m->text)),
                     RE2::UNANCHORED, m->matches, n);
 
     if (matched) {
@@ -1216,6 +1337,10 @@ void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
   rb_define_method(re2_cMatchData, "length",
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
+  rb_define_method(re2_cMatchData, "begin",
+      RUBY_METHOD_FUNC(re2_matchdata_begin), 1);
+  rb_define_method(re2_cMatchData, "end",
+      RUBY_METHOD_FUNC(re2_matchdata_end), 1);
   rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
       -1); rb_define_method(re2_cMatchData, "to_s",
         RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);

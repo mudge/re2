@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require "spec_helper"
 
 describe RE2::MatchData do
@@ -157,6 +159,50 @@ describe RE2::MatchData do
       m1.must_equal("1234 56")
       m2.must_equal("1234")
       m3.must_equal("56")
+    end
+  end
+
+  describe "#begin" do
+    it "returns the offset of the start of a match by index" do
+      md = RE2::Regexp.new('(wo{2})').match('a woohoo')
+      md.string[md.begin(0)..-1].must_equal('woohoo')
+    end
+
+    it "returns the offset of the start of a match by string name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[md.begin('foo')..-1].must_equal('foobar')
+    end
+
+    it "returns the offset of the start of a match by symbol name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[md.begin(:foo)..-1].must_equal('foobar')
+    end
+
+    it "returns the offset despite multibyte characters" do
+      md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
+      md.string[md.begin(0)..-1].must_equal('Ruby')
+    end
+  end
+
+  describe "#end" do
+    it "returns the offset of the character following the end of a match" do
+      md = RE2::Regexp.new('(wo{2})').match('a woohoo')
+      md.string[0...md.end(0)].must_equal('a woo')
+    end
+
+    it "returns the offset of a match by string name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[0...md.end('foo')].must_equal('a foo')
+    end
+
+    it "returns the offset of a match by symbol name" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+      md.string[0...md.end(:foo)].must_equal('a foo')
+    end
+
+    it "returns the offset despite multibyte characters" do
+      md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
+      md.string[0...md.end(0)].must_equal('I ♥ Ruby')
     end
   end
 end
