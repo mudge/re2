@@ -11,6 +11,9 @@ incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 $CFLAGS << " -Wall -Wextra -funroll-loops"
 
 have_library("stdc++")
+have_header("stdint.h")
+have_func("rb_str_sublen")
+
 if have_library("re2")
 
   # Determine which version of re2 the user has installed.
@@ -36,24 +39,6 @@ SRC
     # as C++ (as it will end in .c by default).
     if try_compile(test_re2_match_signature, "-x c++")
       $defs.push("-DHAVE_ENDPOS_ARGUMENT")
-    end
-  end
-
-  # Determine whether the user has a version of Ruby with rb_str_sublen.
-  # This is present in MRI Ruby > 1.8 but missing from Rubinius so we can't
-  # just use HAVE_RUBY_ENCODING_H.
-  checking_for("rb_str_sublen") do
-    test_rb_str_sublen = <<SRC
-#include <ruby.h>
-
-int main() {
-  VALUE str = rb_str_new("abc", 3);
-  rb_str_sublen(str, 1);
-}
-SRC
-
-    if try_compile(test_rb_str_sublen)
-      $defs.push("-DHAVE_RB_STR_SUBLEN")
     end
   end
 

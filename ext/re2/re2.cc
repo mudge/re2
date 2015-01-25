@@ -18,6 +18,17 @@ using std::nothrow;
 using std::map;
 using std::vector;
 
+#define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
+#define UNUSED(x) ((void)x)
+
+#ifndef RSTRING_LEN
+  #define RSTRING_LEN(x) (RSTRING(x)->len)
+#endif
+
+#ifndef RSTRING_PTR
+  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
+#endif
+
 #ifdef HAVE_RUBY_ENCODING_H
   #include <ruby/encoding.h>
   #define ENCODED_STR_NEW(str, length, encoding) \
@@ -47,22 +58,14 @@ using std::vector;
 #else
   #ifdef HAVE_RUBY_ENCODING_H
     #define ENCODED_STR_SUBLEN(str, offset, encoding) \
-      rb_str_length(ENCODED_STR_NEW(StringValuePtr(str), offset, encoding))
+      ({ \
+        VALUE _string = ENCODED_STR_NEW(RSTRING_PTR(str), offset, encoding); \
+        rb_str_length(_string); \
+      })
   #else
     #define ENCODED_STR_SUBLEN(str, offset, encoding) \
       LONG2NUM(offset)
   #endif
-#endif
-
-#define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
-#define UNUSED(x) ((void)x)
-
-#ifndef RSTRING_LEN
-  #define RSTRING_LEN(x) (RSTRING(x)->len)
-#endif
-
-#ifndef RSTRING_PTR
-  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
 #endif
 
 #ifdef HAVE_ENDPOS_ARGUMENT
