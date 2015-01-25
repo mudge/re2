@@ -34,11 +34,15 @@ using std::vector;
       rb_enc_associate_index(_string, _enc); \
       _string; \
     })
+  #define ENCODED_STR_SUBLEN(str, offset) \
+     LONG2NUM(rb_str_sublen(str, offset))
 #else
   #define ENCODED_STR_NEW(str, length, encoding) \
     rb_str_new((const char *)str, (long)length)
   #define ENCODED_STR_NEW2(str, length, str2) \
     rb_str_new((const char *)str, (long)length)
+  #define ENCODED_STR_SUBLEN(str, offset) \
+    LONG2NUM(offset)
 #endif
 
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
@@ -284,19 +288,20 @@ static VALUE re2_matchdata_size(VALUE self) {
 }
 
 /*
- * Returns the input string up until the start of the given matchdata entry.
+ * Returns the offset of the start of the nth element of the matchdata.
  *
  * @param [Fixnum, String, Symbol] n the name or number of the match
- * @return [String] the string up until the start of the match
+ * @return [Fixnum] the offset of the start of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
- *   m.until_begin(0)  #=> "b"
- *   m.until_begin(1)  #=> "bob "
+ *   m.begin(0)  #=> "1"
+ *   m.begin(1)  #=> "4"
  */
-static VALUE re2_matchdata_until_begin(VALUE self, VALUE n) {
+static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
   re2_matchdata *m;
   re2_pattern *p;
   re2::StringPiece *match;
+  long offset;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
@@ -305,26 +310,27 @@ static VALUE re2_matchdata_until_begin(VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    return ENCODED_STR_NEW(StringValuePtr(m->text),
-           reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)),
-           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
+    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text));
+
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset);
   }
 }
 
 /*
- * Returns the input string up until the end of the given matchdata entry.
+ * Returns the offset of the character following the end of the nth element of the matchdata.
  *
  * @param [Fixnum, String, Symbol] n the name or number of the match
- * @return [String] the string up until the end of the match
+ * @return [Fixnum] the offset of the character following the end of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
- *   m.until_end(0)  #=> "bob 123 b"
- *   m.until_end(1)  #=> "bob 123"
+ *   m.end(0)  #=> "9"
+ *   m.end(1)  #=> "7"
  */
-static VALUE re2_matchdata_until_end(VALUE self, VALUE n) {
+static VALUE re2_matchdata_end(VALUE self, VALUE n) {
   re2_matchdata *m;
   re2_pattern *p;
   re2::StringPiece *match;
+  long offset;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
@@ -334,9 +340,9 @@ static VALUE re2_matchdata_until_end(VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    return ENCODED_STR_NEW(StringValuePtr(m->text),
-           reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size(),
-           p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1");
+    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size();
+
+    return ENCODED_STR_SUBLEN(StringValue(m->text), offset);
   }
 }
 
@@ -1317,10 +1323,10 @@ void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
   rb_define_method(re2_cMatchData, "length",
       RUBY_METHOD_FUNC(re2_matchdata_size), 0);
-  rb_define_method(re2_cMatchData, "until_begin",
-      RUBY_METHOD_FUNC(re2_matchdata_until_begin), 1);
-  rb_define_method(re2_cMatchData, "until_end",
-      RUBY_METHOD_FUNC(re2_matchdata_until_end), 1);
+  rb_define_method(re2_cMatchData, "begin",
+      RUBY_METHOD_FUNC(re2_matchdata_begin), 1);
+  rb_define_method(re2_cMatchData, "end",
+      RUBY_METHOD_FUNC(re2_matchdata_end), 1);
   rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
       -1); rb_define_method(re2_cMatchData, "to_s",
         RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);
