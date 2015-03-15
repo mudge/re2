@@ -1,79 +1,75 @@
-require "spec_helper"
-
-describe RE2 do
+RSpec.describe RE2 do
   describe "#Replace" do
     it "only replaces the first occurrence of the pattern" do
-      RE2.Replace("woo", "o", "a").must_equal("wao")
+      expect(RE2.Replace("woo", "o", "a")).to eq("wao")
     end
 
     it "performs replacement based on regular expressions" do
-      RE2.Replace("woo", "o+", "e").must_equal("we")
+      expect(RE2.Replace("woo", "o+", "e")).to eq("we")
     end
 
     it "supports flags in patterns" do
-      RE2.Replace("Good morning", "(?i)gOOD MORNING", "hi").must_equal("hi")
+      expect(RE2.Replace("Good morning", "(?i)gOOD MORNING", "hi")).to eq("hi")
     end
 
     it "does not perform replacements in-place" do
       name = "Robert"
       replacement = RE2.Replace(name, "R", "Cr")
-      replacement.must_equal("Crobert")
-      name.wont_be_same_as(replacement)
+      expect(name).to_not equal(replacement)
     end
 
     it "supports passing an RE2::Regexp as the pattern" do
       re = RE2::Regexp.new('wo{2}')
-      RE2.Replace("woo", re, "miaow").must_equal("miaow")
+      expect(RE2.Replace("woo", re, "miaow")).to eq("miaow")
     end
 
     it "respects any passed RE2::Regexp's flags" do
       re = RE2::Regexp.new('gOOD MORNING', :case_sensitive => false)
-      RE2.Replace("Good morning", re, "hi").must_equal("hi")
+      expect(RE2.Replace("Good morning", re, "hi")).to eq("hi")
     end
 
     if String.method_defined?(:encoding)
       it "preserves the original string's encoding" do
         original = "Foo"
         replacement = RE2.Replace(original, "oo", "ah")
-        original.encoding.must_equal(replacement.encoding)
+        expect(original.encoding).to eq(replacement.encoding)
       end
     end
   end
 
   describe "#GlobalReplace" do
     it "replaces every occurrence of a pattern" do
-      RE2.GlobalReplace("woo", "o", "a").must_equal("waa")
+      expect(RE2.GlobalReplace("woo", "o", "a")).to eq("waa")
     end
 
     it "performs replacement based on regular expressions" do
-      RE2.GlobalReplace("woohoo", "o+", "e").must_equal("wehe")
+      expect(RE2.GlobalReplace("woohoo", "o+", "e")).to eq("wehe")
     end
 
     it "supports flags in patterns" do
-      RE2.GlobalReplace("Robert", "(?i)r", "w").must_equal("wobewt")
+      expect(RE2.GlobalReplace("Robert", "(?i)r", "w")).to eq("wobewt")
     end
 
     it "does not perform replacement in-place" do
       name = "Robert"
       replacement = RE2.GlobalReplace(name, "(?i)R", "w")
-      replacement.must_equal("wobewt")
-      name.wont_be_same_as(replacement)
+      expect(name).to_not equal(replacement)
     end
 
     it "supports passing an RE2::Regexp as the pattern" do
       re = RE2::Regexp.new('wo{2,}')
-      RE2.GlobalReplace("woowooo", re, "miaow").must_equal("miaowmiaow")
+      expect(RE2.GlobalReplace("woowooo", re, "miaow")).to eq("miaowmiaow")
     end
 
     it "respects any passed RE2::Regexp's flags" do
       re = RE2::Regexp.new('gOOD MORNING', :case_sensitive => false)
-      RE2.GlobalReplace("Good morning Good morning", re, "hi").must_equal("hi hi")
+      expect(RE2.GlobalReplace("Good morning Good morning", re, "hi")).to eq("hi hi")
     end
   end
 
   describe "#QuoteMeta" do
     it "escapes a string so it can be used as a regular expression" do
-      RE2.QuoteMeta("1.5-2.0?").must_equal('1\.5\-2\.0\?')
+      expect(RE2.QuoteMeta("1.5-2.0?")).to eq('1\.5\-2\.0\?')
     end
   end
 end

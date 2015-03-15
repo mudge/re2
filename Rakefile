@@ -1,15 +1,10 @@
 require 'rake/extensiontask'
-require 'rake/testtask'
+require 'rspec/core/rake_task'
 
 Rake::ExtensionTask.new('re2')
 
-Rake::TestTask.new do |t|
-  t.libs << "spec"
-  t.test_files = FileList["spec/**/*_spec.rb"]
-  t.verbose = true
-end
+RSpec::Core::RakeTask.new(:spec)
 
-task :test    => :compile
-task :spec    => :test
-task :default => :test
+task :spec    => :compile
+task :default => :spec
 

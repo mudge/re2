@@ -1,12 +1,10 @@
-require "spec_helper"
-
-describe RE2::Scanner do
+RSpec.describe RE2::Scanner do
   describe "#regexp" do
     it "returns the original pattern for the scanner" do
       re = RE2::Regexp.new('(\w+)')
       scanner = re.scan("It is a truth")
 
-      scanner.regexp.must_be_same_as(re)
+      expect(scanner.regexp).to equal(re)
     end
   end
 
@@ -16,7 +14,7 @@ describe RE2::Scanner do
       text = "It is a truth"
       scanner = re.scan(text)
 
-      scanner.string.must_be_same_as(text)
+      expect(scanner.string).to equal(text)
     end
   end
 
@@ -24,32 +22,32 @@ describe RE2::Scanner do
     it "returns the next array of matches" do
       r = RE2::Regexp.new('(\w+)')
       scanner = r.scan("It is a truth universally acknowledged")
-      scanner.scan.must_equal(["It"])
-      scanner.scan.must_equal(["is"])
-      scanner.scan.must_equal(["a"])
-      scanner.scan.must_equal(["truth"])
-      scanner.scan.must_equal(["universally"])
-      scanner.scan.must_equal(["acknowledged"])
-      scanner.scan.must_be_nil
+      expect(scanner.scan).to eq(["It"])
+      expect(scanner.scan).to eq(["is"])
+      expect(scanner.scan).to eq(["a"])
+      expect(scanner.scan).to eq(["truth"])
+      expect(scanner.scan).to eq(["universally"])
+      expect(scanner.scan).to eq(["acknowledged"])
+      expect(scanner.scan).to be_nil
     end
 
     it "returns an empty array if there are no capturing groups" do
       r = RE2::Regexp.new('\w+')
       scanner = r.scan("Foo bar")
-      scanner.scan.must_equal([])
+      expect(scanner.scan).to eq([])
     end
 
     it "returns nil if there is no match" do
       r = RE2::Regexp.new('\d+')
       scanner = r.scan("Foo bar")
-      scanner.scan.must_be_nil
+      expect(scanner.scan).to be_nil
     end
   end
 
   it "is enumerable" do
     r = RE2::Regexp.new('(\d)')
     scanner = r.scan("There are 1 some 2 numbers 3")
-    scanner.must_be_kind_of(Enumerable)
+    expect(scanner).to be_a(Enumerable)
   end
 
   describe "#each" do
@@ -61,7 +59,7 @@ describe RE2::Scanner do
         matches << match
       end
 
-      matches.must_equal([["1"], ["2"], ["3"]])
+      expect(matches).to eq([["1"], ["2"], ["3"]])
     end
 
     it "returns an enumerator when not given a block" do
@@ -70,9 +68,9 @@ describe RE2::Scanner do
 
       # Prior to Ruby 1.9, Enumerator was within Enumerable.
       if defined?(Enumerator)
-        scanner.each.must_be_kind_of(Enumerator)
+        expect(scanner.each).to be_a(Enumerator)
       elsif defined?(Enumerable::Enumerator)
-        scanner.each.must_be_kind_of(Enumerable::Enumerator)
+        expect(scanner.each).to be_a(Enumerable::Enumerator)
       end
     end
   end
@@ -81,10 +79,10 @@ describe RE2::Scanner do
     it "resets any consumption" do
       r = RE2::Regexp.new('(\d)')
       scanner = r.scan("There are 1 some 2 numbers 3")
-      scanner.to_enum.first.must_equal(["1"])
-      scanner.to_enum.first.must_equal(["2"])
+      expect(scanner.to_enum.first).to eq(["1"])
+      expect(scanner.to_enum.first).to eq(["2"])
       scanner.rewind
-      scanner.to_enum.first.must_equal(["1"])
+      expect(scanner.to_enum.first).to eq(["1"])
     end
   end
 end
