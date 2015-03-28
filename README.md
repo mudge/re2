@@ -166,7 +166,7 @@ Contact
 
 All feedback should go to the mailing list: <mailto:ruby.re2@librelist.com>
 
-  [re2]: http://code.google.com/p/re2/
+  [re2]: https://github.com/google/re2
   [gcc]: http://gcc.gnu.org/
   [ruby-dev]: http://packages.debian.org/ruby-dev
   [build-essential]: http://packages.debian.org/build-essential
