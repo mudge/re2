@@ -35,14 +35,17 @@ Documentation
 Full documentation automatically generated from the latest version is
 available at <http://mudge.name/re2/>.
 
-Bear in mind that re2's regular expression syntax differs from PCRE, see the
-[official syntax page][] for more details.
+Note that re2's regular expression syntax differs from PCRE and Ruby's
+built-in [`Regexp`][Regexp] library, see the [official syntax page][] for more
+details.
 
 Usage
 -----
 
-You can use re2 as a mostly drop-in replacement for Ruby's own [Regexp][] and
-[MatchData][] classes:
+While re2 uses the same naming scheme as Ruby's built-in regular expression
+library (with [`Regexp`](http://mudge.name/re2/RE2/Regexp.html) and
+[`MatchData`](http://mudge.name/re2/RE2/MatchData.html)), its API is slightly
+different:
 
 ```console
 $ irb -rubygems
@@ -67,9 +70,11 @@ $ irb -rubygems
 => nil
 ```
 
-As `RE2::Regexp.new` (or `RE2::Regexp.compile`) can be quite verbose, a helper
-method has been defined against `Kernel` so you can use a shorter version to
-create regular expressions:
+As
+[`RE2::Regexp.new`](http://mudge.name/re2/RE2/Regexp.html#initialize-instance_method)
+(or `RE2::Regexp.compile`) can be quite verbose, a helper method has been
+defined against `Kernel` so you can use a shorter version to create regular
+expressions:
 
 ```console
 > RE2('(\d+)')
@@ -123,7 +128,7 @@ Features
 --------
 
 * Pre-compiling regular expressions with
-  [`RE2::Regexp.new(re)`](http://code.google.com/p/re2/source/browse/re2/re2.h#96),
+  [`RE2::Regexp.new(re)`](https://github.com/google/re2/blob/master/re2/re2.h#L100),
   `RE2::Regexp.compile(re)` or `RE2(re)` (including specifying options, e.g.
   `RE2::Regexp.new("pattern", :case_sensitive => false)`
 
@@ -152,7 +157,7 @@ Features
   `pattern.replace_all(replacement, original)`
 
 * Escaping regular expressions with
-  [`RE2.escape(unquoted)`](http://code.google.com/p/re2/source/browse/re2/re2.h#377) and
+  [`RE2.escape(unquoted)`](https://github.com/google/re2/blob/master/re2/re2.h#L418) and
   `RE2.quote(unquoted)`
 
 Contributions

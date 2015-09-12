@@ -44,5 +44,5 @@ SRC
 
   create_makefile("re2")
 else
-  abort "You must have re2 installed and specified with --with-re2-dir, please see http://code.google.com/p/re2/wiki/Install"
+  abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
 end
