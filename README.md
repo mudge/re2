@@ -128,7 +128,7 @@ Features
 --------
 
 * Pre-compiling regular expressions with
-  [`RE2::Regexp.new(re)`](https://github.com/google/re2/blob/master/re2/re2.h#L100),
+  [`RE2::Regexp.new(re)`](https://github.com/google/re2/blob/2016-02-01/re2/re2.h#L100),
   `RE2::Regexp.compile(re)` or `RE2(re)` (including specifying options, e.g.
   `RE2::Regexp.new("pattern", :case_sensitive => false)`
 
@@ -157,7 +157,7 @@ Features
   `pattern.replace_all(replacement, original)`
 
 * Escaping regular expressions with
-  [`RE2.escape(unquoted)`](https://github.com/google/re2/blob/master/re2/re2.h#L418) and
+  [`RE2.escape(unquoted)`](https://github.com/google/re2/blob/2016-02-01/re2/re2.h#L418) and
   `RE2.quote(unquoted)`
 
 Contributions
@@ -179,5 +179,5 @@ All feedback should go to the mailing list: <mailto:ruby.re2@librelist.com>
   [MatchData]: http://ruby-doc.org/core/classes/MatchData.html
   [Homebrew]: http://mxcl.github.com/homebrew
   [libre2-dev]: http://packages.debian.org/search?keywords=libre2-dev
-  [official syntax page]: http://code.google.com/p/re2/wiki/Syntax
+  [official syntax page]: https://github.com/google/re2/wiki/Syntax
 
