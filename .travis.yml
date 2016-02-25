@@ -10,3 +10,4 @@ rvm:
 before_install:
   - wget https://dl.dropbox.com/u/2175127/libre2-dev_20130802_amd64.deb
   - sudo dpkg -i libre2-dev_20130802_amd64.deb
+  - gem install bundler -v '~> 1.11'
