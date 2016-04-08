@@ -8,7 +8,7 @@ require 'mkmf'
 
 incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 
-$CFLAGS << " -Wall -Wextra -funroll-loops"
+$CXXFLAGS << " -Wall -Wextra -funroll-loops"
 
 have_library("stdc++")
 have_header("stdint.h")
@@ -37,7 +37,7 @@ SRC
 
     # Pass -x c++ to force gcc to compile the test program
     # as C++ (as it will end in .c by default).
-    if try_compile(test_re2_match_signature, "-x c++")
+    if try_compile(test_re2_match_signature, "-x c++ #{$CXXFLAGS}")
       $defs.push("-DHAVE_ENDPOS_ARGUMENT")
     end
   end
