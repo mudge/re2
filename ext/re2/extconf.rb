@@ -8,7 +8,7 @@ require 'mkmf'
 
 incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 
-$CXXFLAGS << " -Wall -Wextra -funroll-loops -std=c++11"
+$CXXFLAGS << " -Wall -Wextra -std=c++11"
 
 have_library("stdc++")
 have_header("stdint.h")
