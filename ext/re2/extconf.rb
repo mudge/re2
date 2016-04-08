@@ -10,7 +10,7 @@ incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 
 # for try_compile: Pass -x c++ to force gcc to compile the test program as C++
 # (as it will end in .c by default).
-cxx_source = '-x c++'
+cxx_source = "-x c++"
 
 if defined? $CXXFLAGS
   $CXXFLAGS << " -Wall -Wextra -std=c++11"
@@ -24,14 +24,13 @@ have_header("stdint.h")
 have_func("rb_str_sublen")
 
 checking_for("C++11 support") do
-
   trivial_test = <<SRC
 int main() {
   return 0;
 }
 SRC
 
-  if not try_compile(trivial_test, cxx_source)
+  if !try_compile(trivial_test, cxx_source)
     abort "Require a compiler with C++11 support"
   else
     true
