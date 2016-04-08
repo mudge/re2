@@ -23,6 +23,21 @@ have_library("stdc++")
 have_header("stdint.h")
 have_func("rb_str_sublen")
 
+checking_for("C++11 support") do
+
+  trivial_test = <<SRC
+int main() {
+  return 0;
+}
+SRC
+
+  if not try_compile(trivial_test, cxx_source)
+    abort "Require a compiler with C++11 support"
+  else
+    true
+  end
+end
+
 if have_library("re2")
 
   # Determine which version of re2 the user has installed.
