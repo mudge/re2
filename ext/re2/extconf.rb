@@ -8,7 +8,16 @@ require 'mkmf'
 
 incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 
-$CXXFLAGS << " -Wall -Wextra -std=c++11"
+# for try_compile: Pass -x c++ to force gcc to compile the test program as C++
+# (as it will end in .c by default).
+cxx_source = '-x c++'
+
+if defined? $CXXFLAGS
+  $CXXFLAGS << " -Wall -Wextra -std=c++11"
+  cxx_source << " #{$CXXFLAGS}"
+else
+  $CFLAGS << " -Wall -Wextra -std=c++11"
+end
 
 have_library("stdc++")
 have_header("stdint.h")
@@ -35,9 +44,7 @@ int main() {
 }
 SRC
 
-    # Pass -x c++ to force gcc to compile the test program
-    # as C++ (as it will end in .c by default).
-    if try_compile(test_re2_match_signature, "-x c++ #{$CXXFLAGS}")
+    if try_compile(test_re2_match_signature, cxx_source)
       $defs.push("-DHAVE_ENDPOS_ARGUMENT")
     end
   end
