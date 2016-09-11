@@ -4,7 +4,7 @@ re2 [![Build Status](https://travis-ci.org/mudge/re2.svg?branch=master)](http://
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 0.7.0  
+**Current version:** 1.0.0  
 **Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, 2.2, 2.3, Rubinius 2.2
 
 Installation
@@ -20,6 +20,8 @@ running the following:
 If you are using Debian, you can install the [libre2-dev][] package like so:
 
     $ sudo apt-get install libre2-dev
+
+Recent versions of re2 require a compiler with C++11 support such as [clang](http://clang.llvm.org/) 3.4 or [gcc](https://gcc.gnu.org/) 4.8.
 
 If you are using a packaged Ruby distribution, make sure you also have the
 Ruby header files installed such as those provided by the [ruby-dev][] package
@@ -163,8 +165,9 @@ Features
 Contributions
 -------------
 
-Thanks to [Jason Woods](https://github.com/driskell) who contributed the
-original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`.
+* Thanks to [Jason Woods](https://github.com/driskell) who contributed the
+original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`;
+* Thanks to [Stefano Rivera](https://github.com/stefanor) who first contributed C++11 support.
 
 Contact
 -------

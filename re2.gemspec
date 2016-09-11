@@ -2,9 +2,9 @@ Gem::Specification.new do |s|
   s.name = "re2"
   s.summary = "Ruby bindings to re2."
   s.description = 'Ruby bindings to re2, "an efficient, principled regular expression library".'
-  s.version = "0.7.0"
+  s.version = "1.0.0"
   s.authors = ["Paul Mucur"]
-  s.homepage = "http://github.com/mudge/re2"
+  s.homepage = "https://github.com/mudge/re2"
   s.email = "ruby.re2@librelist.com"
   s.extensions = ["ext/re2/extconf.rb"]
   s.license = "BSD"
