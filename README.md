@@ -5,7 +5,7 @@ A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
 **Current version:** 0.7.0  
-**Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, Rubinius 2.2
+**Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, 2.2, 2.3, Rubinius 2.2
 
 Installation
 ------------

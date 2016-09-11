@@ -10,20 +10,46 @@ incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 
 $CFLAGS << " -Wall -Wextra -funroll-loops"
 
+# Pass -x c++ to force gcc to compile the test program
+# as C++ (as it will end in .c by default).
+compile_options = "-x c++"
+
 have_library("stdc++")
 have_header("stdint.h")
 have_func("rb_str_sublen")
 
-if have_library("re2")
+unless have_library("re2")
+  abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
+end
 
-  # Determine which version of re2 the user has installed.
-  # Revision d9f8806c004d added an `endpos` argument to the
-  # generic Match() function.
-  #
-  # To test for this, try to compile a simple program that uses
-  # the newer form of Match() and set a flag if it is successful.
-  checking_for("RE2::Match() with endpos argument") do
-    test_re2_match_signature = <<SRC
+# Recent versions of re2 now require a compiler with C++11 support
+checking_for("re2 requires C++11 compiler") do
+  minimal_program = <<SRC
+#include <re2/re2.h>
+int main() { return 0; }
+SRC
+
+  unless try_compile(minimal_program, compile_options)
+    if try_compile(minimal_program, compile_options + " -std=c++11")
+      compile_options << " -std=c++11"
+      $CPPFLAGS << " -std=c++11"
+    elsif try_compile(minimal_program, compile_options + " -std=c++0x")
+      compile_options << " -std=c++0x"
+      $CPPFLAGS << " -std=c++0x"
+    else
+      abort "Cannot compile re2 with your compiler: recent versions require C++11 support."
+    end
+  end
+end
+
+# Determine which version of re2 the user has installed.
+# Revision d9f8806c004d added an `endpos` argument to the
+# generic Match() function.
+#
+# To test for this, try to compile a simple program that uses
+# the newer form of Match() and set a flag if it is successful.
+checking_for("RE2::Match() with endpos argument") do
+  test_re2_match_signature = <<SRC
 #include <re2/re2.h>
 
 int main() {
@@ -35,14 +61,9 @@ int main() {
 }
 SRC
 
-    # Pass -x c++ to force gcc to compile the test program
-    # as C++ (as it will end in .c by default).
-    if try_compile(test_re2_match_signature, "-x c++")
-      $defs.push("-DHAVE_ENDPOS_ARGUMENT")
-    end
+  if try_compile(test_re2_match_signature, compile_options)
+    $defs.push("-DHAVE_ENDPOS_ARGUMENT")
   end
-
-  create_makefile("re2")
-else
-  abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
 end
+
+create_makefile("re2")

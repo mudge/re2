@@ -6,8 +6,8 @@
  * Released under the BSD Licence, please see LICENSE.txt
  */
 
-#include <re2/re2.h>
 #include <ruby.h>
+#include <re2/re2.h>
 #include <stdint.h>
 #include <string>
 #include <sstream>
