@@ -89,6 +89,7 @@ typedef struct {
 typedef struct {
   re2::StringPiece *input;
   int number_of_capturing_groups;
+  bool eof;
   VALUE regexp, text;
 } re2_scanner;
 
@@ -173,6 +174,21 @@ static VALUE re2_scanner_string(VALUE self) {
 }
 
 /*
+ * Returns whether the scanner has consumed all input or not.
+ *
+ * @return [Boolean] whether the scanner has consumed all input or not
+ * @example
+ *   c = RE2::Regexp.new('(\d+)').scan("foo")
+ *   c.eof? #=> true
+ */
+static VALUE re2_scanner_eof(VALUE self) {
+  re2_scanner *c;
+  Data_Get_Struct(self, re2_scanner, c);
+
+  return BOOL2RUBY(c->eof);
+}
+
+/*
  * Rewind the scanner to the start of the string.
  *
  * @example
@@ -188,6 +204,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
   Data_Get_Struct(self, re2_scanner, c);
 
   c->input = new(nothrow) re2::StringPiece(StringValuePtr(c->text));
+  c->eof = false;
 
   return self;
 }
@@ -204,6 +221,8 @@ static VALUE re2_scanner_rewind(VALUE self) {
  */
 static VALUE re2_scanner_scan(VALUE self) {
   int i;
+  size_t original_input_size, new_input_size;
+  bool input_advanced;
   re2_pattern *p;
   re2_scanner *c;
   VALUE result;
@@ -215,6 +234,12 @@ static VALUE re2_scanner_scan(VALUE self) {
   vector<RE2::Arg*> args(c->number_of_capturing_groups);
   vector<string> matches(c->number_of_capturing_groups);
 
+  if (c->eof) {
+    return Qnil;
+  }
+
+  original_input_size = c->input->size();
+
   for (i = 0; i < c->number_of_capturing_groups; i++) {
     matches[i] = "";
     argv[i] = &matches[i];
@@ -224,6 +249,9 @@ static VALUE re2_scanner_scan(VALUE self) {
   if (RE2::FindAndConsumeN(c->input, *p->pattern, &args[0],
         c->number_of_capturing_groups)) {
     result = rb_ary_new2(c->number_of_capturing_groups);
+    new_input_size = c->input->size();
+    input_advanced = new_input_size < original_input_size;
+
     for (i = 0; i < c->number_of_capturing_groups; i++) {
       if (matches[i].empty()) {
         rb_ary_push(result, Qnil);
@@ -232,6 +260,14 @@ static VALUE re2_scanner_scan(VALUE self) {
               matches[i].size(),
               p->pattern->options().utf8() ? "UTF-8" : "ISO-8859-1"));
       }
+    }
+
+    /* Check whether we've exhausted the input yet. */
+    c->eof = new_input_size == 0;
+
+    /* If the match didn't advance the input, we need to do this ourselves. */
+    if (!input_advanced && new_input_size > 0) {
+      c->input->remove_prefix(1);
     }
   } else {
     result = Qnil;
@@ -1216,6 +1252,7 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
   c->regexp = self;
   c->text = text;
   c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
+  c->eof = false;
 
   return scanner;
 }
@@ -1349,6 +1386,8 @@ void Init_re2(void) {
 
   rb_define_method(re2_cScanner, "string",
       RUBY_METHOD_FUNC(re2_scanner_string), 0);
+  rb_define_method(re2_cScanner, "eof?",
+      RUBY_METHOD_FUNC(re2_scanner_eof), 0);
   rb_define_method(re2_cScanner, "regexp",
       RUBY_METHOD_FUNC(re2_scanner_regexp), 0);
   rb_define_method(re2_cScanner, "scan",
