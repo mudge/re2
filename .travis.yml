@@ -10,7 +10,8 @@ rvm:
   - 2.2
   - 2.3
   - ree
-  - rbx
+  - rbx-2
+  - rbx-3
 before_install:
   - wget https://dl.dropbox.com/u/2175127/$RE2_PACKAGE
   - sudo dpkg -i $RE2_PACKAGE
