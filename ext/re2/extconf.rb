@@ -6,6 +6,9 @@
 
 require 'mkmf'
 
+RbConfig::MAKEFILE_CONFIG["CC"] = ENV["CC"] if ENV["CC"]
+RbConfig::MAKEFILE_CONFIG["CXX"] = ENV["CXX"] if ENV["CXX"]
+
 incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 
 $CFLAGS << " -Wall -Wextra -funroll-loops"
