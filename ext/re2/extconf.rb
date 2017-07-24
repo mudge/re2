@@ -6,8 +6,15 @@
 
 require 'mkmf'
 
-RbConfig::MAKEFILE_CONFIG["CC"] = ENV["CC"] if ENV["CC"]
-RbConfig::MAKEFILE_CONFIG["CXX"] = ENV["CXX"] if ENV["CXX"]
+if ENV["CC"]
+  RbConfig::MAKEFILE_CONFIG["CC"] = ENV["CC"]
+  RbConfig::CONFIG["CC"] = ENV["CC"]
+end
+
+if ENV["CXX"]
+  RbConfig::MAKEFILE_CONFIG["CXX"] = ENV["CXX"]
+  RbConfig::CONFIG["CXX"] = ENV["CXX"]
+end
 
 incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
 
