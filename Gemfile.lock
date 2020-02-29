@@ -10,7 +10,7 @@ GEM
     ffi2-generators (0.1.1)
     psych (2.0.2)
     racc (1.4.11)
-    rake (10.3.2)
+    rake (13.0.1)
     rake-compiler (0.9.3)
       rake
     rspec (3.2.0)
