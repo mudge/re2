@@ -16,5 +16,6 @@ before_install:
   - sudo dpkg -i $RE2_PACKAGE
   - gem install bundler -v '~> 1.11'
 env:
+  - GITHUB_RELEASE=v1.2.0 RE2_PACKAGE=libre2-dev_20200409_amd64.deb
   - GITHUB_RELEASE=v1.0.0 RE2_PACKAGE=libre2-dev_20160901_amd64.deb
   - GITHUB_RELEASE=v0.6.0 RE2_PACKAGE=libre2-dev_20130802_amd64.deb
