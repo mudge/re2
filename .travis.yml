@@ -12,9 +12,9 @@ rvm:
   - ree
   - rbx-3
 before_install:
-  - wget https://dl.dropbox.com/u/2175127/$RE2_PACKAGE
+  - wget https://github.com/mudge/re2/releases/download/$GITHUB_RELEASE/$RE2_PACKAGE
   - sudo dpkg -i $RE2_PACKAGE
   - gem install bundler -v '~> 1.11'
 env:
-  - RE2_PACKAGE=libre2-dev_20160901_amd64.deb
-  - RE2_PACKAGE=libre2-dev_20130802_amd64.deb
+  - GITHUB_RELEASE=v1.0.0 RE2_PACKAGE=libre2-dev_20160901_amd64.deb
+  - GITHUB_RELEASE=v0.6.0 RE2_PACKAGE=libre2-dev_20130802_amd64.deb
