@@ -4,7 +4,7 @@ re2 [![Build Status](https://travis-ci.org/mudge/re2.svg?branch=master)](http://
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 1.1.1  
+**Current version:** 1.2.0  
 **Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, 2.2, 2.3, Rubinius 3.8
 
 Installation
@@ -166,9 +166,11 @@ Contributions
 -------------
 
 * Thanks to [Jason Woods](https://github.com/driskell) who contributed the
-original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`;
+  original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`;
 * Thanks to [Stefano Rivera](https://github.com/stefanor) who first contributed C++11 support;
-* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan`.
+* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan`;
+* Thanks to [Sebastian Reitenbach](https://github.com/buzzdeee) for reporting
+  the deprecation and removal of the `utf8` encoding option in re2.
 
 Contact
 -------

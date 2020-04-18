@@ -5,6 +5,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [1.2.0] - 2020-04-18
+### Changed
+- Stop using the now-deprecated utf8 API and re-implement it in terms of the
+  encoding API in order to support both existing and upcoming releases of re2
+
 ## [1.1.1] - 2017-07-24
 ### Fixed
 - Ensure that any compilers passed via the CC and CXX environment variables are
@@ -51,6 +56,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[1.2.0]: https://github.com/mudge/re2/releases/tag/v1.2.0
 [1.1.1]: https://github.com/mudge/re2/releases/tag/v1.1.1
 [1.1.0]: https://github.com/mudge/re2/releases/tag/v1.1.0
 [1.0.0]: https://github.com/mudge/re2/releases/tag/v1.0.0
