@@ -175,7 +175,7 @@ Contributions
 Contact
 -------
 
-All feedback should go to the mailing list: <mailto:ruby.re2@librelist.com>
+All issues and suggestions should go to [GitHub Issues](https://github.com/mudge/re2/issues).
 
   [re2]: https://github.com/google/re2
   [gcc]: http://gcc.gnu.org/

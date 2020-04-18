@@ -5,7 +5,6 @@ Gem::Specification.new do |s|
   s.version = "1.2.0"
   s.authors = ["Paul Mucur"]
   s.homepage = "https://github.com/mudge/re2"
-  s.email = "ruby.re2@librelist.com"
   s.extensions = ["ext/re2/extconf.rb"]
   s.license = "BSD-3-Clause"
   s.files = [
