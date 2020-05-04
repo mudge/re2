@@ -1,11 +1,12 @@
-re2 [![Build Status](https://travis-ci.org/mudge/re2.svg?branch=master)](http://travis-ci.org/mudge/re2)
+re2 [![Build Status](https://github.com/mudge/re2/workflows/Tests/badge.svg?branch=master)](https://github.com/mudge/re2/actions)
 ===
 
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
 **Current version:** 1.2.0  
-**Supported Ruby versions:** 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, 2.2, 2.3, Rubinius 3.8
+**Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, Rubinius 3  
+**Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01)
 
 Installation
 ------------
