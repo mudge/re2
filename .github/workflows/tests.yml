@@ -1,0 +1,32 @@
+name: Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby:
+          - "ruby1.8"
+          - "ruby1.9.1"
+          - "ruby2.0"
+          - "ruby2.1"
+          - "ruby2.2"
+          - "ruby2.3"
+          - "ruby2.4"
+          - "ruby2.5"
+          - "ruby2.6"
+          - "rbx3.107"
+        libre2:
+          - "20130802-1"
+          - "20160901-1"
+          - "20200501"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: mudge/re2-test-action@v1
+      with:
+        ruby-version: "${{ matrix.ruby }}"
+        libre2-dev-url: "https://github.com/mudge/re2-test-action/releases/download/v1/libre2-dev_${{ matrix.libre2 }}_amd64.deb"
