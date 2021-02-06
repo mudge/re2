@@ -20,6 +20,7 @@ jobs:
           - "ruby2.5"
           - "ruby2.6"
           - "rbx3.107"
+          - "truffleruby-head"
         libre2:
           - "20130802-1"
           - "20160901-1"
