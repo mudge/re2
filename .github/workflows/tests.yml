@@ -10,23 +10,27 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - "ruby1.8"
-          - "ruby1.9.1"
-          - "ruby2.0"
-          - "ruby2.1"
-          - "ruby2.2"
-          - "ruby2.3"
-          - "ruby2.4"
-          - "ruby2.5"
-          - "ruby2.6"
-          - "rbx3.107"
+          - "1.8.7"
+          - "1.9.1-p431"
+          - "2.0.0-p648"
+          - "2.1.10"
+          - "2.2.10"
+          - "2.3.8"
+          - "2.4.10"
+          - "2.5.8"
+          - "2.6.6"
+          - "2.7.2"
+          - "rbx-3.107"
+          - "rbx-4.9"
+          - "rbx-5.0"
+          - "truffleruby-21.0.0"
         libre2:
           - "20130802-1"
           - "20160901-1"
           - "20200501"
     steps:
     - uses: actions/checkout@v2
-    - uses: mudge/re2-test-action@v1
+    - uses: ./.github/actions/test
       with:
         ruby-version: "${{ matrix.ruby }}"
         libre2-dev-url: "https://github.com/mudge/re2-test-action/releases/download/v1/libre2-dev_${{ matrix.libre2 }}_amd64.deb"

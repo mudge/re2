@@ -1,0 +1,17 @@
+name: 're2 Test Action'
+description: 'Run re2 test suite against different Rubies and libre2-dev versions'
+inputs:
+  ruby-version:
+    description: 'The version of Ruby to install'
+    required: true
+    default: 'ruby2.6'
+  libre2-dev-url:
+    description: 'The URL of a version of libre2-dev to install'
+    required: true
+    default: 'https://github.com/mudge/re2/releases/download/v1.2.0/libre2-dev_20200501_amd64.deb'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.ruby-version }}
+    - ${{ inputs.libre2-dev-url }}
