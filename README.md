@@ -5,8 +5,8 @@ A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
 **Current version:** 1.2.0  
-**Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, Rubinius 3  
-**Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01)
+**Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0  
+**Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01)
 
 Installation
 ------------
