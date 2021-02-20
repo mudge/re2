@@ -1,4 +1,4 @@
-re2 [![Build Status](https://github.com/mudge/re2/workflows/Tests/badge.svg?branch=master)](https://github.com/mudge/re2/actions)
+re2 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 ===
 
 A Ruby binding to [re2][], an "efficient, principled regular expression
