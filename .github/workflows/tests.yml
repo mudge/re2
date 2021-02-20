@@ -6,39 +6,33 @@ on:
   pull_request:
 jobs:
   test:
-    name: Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
-    runs-on: ubuntu-16.04
+    name: Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }} - Ubuntu ${{ matrix.ubuntu }}
+    runs-on: ubuntu-${{ matrix.ubuntu }}
     strategy:
+      fail-fast: false
       matrix:
         ruby:
           - '3.0'
-          - 2.7
-          - 2.6
-          - 2.5
-          - 2.4
-          - 2.3
-          - 2.2
-          - 2.1.9
+          - truffleruby-head
+          - truffleruby-21.0.0
         libre2:
-          - version: "20150501"
-            soname: 0
-          - version: "20200302"
-            soname: 1
-          - version: "20200303"
-            soname: 6
-          - version: "20200501"
-            soname: 7
-          - version: "20200706"
-            soname: 8
-          - version: "20201101"
+          - version: "20210202"
             soname: 9
+        ubuntu:
+          - '18.04'
+          - '20.04'
+        include:
+          - ubuntu: '18.04'
+            existing_libre2: 'libre2-4'
+          - ubuntu: '20.04'
+            existing_libre2: 'libre2-5'
     steps:
       - uses: actions/checkout@v2
       - name: Remove any existing libre2 installation
-        run: sudo apt-get remove -y libre2-dev libre2-1v5
+        run: sudo apt-get remove -y libre2-dev ${{ matrix.existing_libre2 }}
       - name: Download and install specific release of libre2
         run: |
-          curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v1/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
+          curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v1/libre2-dev_${{ matrix.libre2.version }}_${{ matrix.ubuntu }}_amd64.deb
           sudo dpkg -i libre2-dev.deb
       - uses: ruby/setup-ruby@v1
         with:
@@ -46,36 +40,21 @@ jobs:
           bundler-cache: true
       - run: bundle exec rake
 
-  legacy:
-    name: Legacy Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
-    runs-on: ubuntu-16.04
-    container:
-      image: "mudge/re2-ci:${{ matrix.ruby }}"
-      options: "--add-host rubygems.org:151.101.0.70 --add-host api.rubygems.org:151.101.0.70"
+  macos:
+    name: Ruby ${{ matrix.ruby }} - macOS 10.15
+    runs-on: macos-10.15
     strategy:
+      fail-fast: false
       matrix:
         ruby:
-          - 1.8
-          - 1.9.1
-          - '2.0'
-        libre2:
-          - version: "20150501"
-            soname: 0
-          - version: "20200302"
-            soname: 1
-          - version: "20200303"
-            soname: 6
-          - version: "20200501"
-            soname: 7
-          - version: "20200706"
-            soname: 8
-          - version: "20201101"
-            soname: 9
+          - truffleruby-head
+          - truffleruby-21.0.0
     steps:
       - uses: actions/checkout@v2
-      - name: Download and install specific release of libre2
-        run: |
-          curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v1/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
-          dpkg -i libre2-dev.deb
-      - run: bundle install --jobs 4
+      - name: Install re2
+        run: brew install re2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{ matrix.ruby }}"
+          bundler-cache: true
       - run: bundle exec rake
