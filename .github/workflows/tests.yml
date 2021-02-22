@@ -77,5 +77,14 @@ jobs:
         run: |
           curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v1/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
           dpkg -i libre2-dev.deb
+      - name: Configure Bundler for Ruby dependencies
+        run: bundle config --local path vendor/bundle
+      - name: Generate Gemfile.lock
+        run: bundle lock
+      - name: Cache Ruby dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: gems-v1-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('Gemfile.lock') }}
       - run: bundle install --jobs 4
       - run: bundle exec rake
