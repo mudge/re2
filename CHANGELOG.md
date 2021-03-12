@@ -5,6 +5,12 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [1.3.0] - 2021-03-12
+### Added
+- Add Homebrew's prefix on Apple Silicon and /usr as fallback locations
+  searched when looking for the underlying re2 library if not found in
+  /usr/local
+
 ## [1.2.0] - 2020-04-18
 ### Changed
 - Stop using the now-deprecated utf8 API and re-implement it in terms of the
@@ -56,6 +62,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[1.3.0]: https://github.com/mudge/re2/releases/tag/v1.3.0
 [1.2.0]: https://github.com/mudge/re2/releases/tag/v1.2.0
 [1.1.1]: https://github.com/mudge/re2/releases/tag/v1.1.1
 [1.1.0]: https://github.com/mudge/re2/releases/tag/v1.1.0
