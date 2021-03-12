@@ -16,7 +16,19 @@ if ENV["CXX"]
   RbConfig::CONFIG["CXX"] = ENV["CXX"]
 end
 
-incl, lib = dir_config("re2", "/usr/local/include", "/usr/local/lib")
+header_dirs = [
+  "/usr/local/include",
+  "/opt/homebrew/include",
+  "/usr/include"
+]
+
+lib_dirs = [
+  "/usr/local/lib",
+  "/opt/homebrew/lib",
+  "/usr/lib"
+]
+
+dir_config("re2", header_dirs, lib_dirs)
 
 $CFLAGS << " -Wall -Wextra -funroll-loops"
 

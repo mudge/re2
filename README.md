@@ -29,8 +29,12 @@ Ruby header files installed such as those provided by the [ruby-dev][] package
 on Debian and Ubuntu.
 
 You can then install the library via RubyGems with `gem install re2` or `gem
-install re2 -- --with-re2-dir=/opt/local/re2` if re2 is not installed in the
-default location of `/usr/local/`.
+install re2 -- --with-re2-dir=/path/to/re2/prefix` if re2 is not installed in
+any of the following default locations:
+
+* `/usr/local`
+* `/opt/homebrew`
+* `/usr`
 
 Documentation
 -------------
