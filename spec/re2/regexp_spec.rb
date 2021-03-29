@@ -13,6 +13,11 @@ RSpec.describe RE2::Regexp do
     it "raises an error if given an inappropriate type" do
       expect { RE2::Regexp.new(nil) }.to raise_error(TypeError)
     end
+
+    it "allows invalid patterns to be created" do
+      re = RE2::Regexp.new('???', :log_errors => false)
+      expect(re).to be_a(RE2::Regexp)
+    end
   end
 
   describe "#compile" do
@@ -23,6 +28,11 @@ RSpec.describe RE2::Regexp do
 
     it "returns an instance given a pattern and options" do
       re = RE2::Regexp.compile('woo', :case_sensitive => false)
+      expect(re).to be_a(RE2::Regexp)
+    end
+
+    it "allows invalid patterns to be created" do
+      re = RE2::Regexp.compile('???', :log_errors => false)
       expect(re).to be_a(RE2::Regexp)
     end
   end
@@ -83,6 +93,11 @@ RSpec.describe RE2::Regexp do
       program_size = RE2::Regexp.new('w(o)(o)').program_size
       expect(program_size).to be_a(Fixnum)
     end
+
+    it "returns -1 for an invalid pattern" do
+      program_size = RE2::Regexp.new('???', :log_errors => false).program_size
+      expect(program_size).to eq(-1)
+    end
   end
 
   describe "#to_str" do
@@ -96,6 +111,11 @@ RSpec.describe RE2::Regexp do
     it "returns the original pattern" do
       pattern = RE2::Regexp.new('w(o)(o)').pattern
       expect(pattern).to eq("w(o)(o)")
+    end
+
+    it "returns the pattern even if invalid" do
+      pattern = RE2::Regexp.new('???', :log_errors => false).pattern
+      expect(pattern).to eq("???")
     end
   end
 
@@ -278,6 +298,11 @@ RSpec.describe RE2::Regexp do
       expect { re.match("My name is Robert Paulson", -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
     end
 
+    it "returns nil with an invalid pattern" do
+      re = RE2::Regexp.new('???', :log_errors => false)
+      expect(re.match('My name is Robert Paulson')).to be_nil
+    end
+
     describe "with a specific number of matches under the total in the pattern" do
       subject { re.match("My name is Robert Paulson", 1) }
 
@@ -328,6 +353,11 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
       expect(re.match?("My name is Robert Paulson")).to eq(true)
       expect(re.match?("My age is 99")).to eq(false)
+    end
+
+    it "returns false if the pattern is invalid" do
+      re = RE2::Regexp.new('???', :log_errors => false)
+      expect(re.match?("My name is Robert Paulson")).to eq(false)
     end
   end
 
@@ -387,6 +417,10 @@ RSpec.describe RE2::Regexp do
       expect(RE2::Regexp.new('abc').number_of_capturing_groups).to eq(0)
       expect(RE2::Regexp.new('a((b)c)').number_of_capturing_groups).to eq(2)
     end
+
+    it "returns -1 for an invalid regexp" do
+      expect(RE2::Regexp.new('???', :log_errors => false).number_of_capturing_groups).to eq(-1)
+    end
   end
 
   describe "#named_capturing_groups" do
@@ -403,6 +437,10 @@ RSpec.describe RE2::Regexp do
       groups = RE2::Regexp.new('(?P<bob>a)(o)(?P<rob>e)').named_capturing_groups
       expect(groups["bob"]).to eq(1)
       expect(groups["rob"]).to eq(3)
+    end
+
+    it "returns an empty hash for an invalid regexp" do
+      expect(RE2::Regexp.new('???', :log_errors => false).named_capturing_groups).to be_empty
     end
   end
 
