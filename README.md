@@ -4,7 +4,7 @@ re2 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/ba
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 1.3.0  
+**Current version:** 1.4.0  
 **Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0  
 **Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01)
 
@@ -175,7 +175,9 @@ Contributions
 * Thanks to [Stefano Rivera](https://github.com/stefanor) who first contributed C++11 support;
 * Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan`;
 * Thanks to [Sebastian Reitenbach](https://github.com/buzzdeee) for reporting
-  the deprecation and removal of the `utf8` encoding option in re2.
+  the deprecation and removal of the `utf8` encoding option in re2;
+* Thanks to [Sergio Medina](https://github.com/serch) for reporting a bug when
+  using `RE2::Scanner#scan` with an invalid regular expression.
 
 Contact
 -------

@@ -5,6 +5,13 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [1.4.0] - 2021-03-29
+### Fixed
+- Fixed a crash when using RE2::Scanner#scan with an invalid regular expression
+  (thanks to Sergio Medina for reporting this)
+- Fixed RE2::Regexp#match raising a NoMemoryError instead of an ArgumentError
+  when given a negative number of matches
+
 ## [1.3.0] - 2021-03-12
 ### Added
 - Add Homebrew's prefix on Apple Silicon and /usr as fallback locations
@@ -62,6 +69,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[1.4.0]: https://github.com/mudge/re2/releases/tag/v1.4.0
 [1.3.0]: https://github.com/mudge/re2/releases/tag/v1.3.0
 [1.2.0]: https://github.com/mudge/re2/releases/tag/v1.2.0
 [1.1.1]: https://github.com/mudge/re2/releases/tag/v1.1.1
