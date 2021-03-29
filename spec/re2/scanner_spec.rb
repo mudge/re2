@@ -45,6 +45,12 @@ RSpec.describe RE2::Scanner do
       expect(scanner.scan).to be_nil
     end
 
+    it "returns nil if the regexp is invalid" do
+      r = RE2::Regexp.new('???', :log_errors => false)
+      scanner = r.scan("Foo bar")
+      expect(scanner.scan).to be_nil
+    end
+
     it "returns an empty array if the input is empty" do
       r = RE2::Regexp.new("")
       scanner = r.scan("")

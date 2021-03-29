@@ -1251,7 +1251,13 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
   c->input = new(nothrow) re2::StringPiece(StringValuePtr(text));
   c->regexp = self;
   c->text = text;
-  c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
+
+  if (p->pattern->ok()) {
+    c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
+  } else {
+    c->number_of_capturing_groups = 0;
+  }
+
   c->eof = false;
 
   return scanner;
