@@ -1158,6 +1158,7 @@ static VALUE re2_regexp_named_capturing_groups(VALUE self) {
  *   @param [String] text the text to search
  *   @param [Fixnum] number_of_matches the number of matches to return
  *   @return [RE2::MatchData] the matches
+ *   @raise [ArgumentError] if given a negative number of matches
  *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
  *   @example
  *     r = RE2::Regexp.new('w(o)(o)')
@@ -1180,7 +1181,15 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
 
   if (RTEST(number_of_matches)) {
     n = NUM2INT(number_of_matches);
+
+    if (n < 0) {
+      rb_raise(rb_eArgError, "number of matches should be >= 0");
+    }
   } else {
+    if (!p->pattern->ok()) {
+      return Qnil;
+    }
+
     n = p->pattern->NumberOfCapturingGroups();
   }
 
@@ -1251,7 +1260,13 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
   c->input = new(nothrow) re2::StringPiece(StringValuePtr(text));
   c->regexp = self;
   c->text = text;
-  c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
+
+  if (p->pattern->ok()) {
+    c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
+  } else {
+    c->number_of_capturing_groups = 0;
+  }
+
   c->eof = false;
 
   return scanner;
