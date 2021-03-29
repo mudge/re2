@@ -399,13 +399,13 @@ RSpec.describe RE2::Regexp do
     end
   end
 
-  describe "#escape" do
+  describe ".escape" do
     it "transforms a string into a regexp" do
       expect(RE2::Regexp.escape("1.5-2.0?")).to eq('1\.5\-2\.0\?')
     end
   end
 
-  describe "#quote" do
+  describe ".quote" do
     it "transforms a string into a regexp" do
       expect(RE2::Regexp.quote("1.5-2.0?")).to eq('1\.5\-2\.0\?')
     end
