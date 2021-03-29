@@ -274,6 +274,10 @@ RSpec.describe RE2::Regexp do
       expect { re.match("My name is Robert Paulson", {}) }.to raise_error(TypeError)
     end
 
+    it "raises an exception when given a negative number of matches" do
+      expect { re.match("My name is Robert Paulson", -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
+    end
+
     describe "with a specific number of matches under the total in the pattern" do
       subject { re.match("My name is Robert Paulson", 1) }
 
