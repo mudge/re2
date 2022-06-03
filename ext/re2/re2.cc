@@ -8,6 +8,7 @@
 
 #include <ruby.h>
 #include <re2/re2.h>
+#include <re2/set.h>
 #include <stdint.h>
 #include <string>
 #include <sstream>
@@ -93,12 +94,85 @@ typedef struct {
   VALUE regexp, text;
 } re2_scanner;
 
-VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner;
+typedef struct {
+  RE2::Set *set;
+} re2_set;
+
+VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
+      re2_eSetMatchError;
 
 /* Symbols used in RE2 options. */
 static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
           id_max_mem, id_literal, id_never_nl, id_case_sensitive,
-          id_perl_classes, id_word_boundary, id_one_line;
+          id_perl_classes, id_word_boundary, id_one_line,
+          id_unanchored, id_anchor_start, id_anchor_both;
+
+RE2::Options parse_re2_options(VALUE options) {
+  if (TYPE(options) != T_HASH) {
+    rb_raise(rb_eArgError, "options should be a hash");
+  }
+  VALUE utf8, posix_syntax, longest_match, log_errors,
+        max_mem, literal, never_nl, case_sensitive, perl_classes,
+        word_boundary, one_line;
+  RE2::Options re2_options;
+
+  utf8 = rb_hash_aref(options, ID2SYM(id_utf8));
+  if (!NIL_P(utf8)) {
+    re2_options.set_encoding(RTEST(utf8) ? RE2::Options::EncodingUTF8 : RE2::Options::EncodingLatin1);
+  }
+
+  posix_syntax = rb_hash_aref(options, ID2SYM(id_posix_syntax));
+  if (!NIL_P(posix_syntax)) {
+    re2_options.set_posix_syntax(RTEST(posix_syntax));
+  }
+
+  longest_match = rb_hash_aref(options, ID2SYM(id_longest_match));
+  if (!NIL_P(longest_match)) {
+    re2_options.set_longest_match(RTEST(longest_match));
+  }
+
+  log_errors = rb_hash_aref(options, ID2SYM(id_log_errors));
+  if (!NIL_P(log_errors)) {
+    re2_options.set_log_errors(RTEST(log_errors));
+  }
+
+  max_mem = rb_hash_aref(options, ID2SYM(id_max_mem));
+  if (!NIL_P(max_mem)) {
+    re2_options.set_max_mem(NUM2INT(max_mem));
+  }
+
+  literal = rb_hash_aref(options, ID2SYM(id_literal));
+  if (!NIL_P(literal)) {
+    re2_options.set_literal(RTEST(literal));
+  }
+
+  never_nl = rb_hash_aref(options, ID2SYM(id_never_nl));
+  if (!NIL_P(never_nl)) {
+    re2_options.set_never_nl(RTEST(never_nl));
+  }
+
+  case_sensitive = rb_hash_aref(options, ID2SYM(id_case_sensitive));
+  if (!NIL_P(case_sensitive)) {
+    re2_options.set_case_sensitive(RTEST(case_sensitive));
+  }
+
+  perl_classes = rb_hash_aref(options, ID2SYM(id_perl_classes));
+  if (!NIL_P(perl_classes)) {
+    re2_options.set_perl_classes(RTEST(perl_classes));
+  }
+
+  word_boundary = rb_hash_aref(options, ID2SYM(id_word_boundary));
+  if (!NIL_P(word_boundary)) {
+    re2_options.set_word_boundary(RTEST(word_boundary));
+  }
+
+  one_line = rb_hash_aref(options, ID2SYM(id_one_line));
+  if (!NIL_P(one_line)) {
+    re2_options.set_one_line(RTEST(one_line));
+  }
+
+  return re2_options;
+}
 
 void re2_matchdata_mark(re2_matchdata* self) {
   rb_gc_mark(self->regexp);
@@ -667,75 +741,14 @@ static VALUE re2_re2(int argc, VALUE *argv, VALUE self) {
  *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
  */
 static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
-  VALUE pattern, options, utf8, posix_syntax, longest_match, log_errors,
-        max_mem, literal, never_nl, case_sensitive, perl_classes,
-        word_boundary, one_line;
+  VALUE pattern, options;
   re2_pattern *p;
 
   rb_scan_args(argc, argv, "11", &pattern, &options);
   Data_Get_Struct(self, re2_pattern, p);
 
   if (RTEST(options)) {
-    if (TYPE(options) != T_HASH) {
-      rb_raise(rb_eArgError, "options should be a hash");
-    }
-
-    RE2::Options re2_options;
-
-    utf8 = rb_hash_aref(options, ID2SYM(id_utf8));
-    if (!NIL_P(utf8)) {
-      re2_options.set_encoding(RTEST(utf8) ? RE2::Options::EncodingUTF8 : RE2::Options::EncodingLatin1);
-    }
-
-    posix_syntax = rb_hash_aref(options, ID2SYM(id_posix_syntax));
-    if (!NIL_P(posix_syntax)) {
-      re2_options.set_posix_syntax(RTEST(posix_syntax));
-    }
-
-    longest_match = rb_hash_aref(options, ID2SYM(id_longest_match));
-    if (!NIL_P(longest_match)) {
-      re2_options.set_longest_match(RTEST(longest_match));
-    }
-
-    log_errors = rb_hash_aref(options, ID2SYM(id_log_errors));
-    if (!NIL_P(log_errors)) {
-      re2_options.set_log_errors(RTEST(log_errors));
-    }
-
-    max_mem = rb_hash_aref(options, ID2SYM(id_max_mem));
-    if (!NIL_P(max_mem)) {
-      re2_options.set_max_mem(NUM2INT(max_mem));
-    }
-
-    literal = rb_hash_aref(options, ID2SYM(id_literal));
-    if (!NIL_P(literal)) {
-      re2_options.set_literal(RTEST(literal));
-    }
-
-    never_nl = rb_hash_aref(options, ID2SYM(id_never_nl));
-    if (!NIL_P(never_nl)) {
-      re2_options.set_never_nl(RTEST(never_nl));
-    }
-
-    case_sensitive = rb_hash_aref(options, ID2SYM(id_case_sensitive));
-    if (!NIL_P(case_sensitive)) {
-      re2_options.set_case_sensitive(RTEST(case_sensitive));
-    }
-
-    perl_classes = rb_hash_aref(options, ID2SYM(id_perl_classes));
-    if (!NIL_P(perl_classes)) {
-      re2_options.set_perl_classes(RTEST(perl_classes));
-    }
-
-    word_boundary = rb_hash_aref(options, ID2SYM(id_word_boundary));
-    if (!NIL_P(word_boundary)) {
-      re2_options.set_word_boundary(RTEST(word_boundary));
-    }
-
-    one_line = rb_hash_aref(options, ID2SYM(id_one_line));
-    if (!NIL_P(one_line)) {
-      re2_options.set_one_line(RTEST(one_line));
-    }
+    RE2::Options re2_options = parse_re2_options(options);
 
     p->pattern = new(nothrow) RE2(StringValuePtr(pattern), re2_options);
   } else {
@@ -1362,6 +1375,155 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }
 
+void re2_set_free(re2_set *self) {
+  if (self->set) {
+    delete self->set;
+  }
+  free(self);
+}
+
+static VALUE re2_set_allocate(VALUE klass) {
+  re2_set *s;
+  VALUE result = Data_Make_Struct(klass, re2_set, 0, re2_set_free, s);
+  return result;
+}
+
+/*
+ * Returns a new {RE2::Set} object.
+ *
+ * @return [RE2::Set]
+ *
+ * @overload initialize
+ *   Returns a new {RE2::Set} object for unanchored patterns with the default
+ *   options.
+ *
+ * @overload initialize(anchor)
+ *   Returns a new {RE2::Set} object for the specified anchor with the default
+ *   options.
+ *
+ *   @raise [ArgumentError] if anchor is not one of the accepted choices
+ *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
+ *
+ * @overload initialize(anchor, options)
+ *   Returns a new {RE2::Set} object with the specified options.
+ *
+ *   @param [Symbol] anchor One of :unanchored, :anchor_start, :anchor_both
+ *   @param [Hash] options the options with which to compile the pattern
+ *   @option options [Boolean] :utf8 (true) text and pattern are UTF-8; otherwise Latin-1
+ *   @option options [Boolean] :posix_syntax (false) restrict regexps to POSIX egrep syntax
+ *   @option options [Boolean] :longest_match (false) search for longest match, not first match
+ *   @option options [Boolean] :log_errors (true) log syntax and execution errors to ERROR
+ *   @option options [Fixnum] :max_mem approx. max memory footprint of RE2
+ *   @option options [Boolean] :literal (false) interpret string as literal, not regexp
+ *   @option options [Boolean] :never_nl (false) never match \n, even if it is in regexp
+ *   @option options [Boolean] :case_sensitive (true) match is case-sensitive (regexp can override with (?i) unless in posix_syntax mode)
+ *   @option options [Boolean] :perl_classes (false) allow Perl's \d \s \w \D \S \W when in posix_syntax mode
+ *   @option options [Boolean] :word_boundary (false) allow \b \B (word boundary and not) when in posix_syntax mode
+ *   @option options [Boolean] :one_line (false) ^ and $ only match beginning and end of text when in posix_syntax mode
+ *   @return [RE2::Set] an RE2::Set with the specified anchor and options
+ *   @raise [ArgumentError] if anchor is not one of the accepted choices
+ *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
+ */
+static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
+  VALUE anchor, options;
+  re2_set *s;
+  RE2::Anchor re2_anchor;
+  RE2::Options re2_options;
+
+  rb_scan_args(argc, argv, "02", &anchor, &options);
+  Data_Get_Struct(self, re2_set, s);
+
+  if (RTEST(options)) {
+    re2_options = parse_re2_options(options);
+  } else {
+    re2_options = RE2::DefaultOptions;
+  }
+  if (NIL_P(anchor)) {
+    re2_anchor = RE2::UNANCHORED;
+  } else {
+    Check_Type(anchor, T_SYMBOL);
+    ID id_anchor = SYM2ID(anchor);
+    if (id_anchor == id_unanchored) { re2_anchor = RE2::UNANCHORED; }
+    else if (id_anchor == id_anchor_start) { re2_anchor = RE2::ANCHOR_START; }
+    else if (id_anchor == id_anchor_both) { re2_anchor = RE2::ANCHOR_BOTH; }
+    else {
+      rb_raise(rb_eArgError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both");
+    }
+  }
+
+  s->set = new(nothrow) RE2::Set(re2_options, re2_anchor);
+  if (s->set == 0) rb_raise(rb_eNoMemError, "not enough memory to allocate RE2::Set object");
+  return self;
+}
+
+/*
+ * Adds a regex pattern to the set. Returns index of added pattern. Cannot be
+ * called after #compile has been called.
+ *
+ * @param [String] str the regex pattern
+ * @return [Integer] the index of the pattern in the set
+ * @example
+ *   RE2::Set.new.add("abc")    #=> 0
+ */
+static VALUE re2_set_add(VALUE self, VALUE str) {
+  Check_Type(str, T_STRING);
+  re2::StringPiece regex(RSTRING_PTR(str), RSTRING_LEN(str));
+  std::string err;
+  re2_set *s;
+  Data_Get_Struct(self, re2_set, s);
+  int index = s->set->Add(regex, &err);
+  if (index < 0) rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", err.c_str());
+  return INT2FIX(index);
+}
+
+/*
+ * Compiles a Set so it can be used to match against. Must be called after #add
+ * and before #match.
+ *
+ * @return [Bool] whether compilation was a success
+ */
+static VALUE re2_set_compile(VALUE self) {
+  re2_set *s;
+  Data_Get_Struct(self, re2_set, s);
+  return BOOL2RUBY(s->set->Compile());
+}
+
+/*
+ * @param [String] str the text to match against
+ * @return [Array<Integer>] the indices of matching regexps
+ */
+static VALUE re2_set_match(VALUE self, VALUE str) {
+  Check_Type(str, T_STRING);
+  re2::StringPiece data(RSTRING_PTR(str), RSTRING_LEN(str));
+  std::vector<int> v;
+  RE2::Set::ErrorInfo e;
+  re2_set *s;
+  Data_Get_Struct(self, re2_set, s);
+  bool match_failed = !s->set->Match(data, &v, &e);
+  VALUE result = rb_ary_new2(v.size());
+  if (match_failed) {
+    switch (e.kind) {
+      case RE2::Set::kNoError: break;
+      case RE2::Set::kNotCompiled:
+        rb_raise(re2_eSetMatchError, "#match must not be called before #compile");
+        break;
+      case RE2::Set::kOutOfMemory:
+        rb_raise(re2_eSetMatchError, "The DFA ran out of memory");
+        break;
+      case RE2::Set::kInconsistent:
+        rb_raise(re2_eSetMatchError, "RE2::Prog internal error");
+        break;
+      default:  // Just in case a future version of libre2 adds new ErrorKinds
+        rb_raise(re2_eSetMatchError, "Unknown RE2::Set::ErrorKind: %d", e.kind);
+    }
+  }
+  else {
+    for(size_t i = 0; i < v.size(); i++)
+      rb_ary_push(result, INT2FIX(v[i]));
+  }
+  return result;
+}
+
 /* Forward declare Init_re2 to be called by C code but define it separately so
  * that YARD can parse it.
  */
@@ -1372,12 +1534,16 @@ void Init_re2(void) {
   re2_cRegexp = rb_define_class_under(re2_mRE2, "Regexp", rb_cObject);
   re2_cMatchData = rb_define_class_under(re2_mRE2, "MatchData", rb_cObject);
   re2_cScanner = rb_define_class_under(re2_mRE2, "Scanner", rb_cObject);
+  re2_cSet = rb_define_class_under(re2_mRE2, "Set", rb_cObject);
+  re2_eSetMatchError = rb_define_class_under(re2_cSet, "MatchError",
+      rb_const_get(rb_cObject, rb_intern("StandardError")));
 
   rb_define_alloc_func(re2_cRegexp, (VALUE (*)(VALUE))re2_regexp_allocate);
   rb_define_alloc_func(re2_cMatchData,
       (VALUE (*)(VALUE))re2_matchdata_allocate);
   rb_define_alloc_func(re2_cScanner,
       (VALUE (*)(VALUE))re2_scanner_allocate);
+  rb_define_alloc_func(re2_cSet, (VALUE (*)(VALUE))re2_set_allocate);
 
   rb_define_method(re2_cMatchData, "string",
       RUBY_METHOD_FUNC(re2_matchdata_string), 0);
@@ -1394,7 +1560,8 @@ void Init_re2(void) {
   rb_define_method(re2_cMatchData, "end",
       RUBY_METHOD_FUNC(re2_matchdata_end), 1);
   rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
-      -1); rb_define_method(re2_cMatchData, "to_s",
+      -1);
+  rb_define_method(re2_cMatchData, "to_s",
         RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);
   rb_define_method(re2_cMatchData, "inspect",
       RUBY_METHOD_FUNC(re2_matchdata_inspect), 0);
@@ -1471,6 +1638,12 @@ void Init_re2(void) {
   rb_define_method(re2_cRegexp, "one_line?",
       RUBY_METHOD_FUNC(re2_regexp_one_line), 0);
 
+  rb_define_method(re2_cSet, "initialize",
+      RUBY_METHOD_FUNC(re2_set_initialize), -1);
+  rb_define_method(re2_cSet, "add", RUBY_METHOD_FUNC(re2_set_add), 1);
+  rb_define_method(re2_cSet, "compile", RUBY_METHOD_FUNC(re2_set_compile), 0);
+  rb_define_method(re2_cSet, "match", RUBY_METHOD_FUNC(re2_set_match), 1);
+
   rb_define_module_function(re2_mRE2, "Replace",
       RUBY_METHOD_FUNC(re2_Replace), 3);
   rb_define_module_function(re2_mRE2, "GlobalReplace",
@@ -1498,6 +1671,9 @@ void Init_re2(void) {
   id_perl_classes = rb_intern("perl_classes");
   id_word_boundary = rb_intern("word_boundary");
   id_one_line = rb_intern("one_line");
+  id_unanchored = rb_intern("unanchored");
+  id_anchor_start = rb_intern("anchor_start");
+  id_anchor_both = rb_intern("anchor_both");
 
   #if 0
     /* Fake so YARD generates the file. */

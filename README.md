@@ -131,6 +131,22 @@ enum.next #=> ["It"]
 enum.next #=> ["is"]
 ```
 
+On versions later than 1.4.0, you can use `RE2::Set` to match multiple patterns
+against a string. Calling `RE2::Set#add` with a pattern will return an integer
+index of the pattern. After all patterns have been added, the set can be
+compiled using `RE2::Set#compile`, and then `RE2::Set#match` will return an
+`Array<Integer>` containing the indexes of all the patterns that matched.
+
+``` ruby
+set = RE2::Set.new
+set.add("abc") #=> 0
+set.add("def") #=> 1
+set.add("ghi") #=> 2
+set.compile #=> true
+set.match("abcdefghi") #=> [0, 1, 2]
+set.match("ghidefabc") #=> [2, 1, 0]
+```
+
 Features
 --------
 
