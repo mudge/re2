@@ -88,4 +88,28 @@ SRC
   end
 end
 
+checking_for("RE2::Set::Match() with error information") do
+  test_re2_set_match_signature = <<SRC
+#include <vector>
+#include <re2/re2.h>
+#include <re2/set.h>
+
+int main() {
+  RE2::Set s(RE2::DefaultOptions, RE2::UNANCHORED);
+  s.Add("foo", NULL);
+  s.Compile();
+
+  std::vector<int> v;
+  RE2::Set::ErrorInfo ei;
+  s.Match("foo", &v, &ei);
+
+  return 0;
+}
+SRC
+
+  if try_compile(test_re2_set_match_signature, compile_options)
+    $defs.push("-DHAVE_ERROR_INFO_ARGUMENT")
+  end
+end
+
 create_makefile("re2")
