@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-20.04
     container:
       image: "mudge/re2-ci:${{ matrix.ruby }}"
-      options: "--add-host rubygems.org:151.101.0.70 --add-host api.rubygems.org:151.101.0.70"
+      options: "--add-host rubygems.org:151.101.129.227 --add-host api.rubygems.org:151.101.129.227"
     strategy:
       matrix:
         ruby:
