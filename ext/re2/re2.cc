@@ -1505,12 +1505,18 @@ static VALUE re2_set_match(VALUE self, VALUE str) {
   Check_Type(str, T_STRING);
   re2::StringPiece data(RSTRING_PTR(str), RSTRING_LEN(str));
   std::vector<int> v;
-  RE2::Set::ErrorInfo e;
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+  RE2::Set::ErrorInfo e;
   bool match_failed = !s->set->Match(data, &v, &e);
+#else
+  bool match_failed = !s->set->Match(data, &v);
+#endif
   VALUE result = rb_ary_new2(v.size());
+
   if (match_failed) {
+#ifdef HAVE_ERROR_INFO_ARGUMENT
     switch (e.kind) {
       case RE2::Set::kNoError:
         break;
@@ -1526,6 +1532,7 @@ static VALUE re2_set_match(VALUE self, VALUE str) {
       default:  // Just in case a future version of libre2 adds new ErrorKinds
         rb_raise(re2_eSetMatchError, "Unknown RE2::Set::ErrorKind: %d", e.kind);
     }
+#endif
   } else {
     for (size_t i = 0; i < v.size(); i++) {
       rb_ary_push(result, INT2FIX(v[i]));

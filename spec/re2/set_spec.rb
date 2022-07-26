@@ -110,6 +110,8 @@ RSpec.describe RE2::Set do
     end
 
     it "raises an error if called before #compile" do
+      pending "Versions of re2 with ABI 0 will only return false here"
+
       set = RE2::Set.new(:unanchored, :log_errors => false)
       silence_stderr do
         expect { set.match("") }.to raise_error(RE2::Set::MatchError)
