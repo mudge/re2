@@ -3,14 +3,29 @@ RSpec.describe RE2::Set do
   # libre2, as of 2022-06-01, in set.cc, does print to stderr (fd 2) even when
   # :log_errors is false. So we need to temporarily redirect stderr while
   # running tests that might print to it.
-  def silence_stderr(&blk)
-    null_stream = StringIO.new
-    original_stream = $stderr
-    $stderr = null_stream
+  def silence_stderr
+    original_stream = STDERR
 
-    blk.call
+    if File.const_defined?(:NULL)
+      STDERR.reopen(File::NULL)
+    else
+      platform = RUBY_PLATFORM == 'java' ? RbConfig::CONFIG['host_os'] : RUBY_PLATFORM
+
+      case platform
+      when /mswin|mingw/i
+        STDERR.reopen('NUL')
+      when /amiga/i
+        STDERR.reopen('NIL')
+      when /openvms/i
+        STDERR.reopen('NL:')
+      else
+        STDERR.reopen('/dev/null')
+      end
+    end
+
+    yield
   ensure
-    $stderr = original_stream
+    STDERR.reopen(original_stream)
   end
 
   describe "#initialize" do
