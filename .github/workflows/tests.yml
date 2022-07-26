@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Remove any existing libre2 installation
-        run: sudo apt-get remove -y libre2-dev libre2-1v5
+        run: sudo apt-get remove -y libre2-dev libre2-5
       - name: Download and install specific release of libre2
         run: |
           curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v2/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
