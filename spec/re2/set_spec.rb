@@ -34,8 +34,18 @@ RSpec.describe RE2::Set do
       expect(set).to be_a(RE2::Set)
     end
 
-    it "returns an instance given only an anchor" do
+    it "returns an instance given only an anchor of :unanchored" do
       set = RE2::Set.new(:unanchored)
+      expect(set).to be_a(RE2::Set)
+    end
+
+    it "returns an instance given only an anchor of :anchor_start" do
+      set = RE2::Set.new(:anchor_start)
+      expect(set).to be_a(RE2::Set)
+    end
+
+    it "returns an instance given only an anchor of :anchor_both" do
+      set = RE2::Set.new(:anchor_both)
       expect(set).to be_a(RE2::Set)
     end
 
@@ -46,6 +56,13 @@ RSpec.describe RE2::Set do
 
     it "raises an error if given an inappropriate type" do
       expect { RE2::Set.new(0) }.to raise_error(TypeError)
+    end
+
+    it "raises an error if given an invalid anchor" do
+      expect { RE2::Set.new(:not_a_valid_anchor) }.to raise_error(
+        ArgumentError,
+        "anchor should be one of: :unanchored, :anchor_start, :anchor_both"
+      )
     end
   end
 
@@ -59,7 +76,7 @@ RSpec.describe RE2::Set do
 
     it "rejects invalid patterns when added" do
       set = RE2::Set.new(:unanchored, :log_errors => false)
-      expect { set.add("???") }.to raise_error(ArgumentError)
+      expect { set.add("???") }.to raise_error(ArgumentError, /str rejected by RE2::Set->Add()/)
     end
 
     it "raises an error if called after #compile" do
@@ -78,7 +95,7 @@ RSpec.describe RE2::Set do
       set.add("abc")
       set.add("def")
       set.add("ghi")
-      expect { set.compile }.not_to raise_error
+      expect(set.compile).to be_truthy
     end
   end
 
@@ -89,8 +106,7 @@ RSpec.describe RE2::Set do
       set.add("def")
       set.add("ghi")
       set.compile
-      matches = set.match("abcdefghi")
-      expect(matches).to eq([0, 1, 2])
+      expect(set.match("abcdefghi")).to eq([0, 1, 2])
     end
 
     it "raises an error if called before #compile" do
