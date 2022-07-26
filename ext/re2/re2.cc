@@ -1443,16 +1443,22 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
   } else {
     Check_Type(anchor, T_SYMBOL);
     ID id_anchor = SYM2ID(anchor);
-    if (id_anchor == id_unanchored) { re2_anchor = RE2::UNANCHORED; }
-    else if (id_anchor == id_anchor_start) { re2_anchor = RE2::ANCHOR_START; }
-    else if (id_anchor == id_anchor_both) { re2_anchor = RE2::ANCHOR_BOTH; }
-    else {
+    if (id_anchor == id_unanchored) {
+      re2_anchor = RE2::UNANCHORED;
+    } else if (id_anchor == id_anchor_start) {
+      re2_anchor = RE2::ANCHOR_START;
+    } else if (id_anchor == id_anchor_both) {
+      re2_anchor = RE2::ANCHOR_BOTH;
+    } else {
       rb_raise(rb_eArgError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both");
     }
   }
 
   s->set = new(nothrow) RE2::Set(re2_options, re2_anchor);
-  if (s->set == 0) rb_raise(rb_eNoMemError, "not enough memory to allocate RE2::Set object");
+  if (s->set == 0) {
+    rb_raise(rb_eNoMemError, "not enough memory to allocate RE2::Set object");
+  }
+
   return self;
 }
 
@@ -1472,7 +1478,10 @@ static VALUE re2_set_add(VALUE self, VALUE str) {
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
   int index = s->set->Add(regex, &err);
-  if (index < 0) rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", err.c_str());
+  if (index < 0) {
+    rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", err.c_str());
+  }
+
   return INT2FIX(index);
 }
 
@@ -1503,7 +1512,8 @@ static VALUE re2_set_match(VALUE self, VALUE str) {
   VALUE result = rb_ary_new2(v.size());
   if (match_failed) {
     switch (e.kind) {
-      case RE2::Set::kNoError: break;
+      case RE2::Set::kNoError:
+        break;
       case RE2::Set::kNotCompiled:
         rb_raise(re2_eSetMatchError, "#match must not be called before #compile");
         break;
@@ -1516,10 +1526,10 @@ static VALUE re2_set_match(VALUE self, VALUE str) {
       default:  // Just in case a future version of libre2 adds new ErrorKinds
         rb_raise(re2_eSetMatchError, "Unknown RE2::Set::ErrorKind: %d", e.kind);
     }
-  }
-  else {
-    for(size_t i = 0; i < v.size(); i++)
+  } else {
+    for (size_t i = 0; i < v.size(); i++) {
       rb_ary_push(result, INT2FIX(v[i]));
+    }
   }
   return result;
 }
