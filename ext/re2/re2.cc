@@ -1494,6 +1494,17 @@ static VALUE re2_set_compile(VALUE self) {
 }
 
 /*
+ * @return [Bool] whether the underlying re2 outputs error information from Set matches
+ */
+static VALUE re2_set_match_raises_errors_p(VALUE self) {
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+  return Qtrue;
+#else
+  return Qfalse;
+#endif
+}
+
+/*
  * @param [String] str the text to match against
  * @return [Array<Integer>] the indices of matching regexps
  */
@@ -1651,6 +1662,8 @@ void Init_re2(void) {
   rb_define_method(re2_cRegexp, "one_line?",
       RUBY_METHOD_FUNC(re2_regexp_one_line), 0);
 
+  rb_define_singleton_method(re2_cSet, "match_raises_errors?",
+      RUBY_METHOD_FUNC(re2_set_match_raises_errors_p), 0);
   rb_define_method(re2_cSet, "initialize",
       RUBY_METHOD_FUNC(re2_set_initialize), -1);
   rb_define_method(re2_cSet, "add", RUBY_METHOD_FUNC(re2_set_add), 1);

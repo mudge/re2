@@ -109,12 +109,21 @@ RSpec.describe RE2::Set do
       expect(set.match("abcdefghi")).to eq([0, 1, 2])
     end
 
-    it "raises an error if called before #compile" do
-      pending "Versions of re2 with ABI 0 will only return false here"
+    it "raises an error if called before #compile when match outputs errors" do
+      skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
 
       set = RE2::Set.new(:unanchored, :log_errors => false)
       silence_stderr do
         expect { set.match("") }.to raise_error(RE2::Set::MatchError)
+      end
+    end
+
+    it "returns an empty array if called before #compile when match does not output errors" do
+      skip "Underlying RE2::Set::Match outputs error information" if RE2::Set.match_raises_errors?
+
+      set = RE2::Set.new(:unanchored, :log_errors => false)
+      silence_stderr do
+        expect(set.match("")).to be_empty
       end
     end
   end
