@@ -106,10 +106,10 @@ RSpec.describe RE2::Set do
       set.add("def")
       set.add("ghi")
       set.compile
-      expect(set.match("abcdefghi")).to eq([0, 1, 2])
+      expect(set.match("abcdefghi", :exception => false)).to eq([0, 1, 2])
     end
 
-    it "raises an error if called before #compile when match outputs errors" do
+    it "raises an error if called before #compile by default" do
       skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
 
       set = RE2::Set.new(:unanchored, :log_errors => false)
@@ -118,12 +118,28 @@ RSpec.describe RE2::Set do
       end
     end
 
-    it "returns an empty array if called before #compile when match does not output errors" do
+    it "raises an error if called before #compile when :exception is true" do
+      skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
+
+      set = RE2::Set.new(:unanchored, :log_errors => false)
+      silence_stderr do
+        expect { set.match("", :exception => true) }.to raise_error(RE2::Set::MatchError)
+      end
+    end
+
+    it "returns an empty array if called before #compile when :exception is false" do
+      set = RE2::Set.new(:unanchored, :log_errors => false)
+      silence_stderr do
+        expect(set.match("", :exception => false)).to be_empty
+      end
+    end
+
+    it "raises an error if :exception is true and re2 does not support it" do
       skip "Underlying RE2::Set::Match outputs error information" if RE2::Set.match_raises_errors?
 
       set = RE2::Set.new(:unanchored, :log_errors => false)
       silence_stderr do
-        expect(set.match("")).to be_empty
+        expect { set.match("", :exception => true) }.to raise_error(RE2::Set::UnsupportedError)
       end
     end
   end

@@ -99,13 +99,13 @@ typedef struct {
 } re2_set;
 
 VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
-      re2_eSetMatchError;
+      re2_eSetMatchError, re2_eSetUnsupportedError;
 
 /* Symbols used in RE2 options. */
 static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
           id_max_mem, id_literal, id_never_nl, id_case_sensitive,
           id_perl_classes, id_word_boundary, id_one_line,
-          id_unanchored, id_anchor_start, id_anchor_both;
+          id_unanchored, id_anchor_start, id_anchor_both, id_exception;
 
 void parse_re2_options(RE2::Options& re2_options, VALUE options) {
   if (TYPE(options) != T_HASH) {
@@ -1506,46 +1506,77 @@ static VALUE re2_set_match_raises_errors_p(VALUE self) {
 
 /*
  * @param [String] str the text to match against
+ * @param [Hash] options the options with which to match
+ * @option options [Boolean] :exception (true) whether to raise exceptions with re2's error information (not supported on ABI version 0 of re2)
  * @return [Array<Integer>] the indices of matching regexps
+ * @raise [MatchError] if an error occurs while matching
+ * @raise [UnsupportedError] if using the :exception option against a version of re2 that does not support it
  */
-static VALUE re2_set_match(VALUE self, VALUE str) {
+static VALUE re2_set_match(int argc, VALUE *argv, VALUE self) {
+  VALUE str, options, exception_option;
+  bool raise_exception = true;
+  rb_scan_args(argc, argv, "11", &str, &options);
   Check_Type(str, T_STRING);
   re2::StringPiece data(RSTRING_PTR(str), RSTRING_LEN(str));
   std::vector<int> v;
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
-#ifdef HAVE_ERROR_INFO_ARGUMENT
-  RE2::Set::ErrorInfo e;
-  bool match_failed = !s->set->Match(data, &v, &e);
-#else
-  bool match_failed = !s->set->Match(data, &v);
-#endif
-  VALUE result = rb_ary_new2(v.size());
 
-  if (match_failed) {
-#ifdef HAVE_ERROR_INFO_ARGUMENT
-    switch (e.kind) {
-      case RE2::Set::kNoError:
-        break;
-      case RE2::Set::kNotCompiled:
-        rb_raise(re2_eSetMatchError, "#match must not be called before #compile");
-        break;
-      case RE2::Set::kOutOfMemory:
-        rb_raise(re2_eSetMatchError, "The DFA ran out of memory");
-        break;
-      case RE2::Set::kInconsistent:
-        rb_raise(re2_eSetMatchError, "RE2::Prog internal error");
-        break;
-      default:  // Just in case a future version of libre2 adds new ErrorKinds
-        rb_raise(re2_eSetMatchError, "Unknown RE2::Set::ErrorKind: %d", e.kind);
+  if (RTEST(options)) {
+    if (TYPE(options) != T_HASH) {
+      rb_raise(rb_eArgError, "options should be a hash");
     }
-#endif
-  } else {
-    for (size_t i = 0; i < v.size(); i++) {
-      rb_ary_push(result, INT2FIX(v[i]));
+
+    exception_option = rb_hash_aref(options, ID2SYM(id_exception));
+    if (!NIL_P(exception_option)) {
+      raise_exception = RTEST(exception_option);
     }
   }
-  return result;
+
+  if (raise_exception) {
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+    RE2::Set::ErrorInfo e;
+    bool match_failed = !s->set->Match(data, &v, &e);
+    VALUE result = rb_ary_new2(v.size());
+
+    if (match_failed) {
+      switch (e.kind) {
+        case RE2::Set::kNoError:
+          break;
+        case RE2::Set::kNotCompiled:
+          rb_raise(re2_eSetMatchError, "#match must not be called before #compile");
+          break;
+        case RE2::Set::kOutOfMemory:
+          rb_raise(re2_eSetMatchError, "The DFA ran out of memory");
+          break;
+        case RE2::Set::kInconsistent:
+          rb_raise(re2_eSetMatchError, "RE2::Prog internal error");
+          break;
+        default:  // Just in case a future version of libre2 adds new ErrorKinds
+          rb_raise(re2_eSetMatchError, "Unknown RE2::Set::ErrorKind: %d", e.kind);
+      }
+    } else {
+      for (size_t i = 0; i < v.size(); i++) {
+        rb_ary_push(result, INT2FIX(v[i]));
+      }
+    }
+
+    return result;
+#else
+    rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match does not output error information, try using setting the :exception option to false");
+#endif
+  } else {
+    bool matched = s->set->Match(data, &v);
+    VALUE result = rb_ary_new2(v.size());
+
+    if (matched) {
+      for (size_t i = 0; i < v.size(); i++) {
+        rb_ary_push(result, INT2FIX(v[i]));
+      }
+    }
+
+    return result;
+  }
 }
 
 /* Forward declare Init_re2 to be called by C code but define it separately so
@@ -1560,6 +1591,8 @@ void Init_re2(void) {
   re2_cScanner = rb_define_class_under(re2_mRE2, "Scanner", rb_cObject);
   re2_cSet = rb_define_class_under(re2_mRE2, "Set", rb_cObject);
   re2_eSetMatchError = rb_define_class_under(re2_cSet, "MatchError",
+      rb_const_get(rb_cObject, rb_intern("StandardError")));
+  re2_eSetUnsupportedError = rb_define_class_under(re2_cSet, "UnsupportedError",
       rb_const_get(rb_cObject, rb_intern("StandardError")));
 
   rb_define_alloc_func(re2_cRegexp, (VALUE (*)(VALUE))re2_regexp_allocate);
@@ -1668,7 +1701,7 @@ void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_set_initialize), -1);
   rb_define_method(re2_cSet, "add", RUBY_METHOD_FUNC(re2_set_add), 1);
   rb_define_method(re2_cSet, "compile", RUBY_METHOD_FUNC(re2_set_compile), 0);
-  rb_define_method(re2_cSet, "match", RUBY_METHOD_FUNC(re2_set_match), 1);
+  rb_define_method(re2_cSet, "match", RUBY_METHOD_FUNC(re2_set_match), -1);
 
   rb_define_module_function(re2_mRE2, "Replace",
       RUBY_METHOD_FUNC(re2_Replace), 3);
@@ -1700,6 +1733,7 @@ void Init_re2(void) {
   id_unanchored = rb_intern("unanchored");
   id_anchor_start = rb_intern("anchor_start");
   id_anchor_both = rb_intern("anchor_both");
+  id_exception = rb_intern("exception");
 
   #if 0
     /* Fake so YARD generates the file. */
