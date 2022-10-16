@@ -4,7 +4,7 @@ re2 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/ba
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 1.4.0  
+**Current version:** 1.5.0  
 **Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0  
 **Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01)
 
@@ -131,6 +131,22 @@ enum.next #=> ["It"]
 enum.next #=> ["is"]
 ```
 
+As of 1.5.0, you can use `RE2::Set` to match multiple patterns against a
+string. Calling `RE2::Set#add` with a pattern will return an integer index of
+the pattern. After all patterns have been added, the set can be compiled using
+`RE2::Set#compile`, and then `RE2::Set#match` will return an `Array<Integer>`
+containing the indices of all the patterns that matched.
+
+``` ruby
+set = RE2::Set.new
+set.add("abc") #=> 0
+set.add("def") #=> 1
+set.add("ghi") #=> 2
+set.compile #=> true
+set.match("abcdefghi") #=> [0, 1, 2]
+set.match("ghidefabc") #=> [2, 1, 0]
+```
+
 Features
 --------
 
@@ -148,6 +164,8 @@ Features
   statements) and `re2 !~ text`
 
 * Incrementally scanning text with `re2.scan(text)`
+
+* Search a collection of patterns simultaneously with `RE2::Set`
 
 * Checking regular expression compilation with `re2.ok?`, `re2.error` and
   `re2.error_arg`
@@ -177,7 +195,9 @@ Contributions
 * Thanks to [Sebastian Reitenbach](https://github.com/buzzdeee) for reporting
   the deprecation and removal of the `utf8` encoding option in re2;
 * Thanks to [Sergio Medina](https://github.com/serch) for reporting a bug when
-  using `RE2::Scanner#scan` with an invalid regular expression.
+  using `RE2::Scanner#scan` with an invalid regular expression;
+* Thanks to [Pritam Baral](https://github.com/pritambaral) for contributed the
+  initial support for `RE2::Set`.
 
 Contact
 -------

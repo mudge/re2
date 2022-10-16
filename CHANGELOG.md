@@ -5,6 +5,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [1.5.0] - 2022-10-16
+### Added
+- Added RE2::Set for simultaneously searching a collection of patterns
+
 ## [1.4.0] - 2021-03-29
 ### Fixed
 - Fixed a crash when using RE2::Scanner#scan with an invalid regular expression
@@ -69,6 +73,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[1.5.0]: https://github.com/mudge/re2/releases/tag/v1.5.0
 [1.4.0]: https://github.com/mudge/re2/releases/tag/v1.4.0
 [1.3.0]: https://github.com/mudge/re2/releases/tag/v1.3.0
 [1.2.0]: https://github.com/mudge/re2/releases/tag/v1.2.0
