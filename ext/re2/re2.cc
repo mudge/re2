@@ -1464,6 +1464,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
  *
  * @param [String] str the regex pattern
  * @return [Integer] the index of the pattern in the set
+ * @raise [ArgumentError] if called after compile
  * @example
  *   RE2::Set.new.add("abc")    #=> 0
  */
@@ -1494,6 +1495,8 @@ static VALUE re2_set_compile(VALUE self) {
 }
 
 /*
+ * Determine whether the underlying re2 version outputs error information from RE2::Set::Match.
+ *
  * @return [Bool] whether the underlying re2 outputs error information from Set matches
  */
 static VALUE re2_set_match_raises_errors_p(VALUE self) {
@@ -1505,6 +1508,10 @@ static VALUE re2_set_match_raises_errors_p(VALUE self) {
 }
 
 /*
+ * Match the given text against patterns in the set, returning an array of
+ * integer indices of the matching patterns if matched or an empty array if
+ * there are no matches.
+ *
  * @param [String] str the text to match against
  * @param [Hash] options the options with which to match
  * @option options [Boolean] :exception (true) whether to raise exceptions with re2's error information (not supported on ABI version 0 of re2)
@@ -1523,9 +1530,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, VALUE self) {
   Data_Get_Struct(self, re2_set, s);
 
   if (RTEST(options)) {
-    if (TYPE(options) != T_HASH) {
-      rb_raise(rb_eArgError, "options should be a hash");
-    }
+    Check_Type(options, T_HASH);
 
     exception_option = rb_hash_aref(options, ID2SYM(id_exception));
     if (!NIL_P(exception_option)) {
@@ -1563,7 +1568,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, VALUE self) {
 
     return result;
 #else
-    rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match does not output error information, try using setting the :exception option to false");
+    rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match does not output error information, try setting the :exception option to false");
 #endif
   } else {
     bool matched = s->set->Match(data, &v);
