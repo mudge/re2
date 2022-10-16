@@ -107,14 +107,13 @@ static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
           id_perl_classes, id_word_boundary, id_one_line,
           id_unanchored, id_anchor_start, id_anchor_both;
 
-RE2::Options parse_re2_options(VALUE options) {
+void parse_re2_options(RE2::Options& re2_options, VALUE options) {
   if (TYPE(options) != T_HASH) {
     rb_raise(rb_eArgError, "options should be a hash");
   }
   VALUE utf8, posix_syntax, longest_match, log_errors,
         max_mem, literal, never_nl, case_sensitive, perl_classes,
         word_boundary, one_line;
-  RE2::Options re2_options;
 
   utf8 = rb_hash_aref(options, ID2SYM(id_utf8));
   if (!NIL_P(utf8)) {
@@ -170,8 +169,6 @@ RE2::Options parse_re2_options(VALUE options) {
   if (!NIL_P(one_line)) {
     re2_options.set_one_line(RTEST(one_line));
   }
-
-  return re2_options;
 }
 
 void re2_matchdata_mark(re2_matchdata* self) {
@@ -748,7 +745,8 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
   Data_Get_Struct(self, re2_pattern, p);
 
   if (RTEST(options)) {
-    RE2::Options re2_options = parse_re2_options(options);
+    RE2::Options re2_options;
+    parse_re2_options(re2_options, options);
 
     p->pattern = new(nothrow) RE2(StringValuePtr(pattern), re2_options);
   } else {
@@ -1434,9 +1432,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
   Data_Get_Struct(self, re2_set, s);
 
   if (RTEST(options)) {
-    re2_options = parse_re2_options(options);
-  } else {
-    re2_options = RE2::DefaultOptions;
+    parse_re2_options(re2_options, options);
   }
   if (NIL_P(anchor)) {
     re2_anchor = RE2::UNANCHORED;
