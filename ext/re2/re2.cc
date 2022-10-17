@@ -1526,18 +1526,40 @@ static VALUE re2_set_match_raises_errors_p(VALUE self) {
  * integer indices of the matching patterns if matched or an empty array if
  * there are no matches.
  *
- * @param [String] str the text to match against
- * @param [Hash] options the options with which to match
- * @option options [Boolean] :exception (true) whether to raise exceptions with re2's error information (not supported on ABI version 0 of re2)
- * @return [Array<Integer>] the indices of matching regexps
- * @raise [MatchError] if an error occurs while matching
- * @raise [UnsupportedError] if using the :exception option against a version of re2 that does not support it
- * @example
- *   set = RE2::Set.new
- *   set.add("abc")
- *   set.add("def")
- *   set.compile
- *   set.match("abcdef")    # => [0, 1]
+ * @return [Array<Integer>]
+ *
+ * @overload match(str)
+ *   Returns an array of integer indices of patterns matching the given string
+ *   (if any). Raises exceptions if there are any errors while matching.
+ *
+ *   @param [String] str the text to match against
+ *   @return [Array<Integer>] the indices of matching regexps
+ *   @raise [MatchError] if an error occurs while matching
+ *   @raise [UnsupportedError] if the underlying version of re2 does not output error information
+ *   @example
+ *     set = RE2::Set.new
+ *     set.add("abc")
+ *     set.add("def")
+ *     set.compile
+ *     set.match("abcdef")    # => [0, 1]
+ *
+ * @overload match(str, options)
+ *   Returns an array of integer indices of patterns matching the given string
+ *   (if any). Raises exceptions if there are any errors while matching and the
+ *   :exception option is set to true.
+ *
+ *   @param [String] str the text to match against
+ *   @param [Hash] options the options with which to match
+ *   @option options [Boolean] :exception (true) whether to raise exceptions with re2's error information (not supported on ABI version 0 of re2)
+ *   @return [Array<Integer>] the indices of matching regexps
+ *   @raise [MatchError] if an error occurs while matching
+ *   @raise [UnsupportedError] if the underlying version of re2 does not output error information
+ *   @example
+ *     set = RE2::Set.new
+ *     set.add("abc")
+ *     set.add("def")
+ *     set.compile
+ *     set.match("abcdef", :exception => true)    # => [0, 1]
  */
 static VALUE re2_set_match(int argc, VALUE *argv, VALUE self) {
   VALUE str, options, exception_option;
