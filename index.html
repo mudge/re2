@@ -1,8 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
   File: README
   
@@ -10,14 +10,13 @@
   
 </title>
 
-  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
 
-  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
 
-<script type="text/javascript" charset="utf-8">
-  hasFrames = window.top.frames.main ? true : false;
+<script type="text/javascript">
+  pathId = "README";
   relpath = '';
-  framesUrl = "frames.html#!file.README.html";
 </script>
 
 
@@ -28,50 +27,48 @@
 
   </head>
   <body>
-    <div id="header">
-      <div id="menu">
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
   
     <a href="_index.html">Index</a> &raquo; 
     <span class="title">File: README</span>
   
-
-  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
 </div>
 
-      <div id="search">
+        <div id="search">
   
     <a class="full_list_link" id="class_list_link"
         href="class_list.html">
-      Class List
-    </a>
-  
-    <a class="full_list_link" id="method_list_link"
-        href="method_list.html">
-      Method List
-    </a>
-  
-    <a class="full_list_link" id="file_list_link"
-        href="file_list.html">
-      File List
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
     </a>
   
 </div>
-      <div class="clear"></div>
-    </div>
+        <div class="clear"></div>
+      </div>
 
-    <iframe id="search_frame"></iframe>
+      <div id="content"><div id='filecontents'><h1 id="re2">re2 <a href="https://github.com/mudge/re2/actions"><img src="https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main" alt="Build Status"></a></h1>
 
-    <div id="content"><div id='filecontents'><h1>re2 <a href="http://travis-ci.org/mudge/re2"><img src="https://travis-ci.org/mudge/re2.svg?branch=master" alt="Build Status"></a></h1>
-
-<p>A Ruby binding to <a href="http://code.google.com/p/re2/">re2</a>, an &quot;efficient, principled regular expression
+<p>A Ruby binding to <a href="https://github.com/google/re2">re2</a>, an &quot;efficient, principled regular expression
 library&quot;.</p>
 
-<p><strong>Current version:</strong> 0.7.0<br>
-<strong>Supported Ruby versions:</strong> 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, Rubinius 2.2</p>
+<p><strong>Current version:</strong> 1.5.0<br>
+<strong>Supported Ruby versions:</strong> 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0<br>
+<strong>Supported re2 versions:</strong> libre2.0 (&lt; 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01)</p>
 
-<h2>Installation</h2>
+<h2 id="installation">Installation</h2>
 
-<p>You will need <a href="http://code.google.com/p/re2/">re2</a> installed as well as a C++ compiler such as <a href="http://gcc.gnu.org/">gcc</a> (on
+<p>You will need <a href="https://github.com/google/re2">re2</a> installed as well as a C++ compiler such as <a href="http://gcc.gnu.org/">gcc</a> (on
 Debian and Ubuntu, this is provided by the <a href="http://packages.debian.org/build-essential">build-essential</a> package). If
 you are using Mac OS X, I recommend installing re2 with <a href="http://mxcl.github.com/homebrew">Homebrew</a> by
 running the following:</p>
@@ -84,26 +81,37 @@ running the following:</p>
 <pre class="code ruby"><code class="ruby">$ sudo apt-get install libre2-dev
 </code></pre>
 
+<p>Recent versions of re2 require a compiler with C++11 support such as <a href="http://clang.llvm.org/">clang</a> 3.4 or <a href="https://gcc.gnu.org/">gcc</a> 4.8.</p>
+
 <p>If you are using a packaged Ruby distribution, make sure you also have the
 Ruby header files installed such as those provided by the <a href="http://packages.debian.org/ruby-dev">ruby-dev</a> package
 on Debian and Ubuntu.</p>
 
 <p>You can then install the library via RubyGems with <code>gem install re2</code> or <code>gem
-install re2 -- --with-re2-dir=/opt/local/re2</code> if re2 is not installed in the
-default location of <code>/usr/local/</code>.</p>
+install re2 -- --with-re2-dir=/path/to/re2/prefix</code> if re2 is not installed in
+any of the following default locations:</p>
 
-<h2>Documentation</h2>
+<ul>
+<li><code>/usr/local</code></li>
+<li><code>/opt/homebrew</code></li>
+<li><code>/usr</code></li>
+</ul>
+
+<h2 id="documentation">Documentation</h2>
 
 <p>Full documentation automatically generated from the latest version is
 available at <a href="http://mudge.name/re2/">http://mudge.name/re2/</a>.</p>
 
-<p>Bear in mind that re2&#39;s regular expression syntax differs from PCRE, see the
-<a href="http://code.google.com/p/re2/wiki/Syntax">official syntax page</a> for more details.</p>
+<p>Note that re2&#39;s regular expression syntax differs from PCRE and Ruby&#39;s
+built-in <a href="http://ruby-doc.org/core/classes/Regexp.html"><code>Regexp</code></a> library, see the <a href="https://github.com/google/re2/wiki/Syntax">official syntax page</a> for more
+details.</p>
 
-<h2>Usage</h2>
+<h2 id="usage">Usage</h2>
 
-<p>You can use re2 as a mostly drop-in replacement for Ruby&#39;s own <a href="http://ruby-doc.org/core/classes/Regexp.html">Regexp</a> and
-<a href="http://ruby-doc.org/core/classes/MatchData.html">MatchData</a> classes:</p>
+<p>While re2 uses the same naming scheme as Ruby&#39;s built-in regular expression
+library (with <a href="http://mudge.name/re2/RE2/Regexp.html"><code>Regexp</code></a> and
+<a href="http://mudge.name/re2/RE2/MatchData.html"><code>MatchData</code></a>), its API is slightly
+different:</p>
 
 <pre class="code console"><code class="console">$ irb -rubygems
 &gt; require &#39;re2&#39;
@@ -127,9 +135,11 @@ available at <a href="http://mudge.name/re2/">http://mudge.name/re2/</a>.</p>
 =&gt; nil
 </code></pre>
 
-<p>As <code>RE2::Regexp.new</code> (or <code>RE2::Regexp.compile</code>) can be quite verbose, a helper
-method has been defined against <code>Kernel</code> so you can use a shorter version to
-create regular expressions:</p>
+<p>As
+<a href="http://mudge.name/re2/RE2/Regexp.html#initialize-instance_method"><code>RE2::Regexp.new</code></a>
+(or <code>RE2::Regexp.compile</code>) can be quite verbose, a helper method has been
+defined against <code>Kernel</code> so you can use a shorter version to create regular
+expressions:</p>
 
 <pre class="code console"><code class="console">&gt; RE2(&#39;(\d+)&#39;)
 =&gt; #&lt;RE2::Regexp /(\d+)/&gt;
@@ -162,7 +172,7 @@ Calling <code>scan</code> will return an <code>RE2::Scanner</code> which is
 use <code>each</code> to iterate through the matches (and even use
 <a href="http://ruby-doc.org/core-2.0/Enumerator/Lazy.html"><code>Enumerator::Lazy</code></a>):</p>
 
-<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_re'>re</span> <span class='op'>=</span> <span class='const'>RE2</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(\w+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_re'>re</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RE2.html" title="RE2 (module)">RE2</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(\w+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_scanner'>scanner</span> <span class='op'>=</span> <span class='id identifier rubyid_re'>re</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>It is a truth universally acknowledged</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_scanner'>scanner</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_match'>match</span><span class='op'>|</span>
   <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_match'>match</span>
@@ -175,11 +185,26 @@ use <code>each</code> to iterate through the matches (and even use
 </span><span class='id identifier rubyid_enum'>enum</span><span class='period'>.</span><span class='id identifier rubyid_next'>next</span> <span class='comment'>#=&gt; [&quot;is&quot;]
 </span></code></pre>
 
-<h2>Features</h2>
+<p>As of 1.5.0, you can use <code>RE2::Set</code> to match multiple patterns against a
+string. Calling <code>RE2::Set#add</code> with a pattern will return an integer index of
+the pattern. After all patterns have been added, the set can be compiled using
+<code>RE2::Set#compile</code>, and then <code>RE2::Set#match</code> will return an <code>Array&lt;Integer&gt;</code>
+containing the indices of all the patterns that matched.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_set'>set</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RE2/Set.html" title="RE2::Set (class)">Set</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="RE2/Set.html#initialize-instance_method" title="RE2::Set#initialize (method)">new</a></span></span>
+<span class='id identifier rubyid_set'>set</span><span class='period'>.</span><span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>abc</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; 0
+</span><span class='id identifier rubyid_set'>set</span><span class='period'>.</span><span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>def</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; 1
+</span><span class='id identifier rubyid_set'>set</span><span class='period'>.</span><span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ghi</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; 2
+</span><span class='id identifier rubyid_set'>set</span><span class='period'>.</span><span class='id identifier rubyid_compile'>compile</span> <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_set'>set</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>abcdefghi</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; [0, 1, 2]
+</span><span class='id identifier rubyid_set'>set</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ghidefabc</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; [2, 1, 0]
+</span></code></pre>
+
+<h2 id="features">Features</h2>
 
 <ul>
 <li><p>Pre-compiling regular expressions with
-<a href="http://code.google.com/p/re2/source/browse/re2/re2.h#96"><code>RE2::Regexp.new(re)</code></a>,
+<a href="https://github.com/google/re2/blob/2016-02-01/re2/re2.h#L100"><code>RE2::Regexp.new(re)</code></a>,
 <code>RE2::Regexp.compile(re)</code> or <code>RE2(re)</code> (including specifying options, e.g.
 <code>RE2::Regexp.new(&quot;pattern&quot;, :case_sensitive =&gt; false)</code></p></li>
 <li><p>Extracting matches with <code>re2.match(text)</code> (and an exact number of matches
@@ -188,6 +213,7 @@ with <code>re2.match(text, number_of_matches)</code> such as <code>re2.match(&qu
 <li><p>Checking for matches with <code>re2 =~ text</code>, <code>re2 === text</code> (for use in <code>case</code>
 statements) and <code>re2 !~ text</code></p></li>
 <li><p>Incrementally scanning text with <code>re2.scan(text)</code></p></li>
+<li><p>Search a collection of patterns simultaneously with <code>RE2::Set</code></p></li>
 <li><p>Checking regular expression compilation with <code>re2.ok?</code>, <code>re2.error</code> and
 <code>re2.error_arg</code></p></li>
 <li><p>Checking regular expression &quot;cost&quot; with <code>re2.program_size</code></p></li>
@@ -198,25 +224,36 @@ original)</code></p></li>
 <li><p>Performing a global string replacement with
 <code>pattern.replace_all(replacement, original)</code></p></li>
 <li><p>Escaping regular expressions with
-<a href="http://code.google.com/p/re2/source/browse/re2/re2.h#377"><code>RE2.escape(unquoted)</code></a> and
+<a href="https://github.com/google/re2/blob/2016-02-01/re2/re2.h#L418"><code>RE2.escape(unquoted)</code></a> and
 <code>RE2.quote(unquoted)</code></p></li>
 </ul>
 
-<h2>Contributions</h2>
+<h2 id="contributions">Contributions</h2>
 
-<p>Thanks to <a href="https://github.com/driskell">Jason Woods</a> who contributed the
-original implementations of <code>RE2::MatchData#begin</code> and <code>RE2::MatchData#end</code>.</p>
+<ul>
+<li>Thanks to <a href="https://github.com/driskell">Jason Woods</a> who contributed the
+original implementations of <code>RE2::MatchData#begin</code> and <code>RE2::MatchData#end</code>;</li>
+<li>Thanks to <a href="https://github.com/stefanor">Stefano Rivera</a> who first contributed C++11 support;</li>
+<li>Thanks to <a href="https://github.com/stanhu">Stan Hu</a> for reporting a bug with empty patterns and <code>RE2::Regexp#scan</code>;</li>
+<li>Thanks to <a href="https://github.com/buzzdeee">Sebastian Reitenbach</a> for reporting
+the deprecation and removal of the <code>utf8</code> encoding option in re2;</li>
+<li>Thanks to <a href="https://github.com/serch">Sergio Medina</a> for reporting a bug when
+using <code>RE2::Scanner#scan</code> with an invalid regular expression;</li>
+<li>Thanks to <a href="https://github.com/pritambaral">Pritam Baral</a> for contributed the
+initial support for <code>RE2::Set</code>.</li>
+</ul>
 
-<h2>Contact</h2>
+<h2 id="contact">Contact</h2>
 
-<p>All feedback should go to the mailing list: <a href="mailto:ruby.re2@librelist.com">ruby.re2@librelist.com</a></p>
+<p>All issues and suggestions should go to <a href="https://github.com/mudge/re2/issues">GitHub Issues</a>.</p>
 </div></div>
 
-    <div id="footer">
-  Generated on Sun Jan 25 15:58:04 2015 by
-  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.4 (ruby-2.1.3).
+      <div id="footer">
+  Generated on Mon Oct 17 11:07:43 2022 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.28 (ruby-3.1.2).
 </div>
 
+    </div>
   </body>
 </html>
