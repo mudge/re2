@@ -241,4 +241,18 @@ RSpec.describe RE2::MatchData do
       expect(md.end(:foo)).to be_nil
     end
   end
+
+  describe "#deconstruct" do
+    it "returns all capturing groups" do
+      md = RE2::Regexp.new('w(o)(o)').match('woo')
+
+      expect(md.deconstruct).to eq(['o', 'o'])
+    end
+
+    it "includes optional capturing groups as nil" do
+      md = RE2::Regexp.new('w(.)(.)(.)?').match('woo')
+
+      expect(md.deconstruct).to eq(['o', 'o', nil])
+    end
+  end
 end
