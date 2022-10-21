@@ -1245,7 +1245,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
  *
  * @return [Boolean] whether the match was successful
  */
-static VALUE re2_regexp_match_query(VALUE self, VALUE text) {
+static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
   VALUE argv[2];
   argv[0] = text;
   argv[1] = INT2FIX(0);
@@ -1696,11 +1696,11 @@ void Init_re2(void) {
   rb_define_method(re2_cRegexp, "match", RUBY_METHOD_FUNC(re2_regexp_match),
       -1);
   rb_define_method(re2_cRegexp, "match?",
-      RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
+      RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
   rb_define_method(re2_cRegexp, "=~",
-      RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
+      RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
   rb_define_method(re2_cRegexp, "===",
-      RUBY_METHOD_FUNC(re2_regexp_match_query), 1);
+      RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
   rb_define_method(re2_cRegexp, "scan",
       RUBY_METHOD_FUNC(re2_regexp_scan), 1);
   rb_define_method(re2_cRegexp, "to_s", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
