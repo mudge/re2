@@ -688,6 +688,46 @@ static VALUE re2_matchdata_inspect(VALUE self) {
 }
 
 /*
+ * Returns the array of submatches for pattern matching.
+ *
+ * @return [Array<String, nil>] the array of submatches
+ * @example
+ *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m.deconstruct    #=> ["123"]
+ *
+ *   case RE2::Regexp.new('(\d+) (\d+)').match("bob 123 456")
+ *   in x, y
+ *     puts "Matched #{x} #{y}"
+ *   else
+ *     puts "Unrecognised match"
+ *   end
+ */
+static VALUE re2_matchdata_deconstruct(VALUE self) {
+  int i;
+  re2_matchdata *m;
+  re2_pattern *p;
+  re2::StringPiece *match;
+  VALUE array;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
+
+  array = rb_ary_new2(m->number_of_matches - 1);
+  for (i = 1; i < m->number_of_matches; i++) {
+    match = &m->matches[i];
+
+    if (match->empty()) {
+      rb_ary_push(array, Qnil);
+    } else {
+      rb_ary_push(array, ENCODED_STR_NEW(match->data(), match->size(),
+            p->pattern->options().encoding() == RE2::Options::EncodingUTF8 ? "UTF-8" : "ISO-8859-1"));
+    }
+  }
+
+  return array;
+}
+
+/*
  * Returns a new RE2 object with a compiled version of
  * +pattern+ stored inside. Equivalent to +RE2.new+.
  *
@@ -1666,6 +1706,8 @@ void Init_re2(void) {
         RUBY_METHOD_FUNC(re2_matchdata_to_s), 0);
   rb_define_method(re2_cMatchData, "inspect",
       RUBY_METHOD_FUNC(re2_matchdata_inspect), 0);
+  rb_define_method(re2_cMatchData, "deconstruct",
+      RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
 
   rb_define_method(re2_cScanner, "string",
       RUBY_METHOD_FUNC(re2_scanner_string), 0);
