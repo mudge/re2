@@ -255,4 +255,48 @@ RSpec.describe RE2::MatchData do
       expect(md.deconstruct).to eq(['o', 'o', nil])
     end
   end
+
+  describe "#deconstruct_keys" do
+    it "returns all named captures if given nil" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.deconstruct_keys(nil)).to eq(:numbers => '123', :letters => 'abc')
+    end
+
+    it "returns only named captures if given names" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.deconstruct_keys([:numbers])).to eq(:numbers => '123')
+    end
+
+    it "returns named captures up until an invalid name is given" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.deconstruct_keys([:numbers, :punctuation])).to eq(:numbers => '123')
+    end
+
+    it "returns an empty hash if given more capture names than exist" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.deconstruct_keys([:numbers, :letters, :punctuation])).to eq({})
+    end
+
+    it "returns an empty hash if there are no named capturing groups" do
+      md = RE2::Regexp.new('(\d+) ([a-zA-Z]+)').match('123 abc')
+
+      expect(md.deconstruct_keys(nil)).to eq({})
+    end
+
+    it "raises an error if given a non-array of keys" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect { md.deconstruct_keys(0) }.to raise_error(TypeError)
+    end
+
+    it "raises an error if given keys as non-symbols" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect { md.deconstruct_keys([0]) }.to raise_error(TypeError)
+    end
+  end
 end
