@@ -4,8 +4,8 @@ re2 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/ba
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 1.5.0  
-**Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0  
+**Current version:** 1.6.0  
+**Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0, 3.1  
 **Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01)
 
 Installation
@@ -137,7 +137,7 @@ the pattern. After all patterns have been added, the set can be compiled using
 `RE2::Set#compile`, and then `RE2::Set#match` will return an `Array<Integer>`
 containing the indices of all the patterns that matched.
 
-``` ruby
+```ruby
 set = RE2::Set.new
 set.add("abc") #=> 0
 set.add("def") #=> 1
@@ -145,6 +145,27 @@ set.add("ghi") #=> 2
 set.compile #=> true
 set.match("abcdefghi") #=> [0, 1, 2]
 set.match("ghidefabc") #=> [2, 1, 0]
+```
+
+As of 1.6.0, you can use [Ruby's pattern matching](https://docs.ruby-lang.org/en/3.0/syntax/pattern_matching_rdoc.html) against `RE2::MatchData` with both array patterns and hash patterns:
+
+```ruby
+case RE2('(\w+) (\d+)').match("Alice 42")
+in [name, age]
+  puts "My name is #{name} and I am #{age} years old"
+else
+  puts "No match!"
+end
+# My name is Alice and I am 42 years old
+
+
+case RE2('(?P<name>\w+) (?P<age>\d+)').match("Alice 42")
+in {name:, age:}
+  puts "My name is #{name} and I am #{age} years old"
+else
+  puts "No match!"
+end
+# My name is Alice and I am 42 years old
 ```
 
 Features
@@ -184,6 +205,8 @@ Features
 * Escaping regular expressions with
   [`RE2.escape(unquoted)`](https://github.com/google/re2/blob/2016-02-01/re2/re2.h#L418) and
   `RE2.quote(unquoted)`
+
+* Pattern matching with `RE2::MatchData`
 
 Contributions
 -------------

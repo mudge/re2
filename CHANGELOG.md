@@ -5,6 +5,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [1.6.0] - 2022-10-22
+### Added
+- Added RE2::MatchData#deconstruct and RE2::MatchData#deconstruct_keys so they
+  can be used with Ruby pattern matching
+
 ## [1.5.0] - 2022-10-16
 ### Added
 - Added RE2::Set for simultaneously searching a collection of patterns
@@ -73,6 +78,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[1.6.0]: https://github.com/mudge/re2/releases/tag/v1.6.0
 [1.5.0]: https://github.com/mudge/re2/releases/tag/v1.5.0
 [1.4.0]: https://github.com/mudge/re2/releases/tag/v1.4.0
 [1.3.0]: https://github.com/mudge/re2/releases/tag/v1.3.0
