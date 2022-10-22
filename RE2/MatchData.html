@@ -165,6 +165,54 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#deconstruct-instance_method" title="#deconstruct (instance method)">#<strong>deconstruct</strong>  &#x21d2; Array&lt;String, nil&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the array of submatches for pattern matching.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#deconstruct_keys-instance_method" title="#deconstruct_keys (instance method)">#<strong>deconstruct_keys</strong>(keys)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns a hash of capturing group names to submatches for pattern matching.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#end-instance_method" title="#end (instance method)">#<strong>end</strong>(n)  &#x21d2; Fixnum </a>
     
 
@@ -840,6 +888,307 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
     return ENCODED_STR_SUBLEN(StringValue(m-&gt;text), offset,
            p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
   }
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="deconstruct-instance_method">
+  
+    #<strong>deconstruct</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span>, nil&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the array of submatches for pattern matching.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_m'>m</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Regexp.html" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Regexp.html#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(\d+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Regexp.html#match-instance_method" title="RE2::Regexp#match (method)">match</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bob 123</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_deconstruct'>deconstruct</span>    <span class='comment'>#=&gt; [&quot;123&quot;]</span></code></pre>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>pattern matching</p>
+</div></p>
+      
+      <pre class="example code"><code><span class='kw'>case</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Regexp.html" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Regexp.html#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(\d+) (\d+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Regexp.html#match-instance_method" title="RE2::Regexp#match (method)">match</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bob 123 456</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>in</span> <span class='id identifier rubyid_x'>x</span><span class='comma'>,</span> <span class='id identifier rubyid_y'>y</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Matched </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_x'>x</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_y'>y</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>else</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unrecognised match</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="String.html" title="RE2::String (module)">String</a></span>, nil&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the array of submatches</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+706
+707
+708
+709
+710
+711
+712
+713
+714
+715
+716
+717
+718
+719
+720
+721
+722
+723
+724
+725
+726
+727
+728
+729</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 706</span>
+
+static VALUE re2_matchdata_deconstruct(VALUE self) {
+  int i;
+  re2_matchdata *m;
+  re2_pattern *p;
+  re2::StringPiece *match;
+  VALUE array;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m-&gt;regexp, re2_pattern, p);
+
+  array = rb_ary_new2(m-&gt;number_of_matches - 1);
+  for (i = 1; i &lt; m-&gt;number_of_matches; i++) {
+    match = &amp;m-&gt;matches[i];
+
+    if (match-&gt;empty()) {
+      rb_ary_push(array, Qnil);
+    } else {
+      rb_ary_push(array, ENCODED_STR_NEW(match-&gt;data(), match-&gt;size(),
+            p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;));
+    }
+  }
+
+  return array;
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="deconstruct_keys-instance_method">
+  
+    #<strong>deconstruct_keys</strong>(keys)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a hash of capturing group names to submatches for pattern matching.</p>
+
+<p>As this is used by Ruby’s pattern matching, it will return an empty hash if given more keys than there are capturing groups. Given keys will populate the hash in order but an invalid name will cause the hash to be immediately returned.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_m'>m</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Regexp.html" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Regexp.html#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(?P&lt;numbers&gt;\d+) (?P&lt;letters&gt;[a-zA-Z]+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Regexp.html#match-instance_method" title="RE2::Regexp#match (method)">match</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>123 abc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_deconstruct_keys'>deconstruct_keys</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='rparen'>)</span>                  <span class='comment'>#=&gt; {:numbers =&gt; &quot;123&quot;, :letters =&gt; &quot;abc&quot;}
+</span><span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_deconstruct_keys'>deconstruct_keys</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='symbol'>:numbers</span><span class='rbracket'>]</span><span class='rparen'>)</span>           <span class='comment'>#=&gt; {:numbers =&gt; &quot;123&quot;}
+</span><span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_deconstruct_keys'>deconstruct_keys</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='symbol'>:fruit</span><span class='rbracket'>]</span><span class='rparen'>)</span>             <span class='comment'>#=&gt; {}
+</span><span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_deconstruct_keys'>deconstruct_keys</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='symbol'>:letters</span><span class='comma'>,</span> <span class='symbol'>:fruit</span><span class='rbracket'>]</span><span class='rparen'>)</span>   <span class='comment'>#=&gt; {:letters =&gt; &quot;abc&quot;}</span></code></pre>
+    
+      
+        <p class="example_title"><div class='inline'>
+<p>pattern matching</p>
+</div></p>
+      
+      <pre class="example code"><code><span class='kw'>case</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Regexp.html" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Regexp.html#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(?P&lt;numbers&gt;\d+) (?P&lt;letters&gt;[a-zA-Z]+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Regexp.html#match-instance_method" title="RE2::Regexp#match (method)">match</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>123 abc</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>in</span> <span class='label'>numbers:</span><span class='comma'>,</span> <span class='label'>letters:</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Numbers: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_numbers'>numbers</span><span class='embexpr_end'>}</span><span class='tstring_content'>, letters: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_letters'>letters</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>else</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unrecognised match</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>keys</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Symbol&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>an array of Symbol capturing group names or nil to return all names</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>a hash of capturing group names to submatches</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+755
+756
+757
+758
+759
+760
+761
+762
+763
+764
+765
+766
+767
+768
+769
+770
+771
+772
+773
+774
+775
+776
+777
+778
+779
+780
+781
+782
+783
+784
+785
+786
+787
+788
+789
+790
+791
+792
+793
+794</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 755</span>
+
+static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
+  int i;
+  VALUE capturing_groups, key;
+  re2_matchdata *m;
+  re2_pattern *p;
+  map&lt;string, int&gt; groups;
+  map&lt;string, int&gt;::iterator iterator;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m-&gt;regexp, re2_pattern, p);
+
+  groups = p-&gt;pattern-&gt;NamedCapturingGroups();
+  capturing_groups = rb_hash_new();
+
+  if (NIL_P(keys)) {
+    for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
+      rb_hash_aset(capturing_groups,
+          ID2SYM(rb_intern(iterator-&gt;first.data())),
+          re2_matchdata_nth_match(iterator-&gt;second, self));
+    }
+  } else {
+    Check_Type(keys, T_ARRAY);
+
+    if (p-&gt;pattern-&gt;NumberOfCapturingGroups() &gt;= RARRAY_LEN(keys)) {
+      for (i = 0; i &lt; RARRAY_LEN(keys); i++) {
+        key = rb_ary_entry(keys, i);
+        Check_Type(key, T_SYMBOL);
+        string name(rb_id2name(SYM2ID(key)));
+
+        if (groups.count(name) == 0) {
+          break;
+        }
+
+        rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(groups[name], self));
+      }
+    }
+  }
+
+  return capturing_groups;
 }</pre>
     </td>
   </tr>
@@ -1571,7 +1920,7 @@ static VALUE re2_matchdata_to_a(VALUE self) {
 </div>
 
       <div id="footer">
-  Generated on Mon Oct 17 11:47:27 2022 by
+  Generated on Sat Oct 22 08:59:55 2022 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.28 (ruby-3.1.2).
 </div>

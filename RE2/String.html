@@ -261,12 +261,12 @@
       <pre class="lines">
 
 
-95
-96
-97</pre>
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 95</span>
+      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 79</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_re2_escape'>re2_escape</span>
   <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='period'>.</span><span class='const'>QuoteMeta</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
@@ -295,55 +295,13 @@
 </div>
 <div class="tags">
   
-  <div class="examples">
-    <p class="tag_title">Examples:</p>
-    
-      
-      <pre class="example code"><code><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello there</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_re2_gsub'>re2_gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>e</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>i</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>   <span class='comment'>#=&gt; &quot;hillo thiri&quot;
-</span><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>oo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>whoops-doops</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_re2_gsub'>re2_gsub</span><span class='lparen'>(</span><span class='id identifier rubyid_re2'>re2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>e</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='comment'>#=&gt; &quot;wheps-deps&quot;
-</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Good morning</span><span class='tstring_end'>&quot;</span></span>
-<span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_re2_gsub'>re2_gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>o</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ee</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>           <span class='comment'>#=&gt; &quot;Geeeed meerning&quot;
-</span><span class='id identifier rubyid_text'>text</span>                               <span class='comment'>#=&gt; &quot;Good morning&quot;</span></code></pre>
-    
-  </div>
-<p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>pattern</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="RE2::String (module)">String</a></span></tt>, <tt><span class='object_link'><a href="Regexp.html" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'>
-<p>a regexp matching text to be replaced</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>rewrite</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="RE2::String (module)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'>
-<p>the string to replace with</p>
-</div>
-      
-    </li>
-  
-</ul>
 
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="../RE2.html#GlobalReplace-class_method" title="RE2.GlobalReplace (method)">RE2.GlobalReplace</a></span></li>
+    
+  </ul>
 
 </div><table class="source_code">
   <tr>
@@ -351,12 +309,12 @@
       <pre class="lines">
 
 
-39
-40
-41</pre>
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_re2_gsub'>re2_gsub</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='period'>.</span><span class='const'>GlobalReplace</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
@@ -680,12 +638,12 @@
       <pre class="lines">
 
 
-84
-85
-86</pre>
+68
+69
+70</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 84</span>
+      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_re2_match'>re2_match</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Regexp.html" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Regexp.html#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Regexp.html#match-instance_method" title="RE2::Regexp#match (method)">match</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
@@ -714,55 +672,13 @@
 </div>
 <div class="tags">
   
-  <div class="examples">
-    <p class="tag_title">Examples:</p>
-    
-      
-      <pre class="example code"><code><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello there</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_re2_sub'>re2_sub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>howdy</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; &quot;howdy there&quot;
-</span><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hel+o</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hello there</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_re2_sub'>re2_sub</span><span class='lparen'>(</span><span class='id identifier rubyid_re2'>re2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yo</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>        <span class='comment'>#=&gt; &quot;yo there&quot;
-</span><span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Good morning</span><span class='tstring_end'>&quot;</span></span>
-<span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_re2_sub'>re2_sub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>morn</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>even</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>            <span class='comment'>#=&gt; &quot;Good evening&quot;
-</span><span class='id identifier rubyid_text'>text</span>                                    <span class='comment'>#=&gt; &quot;Good morning&quot;</span></code></pre>
-    
-  </div>
-<p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>pattern</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="RE2::String (module)">String</a></span></tt>, <tt><span class='object_link'><a href="Regexp.html" title="RE2::Regexp (class)">RE2::Regexp</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'>
-<p>a regexp matching text to be replaced</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>rewrite</span>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="" title="RE2::String (module)">String</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'>
-<p>the string to replace with</p>
-</div>
-      
-    </li>
-  
-</ul>
 
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="../RE2.html#Replace-class_method" title="RE2.Replace (method)">RE2.Replace</a></span></li>
+    
+  </ul>
 
 </div><table class="source_code">
   <tr>
@@ -770,12 +686,12 @@
       <pre class="lines">
 
 
-24
-25
-26</pre>
+16
+17
+18</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/re2/string.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_re2_sub'>re2_sub</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='period'>.</span><span class='const'>Replace</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
@@ -790,7 +706,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Oct 17 11:47:27 2022 by
+  Generated on Sat Oct 22 08:59:55 2022 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.28 (ruby-3.1.2).
 </div>
