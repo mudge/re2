@@ -12,30 +12,14 @@ module RE2
     # Replaces the first occurrence +pattern+ with +rewrite+ and returns a new
     # string.
     #
-    # @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
-    # @param [String] rewrite the string to replace with
-    # @example
-    #   "hello there".re2_sub("hello", "howdy") #=> "howdy there"
-    #   re2 = RE2.new("hel+o")
-    #   "hello there".re2_sub(re2, "yo")        #=> "yo there"
-    #   text = "Good morning"
-    #   text.re2_sub("morn", "even")            #=> "Good evening"
-    #   text                                    #=> "Good morning"
+    # @see RE2.Replace
     def re2_sub(*args)
       RE2.Replace(self, *args)
     end
 
     # Replaces every occurrence of +pattern+ with +rewrite+ and return a new string.
     #
-    # @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
-    # @param [String] rewrite the string to replace with
-    # @example
-    #   "hello there".re2_gsub("e", "i")   #=> "hillo thiri"
-    #   re2 = RE2.new("oo?")
-    #   "whoops-doops".re2_gsub(re2, "e")  #=> "wheps-deps"
-    #   text = "Good morning"
-    #   text.re2_gsub("o", "ee")           #=> "Geeeed meerning"
-    #   text                               #=> "Good morning"
+    # @see RE2.GlobalReplace
     def re2_gsub(*args)
       RE2.GlobalReplace(self, *args)
     end

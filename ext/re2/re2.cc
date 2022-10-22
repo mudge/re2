@@ -795,12 +795,9 @@ static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
 
 /*
  * Returns a new RE2 object with a compiled version of
- * +pattern+ stored inside. Equivalent to +RE2.new+.
+ * +pattern+ stored inside. Equivalent to +RE2::Regexp.new+.
  *
- * @return [RE2::Regexp] an RE2::Regexp with the specified pattern and options
- * @param [String] pattern the pattern to compile
- * @param [Hash] options the options to compile a regexp with
- * @see RE2::Regexp.new
+ * @see RE2::Regexp#initialize
  *
  */
 static VALUE re2_re2(int argc, VALUE *argv, VALUE self) {
@@ -1399,7 +1396,7 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
  * @return [String] the resulting string
  * @example
  *   RE2.Replace("hello there", "hello", "howdy") #=> "howdy there"
- *   re2 = RE2.new("hel+o")
+ *   re2 = RE2::Regexp.new("hel+o")
  *   RE2.Replace("hello there", re2, "yo")        #=> "yo there"
  */
 static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
@@ -1435,7 +1432,7 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
  * @param [String] rewrite the string to replace with
  * @return [String] the resulting string
  * @example
- *   re2 = RE2.new("oo?")
+ *   re2 = RE2::Regexp.new("oo?")
  *   RE2.GlobalReplace("whoops-doops", re2, "e")  #=> "wheps-deps"
  *   RE2.GlobalReplace("hello there", "e", "i")   #=> "hillo thiri"
  */
@@ -1889,9 +1886,4 @@ void Init_re2(void) {
   id_anchor_start = rb_intern("anchor_start");
   id_anchor_both = rb_intern("anchor_both");
   id_exception = rb_intern("exception");
-
-  #if 0
-    /* Fake so YARD generates the file. */
-    rb_mKernel = rb_define_module("Kernel");
-  #endif
 }
