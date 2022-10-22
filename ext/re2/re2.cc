@@ -695,6 +695,7 @@ static VALUE re2_matchdata_inspect(VALUE self) {
  *   m = RE2::Regexp.new('(\d+)').match("bob 123")
  *   m.deconstruct    #=> ["123"]
  *
+ * @example pattern matching
  *   case RE2::Regexp.new('(\d+) (\d+)').match("bob 123 456")
  *   in x, y
  *     puts "Matched #{x} #{y}"
@@ -725,6 +726,71 @@ static VALUE re2_matchdata_deconstruct(VALUE self) {
   }
 
   return array;
+}
+
+/*
+ * Returns a hash of capturing group names to submatches for pattern matching.
+ *
+ * As this is used by Ruby's pattern matching, it will return an empty hash if given
+ * more keys than there are capturing groups. Given keys will populate the hash in
+ * order but an invalid name will cause the hash to be immediately returned.
+ *
+ * @return [Hash] a hash of capturing group names to submatches
+ * @param [Array<Symbol>, nil] keys an array of Symbol capturing group names or nil to return all names
+ * @example
+ *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *   m.deconstruct_keys(nil)                  #=> {:numbers => "123", :letters => "abc"}
+ *   m.deconstruct_keys([:numbers])           #=> {:numbers => "123"}
+ *   m.deconstruct_keys([:fruit])             #=> {}
+ *   m.deconstruct_keys([:letters, :fruit])   #=> {:letters => "abc"}
+ *
+ * @example pattern matching
+ *   case RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *   in numbers:, letters:
+ *     puts "Numbers: #{numbers}, letters: #{letters}"
+ *   else
+ *     puts "Unrecognised match"
+ *   end
+ */
+static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
+  int i;
+  VALUE capturing_groups, key;
+  re2_matchdata *m;
+  re2_pattern *p;
+  map<string, int> groups;
+  map<string, int>::iterator iterator;
+
+  Data_Get_Struct(self, re2_matchdata, m);
+  Data_Get_Struct(m->regexp, re2_pattern, p);
+
+  groups = p->pattern->NamedCapturingGroups();
+  capturing_groups = rb_hash_new();
+
+  if (NIL_P(keys)) {
+    for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
+      rb_hash_aset(capturing_groups,
+          ID2SYM(rb_intern(iterator->first.data())),
+          re2_matchdata_nth_match(iterator->second, self));
+    }
+  } else {
+    Check_Type(keys, T_ARRAY);
+
+    if (p->pattern->NumberOfCapturingGroups() >= RARRAY_LEN(keys)) {
+      for (i = 0; i < RARRAY_LEN(keys); i++) {
+        key = rb_ary_entry(keys, i);
+        Check_Type(key, T_SYMBOL);
+        string name(rb_id2name(SYM2ID(key)));
+
+        if (groups.count(name) == 0) {
+          break;
+        }
+
+        rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(groups[name], self));
+      }
+    }
+  }
+
+  return capturing_groups;
 }
 
 /*
@@ -1708,6 +1774,8 @@ void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_inspect), 0);
   rb_define_method(re2_cMatchData, "deconstruct",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
+  rb_define_method(re2_cMatchData, "deconstruct_keys",
+      RUBY_METHOD_FUNC(re2_matchdata_deconstruct_keys), 1);
 
   rb_define_method(re2_cScanner, "string",
       RUBY_METHOD_FUNC(re2_scanner_string), 0);
