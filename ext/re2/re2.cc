@@ -1620,6 +1620,7 @@ static VALUE re2_set_compile(VALUE self) {
  * @return [Bool] whether the underlying re2 outputs error information from Set matches
  */
 static VALUE re2_set_match_raises_errors_p(VALUE self) {
+  UNUSED(self);
 #ifdef HAVE_ERROR_INFO_ARGUMENT
   return Qtrue;
 #else
