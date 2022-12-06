@@ -33,6 +33,8 @@ jobs:
             soname: 8
           - version: "20201101"
             soname: 9
+          - version: "20221201"
+            soname: 10
     steps:
       - uses: actions/checkout@v3
       - name: Remove any existing libre2 installation
@@ -72,6 +74,8 @@ jobs:
             soname: 8
           - version: "20201101"
             soname: 9
+          - version: "20221201"
+            soname: 10
     steps:
       - uses: actions/checkout@v3
       - name: Download and install specific release of libre2
