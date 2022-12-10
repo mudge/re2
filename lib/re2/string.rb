@@ -58,7 +58,7 @@ module RE2
     #   matches returned (padded with nils if necessary).
     #
     #   @param [String, RE2::Regexp] pattern the regular expression to match
-    #   @param [Fixnum] number_of_matches the number of matches to return
+    #   @param [Integer] number_of_matches the number of matches to return
     #   @return [RE2::MatchData] the matches
     #   @raise [NoMemoryError] if there was not enough memory to allocate the matches
     #   @example

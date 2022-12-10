@@ -91,7 +91,8 @@ RSpec.describe RE2::Regexp do
   describe "#program_size" do
     it "returns a numeric value" do
       program_size = RE2::Regexp.new('w(o)(o)').program_size
-      expect(program_size).to be_a(Fixnum)
+
+      expect(program_size).to be_an(Integer)
     end
 
     it "returns -1 for an invalid pattern" do

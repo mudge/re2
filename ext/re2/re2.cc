@@ -393,7 +393,7 @@ re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
 /*
  * Returns the number of elements in the match array (including nils).
  *
- * @return [Fixnum] the number of elements
+ * @return [Integer] the number of elements
  * @example
  *   m = RE2::Regexp.new('(\d+)').match("bob 123")
  *   m.size      #=> 2
@@ -409,8 +409,8 @@ static VALUE re2_matchdata_size(VALUE self) {
 /*
  * Returns the offset of the start of the nth element of the matchdata.
  *
- * @param [Fixnum, String, Symbol] n the name or number of the match
- * @return [Fixnum] the offset of the start of the match
+ * @param [Integer, String, Symbol] n the name or number of the match
+ * @return [Integer] the offset of the start of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
  *   m.begin(0)  #=> 1
@@ -439,8 +439,8 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
 /*
  * Returns the offset of the character following the end of the nth element of the matchdata.
  *
- * @param [Fixnum, String, Symbol] n the name or number of the match
- * @return [Fixnum] the offset of the character following the end of the match
+ * @param [Integer, String, Symbol] n the name or number of the match
+ * @return [Integer] the offset of the character following the end of the match
  * @example
  *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
  *   m.end(0)  #=> 9
@@ -584,7 +584,7 @@ static VALUE re2_matchdata_named_match(const char* name, VALUE self) {
  * @overload [](index)
  *   Access a particular match by index.
  *
- *   @param [Fixnum] index the index of the match to fetch
+ *   @param [Integer] index the index of the match to fetch
  *   @return [String, nil] the specified match
  *   @example
  *     m = RE2::Regexp.new('(\d+)').match("bob 123")
@@ -593,8 +593,8 @@ static VALUE re2_matchdata_named_match(const char* name, VALUE self) {
  * @overload [](start, length)
  *   Access a range of matches by starting index and length.
  *
- *   @param [Fixnum] start the index from which to start
- *   @param [Fixnum] length the number of elements to fetch
+ *   @param [Integer] start the index from which to start
+ *   @param [Integer] length the number of elements to fetch
  *   @return [Array<String, nil>] the specified matches
  *   @example
  *     m = RE2::Regexp.new('(\d+)').match("bob 123")
@@ -830,7 +830,7 @@ static VALUE re2_re2(int argc, VALUE *argv, VALUE self) {
  *   @option options [Boolean] :posix_syntax (false) restrict regexps to POSIX egrep syntax
  *   @option options [Boolean] :longest_match (false) search for longest match, not first match
  *   @option options [Boolean] :log_errors (true) log syntax and execution errors to ERROR
- *   @option options [Fixnum] :max_mem approx. max memory footprint of RE2
+ *   @option options [Integer] :max_mem approx. max memory footprint of RE2
  *   @option options [Boolean] :literal (false) interpret string as literal, not regexp
  *   @option options [Boolean] :never_nl (false) never match \n, even if it is in regexp
  *   @option options [Boolean] :case_sensitive (true) match is case-sensitive (regexp can override with (?i) unless in posix_syntax mode)
@@ -981,7 +981,7 @@ static VALUE re2_regexp_log_errors(VALUE self) {
  * Returns the max_mem setting for the regular expression
  * +re2+.
  *
- * @return [Fixnum] the max_mem option
+ * @return [Integer] the max_mem option
  * @example
  *   re2 = RE2::Regexp.new("woo?", :max_mem => 1024)
  *   re2.max_mem    #=> 1024
@@ -1135,7 +1135,7 @@ static VALUE re2_regexp_error_arg(VALUE self) {
  * of a regexp's "cost". Larger numbers are more expensive
  * than smaller numbers.
  *
- * @return [Fixnum] the regexp "cost"
+ * @return [Integer] the regexp "cost"
  */
 static VALUE re2_regexp_program_size(VALUE self) {
   re2_pattern *p;
@@ -1200,7 +1200,7 @@ static VALUE re2_regexp_options(VALUE self) {
  * wasn't valid on construction. The overall match ($0) does not
  * count: if the regexp is "(a)(b)", returns 2.
  *
- * @return [Fixnum] the number of capturing subpatterns
+ * @return [Integer] the number of capturing subpatterns
  */
 static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
   re2_pattern *p;
@@ -1270,7 +1270,7 @@ static VALUE re2_regexp_named_capturing_groups(VALUE self) {
  *   matches returned (padded with nils if necessary).
  *
  *   @param [String] text the text to search
- *   @param [Fixnum] number_of_matches the number of matches to return
+ *   @param [Integer] number_of_matches the number of matches to return
  *   @return [RE2::MatchData] the matches
  *   @raise [ArgumentError] if given a negative number of matches
  *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
@@ -1519,7 +1519,7 @@ static VALUE re2_set_allocate(VALUE klass) {
  *   @option options [Boolean] :posix_syntax (false) restrict regexps to POSIX egrep syntax
  *   @option options [Boolean] :longest_match (false) search for longest match, not first match
  *   @option options [Boolean] :log_errors (true) log syntax and execution errors to ERROR
- *   @option options [Fixnum] :max_mem approx. max memory footprint of RE2
+ *   @option options [Integer] :max_mem approx. max memory footprint of RE2
  *   @option options [Boolean] :literal (false) interpret string as literal, not regexp
  *   @option options [Boolean] :never_nl (false) never match \n, even if it is in regexp
  *   @option options [Boolean] :case_sensitive (true) match is case-sensitive (regexp can override with (?i) unless in posix_syntax mode)
