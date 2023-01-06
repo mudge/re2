@@ -5,6 +5,7 @@
 # Released under the BSD Licence, please see LICENSE.txt
 
 require 'mkmf'
+require 'shellwords'
 
 if ENV["CC"]
   RbConfig::MAKEFILE_CONFIG["CC"] = ENV["CC"]
@@ -22,13 +23,40 @@ header_dirs = [
   "/usr/include"
 ]
 
-lib_dirs = [
+LIB_DIRS = [
   "/usr/local/lib",
   "/opt/homebrew/lib",
-  "/usr/lib"
-]
+  "/usr/lib",
+  "/usr/lib/x86_64-linux-gnu"
+].select { |dir| Dir.exist?(dir) }
 
-dir_config("re2", header_dirs, lib_dirs)
+def libflag_to_filename(ldflag)
+  case ldflag
+  when /\A-l(.+)/
+    "lib#{Regexp.last_match(1)}.#{$LIBEXT}"
+  end
+end
+
+def resolve_static_library(arg)
+  libs_path = pkg_config('re2', 'libs-only-L')
+
+  re2_dirs =
+    if libs_path.nil? || libs_path.empty?
+      LIB_DIRS
+    else
+      # There should only be one path, but assume there can be multiple.
+      libs_path.strip.split(' ').map { |lib| lib.gsub(/^-L/, '') }
+    end
+
+  filename = libflag_to_filename(arg)
+  dir = re2_dirs.find { |path| File.exist?(File.join(path, filename)) }
+
+  raise "Unable to find #{filename} in #{re2_dirs}" unless dir
+
+  File.join(dir, filename)
+end
+
+dir_config("re2", header_dirs, LIB_DIRS)
 
 $CFLAGS << " -Wall -Wextra -funroll-loops"
 
@@ -110,6 +138,22 @@ SRC
   if try_compile(test_re2_set_match_signature, compile_options)
     $defs.push("-DHAVE_ERROR_INFO_ARGUMENT")
   end
+end
+
+static_p = enable_config('static', false)
+message "Static linking is #{static_p ? 'enabled' : 'disabled'}.\n"
+
+if static_p
+  append_cppflags('-fPIC')
+
+  $libs = $libs.shellsplit.map do |arg|
+    case arg
+    when '-lre2'
+      resolve_static_library(arg)
+    else
+      arg
+    end
+  end.shelljoin
 end
 
 create_makefile("re2")
