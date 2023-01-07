@@ -12,7 +12,8 @@ RSpec.describe RE2::String do
 
     it "doesn't perform an in-place replacement" do
       string = "My name is Robert Paulson"
-      expect(string.re2_sub('Robert', 'Crobert')).to_not equal(string)
+
+      expect(string.re2_sub('Robert', 'Crobert')).not_to equal(string)
     end
   end
 
@@ -23,13 +24,15 @@ RSpec.describe RE2::String do
 
     it "doesn't perform an in-place replacement" do
       string = "My name is Robert Paulson"
-      expect(string.re2_gsub('a', 'e')).to_not equal(string)
+
+      expect(string.re2_gsub('a', 'e')).not_to equal(string)
     end
   end
 
   describe "#re2_match" do
-    it "delegates to RE2::Regexp#match to perform matches" do
+    it "delegates to RE2::Regexp#match to perform matches", :aggregate_failures do
       md = "My name is Robert Paulson".re2_match('My name is (\S+) (\S+)')
+
       expect(md).to be_a(RE2::MatchData)
       expect(md[0]).to eq("My name is Robert Paulson")
       expect(md[1]).to eq("Robert")
@@ -38,6 +41,7 @@ RSpec.describe RE2::String do
 
     it "supports limiting the number of matches" do
       md = "My name is Robert Paulson".re2_match('My name is (\S+) (\S+)', 0)
+
       expect(md).to eq(true)
     end
   end

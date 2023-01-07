@@ -312,7 +312,6 @@ static VALUE re2_scanner_scan(VALUE self) {
   original_input_size = c->input->size();
 
   for (i = 0; i < c->number_of_capturing_groups; i++) {
-    matches[i] = "";
     argv[i] = &matches[i];
     args[i] = &argv[i];
   }
@@ -1404,7 +1403,9 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
   UNUSED(self);
   re2_pattern *p;
 
-  /* Convert all the inputs to be pumped into RE2::Replace. */
+  /* Take a copy of str so it can be modified in-place by
+   * RE2::Replace.
+   */
   string str_as_string(StringValuePtr(str));
 
   /* Do the replacement. */
@@ -1440,7 +1441,9 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
                                VALUE rewrite) {
   UNUSED(self);
 
-  /* Convert all the inputs to be pumped into RE2::GlobalReplace. */
+  /* Take a copy of str so it can be modified in-place by
+   * RE2::GlobalReplace.
+   */
   re2_pattern *p;
   string str_as_string(StringValuePtr(str));
 
@@ -1579,11 +1582,12 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
  *   set.add("def")    #=> 1
  */
 static VALUE re2_set_add(VALUE self, VALUE pattern) {
-  Check_Type(pattern, T_STRING);
+  StringValue(pattern);
   re2::StringPiece regex(RSTRING_PTR(pattern), RSTRING_LEN(pattern));
   std::string err;
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
+
   int index = s->set->Add(regex, &err);
   if (index < 0) {
     rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", err.c_str());
@@ -1669,7 +1673,8 @@ static VALUE re2_set_match(int argc, VALUE *argv, VALUE self) {
   VALUE str, options, exception_option;
   bool raise_exception = true;
   rb_scan_args(argc, argv, "11", &str, &options);
-  Check_Type(str, T_STRING);
+
+  StringValue(str);
   re2::StringPiece data(RSTRING_PTR(str), RSTRING_LEN(str));
   std::vector<int> v;
   re2_set *s;

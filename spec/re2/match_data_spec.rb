@@ -10,6 +10,18 @@ RSpec.describe RE2::MatchData do
       a = RE2::Regexp.new('(\d?)(a)(b)').match('ab').to_a
       expect(a).to eq(["ab", nil, "a", "b"])
     end
+
+    it "returns UTF-8 strings if the pattern is UTF-8" do
+      a = RE2::Regexp.new('w(o)(o)').match('woo').to_a
+
+      expect(a.map(&:encoding)).to all eq(Encoding::UTF_8)
+    end
+
+    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
+      a = RE2::Regexp.new('w(o)(o)', :utf8 => false).match('woo').to_a
+
+      expect(a.map(&:encoding)).to all eq(Encoding::ISO_8859_1)
+    end
   end
 
   describe "#[]" do
@@ -17,6 +29,18 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d)(\d{2})').match("123")
       expect(md[1]).to eq("1")
       expect(md[2]).to eq("23")
+    end
+
+    it "returns a UTF-8 string by numerical index if the pattern is UTF-8" do
+      md = RE2::Regexp.new('(\d)(\d{2})').match("123")
+
+      expect(md[1].encoding).to eq(Encoding::UTF_8)
+    end
+
+    it "returns a ISO-8859-1 string by numerical index if the pattern is not UTF-8" do
+      md = RE2::Regexp.new('(\d)(\d{2})', :utf8 => false).match("123")
+
+      expect(md[1].encoding).to eq(Encoding::ISO_8859_1)
     end
 
     it "has the whole match as the 0th item" do

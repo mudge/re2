@@ -67,10 +67,16 @@ RSpec.describe RE2::Set do
       end
     end
 
-    it "raises an error if given a non-string pattern" do
+    it "raises an error if given a pattern that can't be coerced to a String" do
       set = RE2::Set.new(:unanchored, :log_errors => false)
 
       expect { set.add(0) }.to raise_error(TypeError)
+    end
+
+    it "accepts a pattern that can be coerced to a String" do
+      set = RE2::Set.new
+
+      expect(set.add(StringLike.new("abc"))).to eq(0)
     end
   end
 
@@ -94,6 +100,24 @@ RSpec.describe RE2::Set do
       set.compile
 
       expect(set.match("abcdefghi", :exception => false)).to eq([0, 1, 2])
+    end
+
+    it "returns an empty array if there is no match" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect(set.match("def", :exception => false)).to be_empty
+    end
+
+    it "returns an empty array if there is no match when :exception is true" do
+      skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
+
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect(set.match("def")).to be_empty
     end
 
     it "raises an error if called before #compile by default" do
@@ -138,6 +162,22 @@ RSpec.describe RE2::Set do
       set = RE2::Set.new
 
       expect { set.match("", 0) }.to raise_error(TypeError)
+    end
+
+    it "raises a Type Error if given input that can't be coerced to a String" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect { set.match(0, :exception => false) }.to raise_error(TypeError)
+    end
+
+    it "accepts input if it can be coerced to a String" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect(set.match(StringLike.new("abcdef"), :exception => false)).to contain_exactly(0)
     end
   end
 
