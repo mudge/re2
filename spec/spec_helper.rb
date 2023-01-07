@@ -1,5 +1,15 @@
 require "re2"
 
+# To test passing objects that can be coerced to a String.
+class StringLike
+  attr_reader :str
+  alias_method :to_str, :str
+
+  def initialize(str)
+    @str = str
+  end
+end
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
