@@ -44,22 +44,30 @@ unless have_library("re2")
   abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
 end
 
-# Recent versions of re2 now require a compiler with C++11 support
-checking_for("re2 requires C++11 compiler") do
-  minimal_program = <<SRC
+minimal_program = <<SRC
 #include <re2/re2.h>
 int main() { return 0; }
 SRC
 
-  unless try_compile(minimal_program, compile_options)
-    if try_compile(minimal_program, compile_options + " -std=c++11")
-      compile_options << " -std=c++11"
-      $CPPFLAGS << " -std=c++11"
-    elsif try_compile(minimal_program, compile_options + " -std=c++0x")
-      compile_options << " -std=c++0x"
-      $CPPFLAGS << " -std=c++0x"
-    else
-      abort "Cannot compile re2 with your compiler: recent versions require C++11 support."
+re2_requires_version_flag = checking_for("re2 that requires explicit C++ version flag") do
+  !try_compile(minimal_program, compile_options)
+end
+
+if re2_requires_version_flag
+  # Recent versions of re2 depend directly on abseil, which requires a
+  # compiler with C++14 support (see
+  # https://github.com/abseil/abseil-cpp/issues/1127 and
+  # https://github.com/abseil/abseil-cpp/issues/1431). However, the
+  # `std=c++14` flag doesn't appear to suffice; we need at least
+  # `std=c++17`.
+  abort "Cannot compile re2 with your compiler: recent versions require C++14 support." unless %w[c++20 c++17 c++11 c++0x].any? do |std|
+    checking_for("re2 that compiles with #{std} standard") do
+      if try_compile(minimal_program, compile_options + " -std=#{std}")
+        compile_options << " -std=#{std}"
+        $CPPFLAGS << " -std=#{std}"
+
+        true
+      end
     end
   end
 end
