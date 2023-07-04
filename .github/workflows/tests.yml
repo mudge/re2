@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         ruby:
@@ -41,7 +41,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Remove any existing libre2 installation
-        run: sudo apt-get remove -y libre2-dev libre2-9
+        run: sudo apt-get remove -y libre2-dev libre2-5
+      - name: Install Abseil for newer re2 releases
+        run: |
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:savoury1/build-tools
+          sudo apt-get install -y libabsl2206
       - name: Download and install specific release of libre2
         run: |
           curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v2/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
