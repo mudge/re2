@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         ruby:
@@ -36,6 +36,8 @@ jobs:
             soname: 9
           - version: "20221201"
             soname: 10
+          - version: "20230701"
+            soname: 11
     steps:
       - uses: actions/checkout@v3
       - name: Remove any existing libre2 installation
