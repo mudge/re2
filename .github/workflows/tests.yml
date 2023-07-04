@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo apt-get install -y software-properties-common
           sudo add-apt-repository ppa:savoury1/build-tools
-          sudo apt-get install -y libabsl2206
+          sudo apt-get install -y libabsl-dev
       - name: Download and install specific release of libre2
         run: |
           curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v2/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
