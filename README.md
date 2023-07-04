@@ -36,6 +36,10 @@ any of the following default locations:
 * `/opt/homebrew`
 * `/usr`
 
+[re2][] versions after 2023-06-01 depend on the [abseil][] library. If
+`abseil` is installed in a non-standard location, you can also use the
+`--with-abseil-dir=/path/to/abseil/prefix` option.
+
 Documentation
 -------------
 
@@ -228,6 +232,7 @@ Contact
 All issues and suggestions should go to [GitHub Issues](https://github.com/mudge/re2/issues).
 
   [re2]: https://github.com/google/re2
+  [abseil]: https://github.com/abseil/abseil-cpp
   [gcc]: http://gcc.gnu.org/
   [ruby-dev]: http://packages.debian.org/ruby-dev
   [build-essential]: http://packages.debian.org/build-essential

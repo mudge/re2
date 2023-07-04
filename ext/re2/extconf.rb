@@ -29,6 +29,7 @@ lib_dirs = [
 ]
 
 dir_config("re2", header_dirs, lib_dirs)
+dir_config("abseil", header_dirs, lib_dirs)
 
 $CFLAGS << " -Wall -Wextra -funroll-loops"
 
