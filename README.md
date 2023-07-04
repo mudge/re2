@@ -22,7 +22,7 @@ If you are using Debian, you can install the [libre2-dev][] package like so:
 
     $ sudo apt-get install libre2-dev
 
-Recent versions of re2 require a compiler with C++11 support such as [clang](http://clang.llvm.org/) 3.4 or [gcc](https://gcc.gnu.org/) 4.8.
+Recent versions of re2 require a compiler with C++14 support such as [clang](http://clang.llvm.org/) 3.4 or [gcc](https://gcc.gnu.org/) 5.
 
 If you are using a packaged Ruby distribution, make sure you also have the
 Ruby header files installed such as those provided by the [ruby-dev][] package
