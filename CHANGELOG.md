@@ -5,6 +5,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [1.7.0] - 2023-07-04
+### Added
+- Added support for libre2.11 (thanks to Stan Hu for contributing this)
+
 ## [1.6.0] - 2022-10-22
 ### Added
 - Added RE2::MatchData#deconstruct and RE2::MatchData#deconstruct_keys so they
@@ -78,6 +82,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[1.7.0]: https://github.com/mudge/re2/releases/tag/v1.7.0
 [1.6.0]: https://github.com/mudge/re2/releases/tag/v1.6.0
 [1.5.0]: https://github.com/mudge/re2/releases/tag/v1.5.0
 [1.4.0]: https://github.com/mudge/re2/releases/tag/v1.4.0
