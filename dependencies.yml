@@ -1,0 +1,9 @@
+libre2:
+  version: "2023-07-01"
+  sha256: "18cf85922e27fad3ed9c96a27733037da445f35eb1a2744c306a37c6d11e95c4"
+  # sha-256 hash provided in https://github.com/google/re2/releases/download/2023-07-01/re2-2023-07-01.tar.gz
+
+abseil:
+  version: "20230125.3"
+  sha256: 5366d7e7fa7ba0d915014d387b66d0d002c03236448e1ba9ef98122c13b35c36
+  # sha-256 hash provided in https://github.com/abseil/abseil-cpp/archive/refs/tags/20230125.3.tar.gz
