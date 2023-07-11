@@ -29,4 +29,5 @@ Gem::Specification.new do |s|
   ]
   s.add_development_dependency("rake-compiler", "~> 0.9")
   s.add_development_dependency("rspec", "~> 3.2")
+  s.add_runtime_dependency("mini_portile2", "~> 2.8.2") # keep version in sync with extconf.rb
 end
