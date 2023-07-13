@@ -27,7 +27,8 @@ Gem::Specification.new do |s|
     "spec/re2/set_spec.rb",
     "spec/re2/scanner_spec.rb"
   ]
-  s.add_development_dependency("rake-compiler", "~> 0.9")
+  s.add_development_dependency "rake-compiler", "~> 1.2.1"
+  s.add_development_dependency "rake-compiler-dock", "~> 1.3.0"
   s.add_development_dependency("rspec", "~> 3.2")
   s.add_runtime_dependency("mini_portile2", "~> 2.8.2") # keep version in sync with extconf.rb
 end

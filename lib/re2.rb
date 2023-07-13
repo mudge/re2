@@ -3,5 +3,11 @@
 #
 # Copyright (c) 2010-2014, Paul Mucur (http://mudge.name)
 # Released under the BSD Licence, please see LICENSE.txt
-require "re2.so"
+begin
+  ::RUBY_VERSION =~ /(\d+\.\d+)/
+  require_relative "#{Regexp.last_match(1)}/re2.so"
+rescue LoadError
+  require 're2.so'
+end
+
 require "re2/scanner"
