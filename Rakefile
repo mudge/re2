@@ -62,7 +62,7 @@ namespace 'gem' do
       RakeCompilerDock.sh <<~SCRIPT, platform: platform, verbose: true
         gem install bundler --no-document &&
         bundle &&
-        CMAKE=#{cmake} bundle exec rake gem:#{platform}:builder MAKE='nice make -j`nproc`'
+        bundle exec rake gem:#{platform}:builder CMAKE=#{cmake}
       SCRIPT
     end
 
