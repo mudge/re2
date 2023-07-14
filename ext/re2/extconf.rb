@@ -114,6 +114,21 @@ def cmake_compile_flags(host)
   ]
 end
 
+# By default, mini_portile2 might add an unnecessary option:
+# https://github.com/flavorjones/mini_portile/blob/5084a2aeab12076f534cf0cabc81a4d5f84b5c25/lib/mini_portile2/mini_portile_cmake.rb#L17
+def delete_cmake_generator_option!(options)
+  indices = []
+
+  options.each_with_index do |element, index|
+    if element == '-G' && index + 1 < options.length
+      indices << index
+      indices << index + 1
+    end
+  end
+
+  indices.reverse_each { |index| options.delete_at(index) }
+end
+
 #
 #  main
 #
@@ -240,6 +255,7 @@ def process_recipe(name, version)
       '-DCMAKE_INSTALL_LIBDIR=lib'
     ]
     recipe.configure_options += cmake_compile_flags(recipe.host)
+    delete_cmake_generator_option!(recipe.configure_options)
 
     yield recipe
 
