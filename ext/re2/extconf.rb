@@ -65,6 +65,55 @@ def do_help
   exit!(0)
 end
 
+def darwin?
+  RbConfig::CONFIG["target_os"].include?("darwin")
+end
+
+def target_host
+  # We use 'host' to set compiler prefix for cross-compiling. Prefer host_alias over host. And
+  # prefer i686 (what external dev tools use) to i386 (what ruby's configure.ac emits).
+  host = RbConfig::CONFIG["host_alias"].empty? ? RbConfig::CONFIG["host"] : RbConfig::CONFIG["host_alias"]
+  host.gsub(/i386/, "i686")
+end
+
+def find_compiler(compilers)
+  compilers.find { |binary| find_executable(binary) }
+end
+
+# configure automatically searches for the right compiler based on the
+# `--host` parameter.  However, we don't have that feature with
+# cmake. Search for the right compiler for the target architecture using
+# some basic heruistics.
+def find_c_and_cxx_compilers(host)
+  if darwin?
+    c_compiler = 'clang'
+    cxx_compiler = 'clang++'
+  else
+    c_compiler = 'gcc'
+    cxx_compiler = 'g++'
+  end
+
+  c_platform_compiler = "#{host}-#{c_compiler}"
+  cxx_platform_compiler = "#{host}-#{cxx_compiler}"
+  c_compiler = find_compiler([c_platform_compiler, c_compiler])
+  cxx_compiler = find_compiler([cxx_platform_compiler, cxx_compiler])
+
+  [c_compiler, cxx_compiler]
+end
+
+def cmake_compile_flags(host)
+  system_name = darwin? ? 'Darwin' : 'Linux'
+  c_compiler, cxx_compiler = find_c_and_cxx_compilers(host)
+
+  # needed to ensure cross-compilation with CMake targets the right CPU and compilers
+  [
+    "-DCMAKE_SYSTEM_PROCESSOR=#{RbConfig::CONFIG['target_cpu']}",
+    "-DCMAKE_SYSTEM_NAME=#{system_name}",
+    "-DCMAKE_C_COMPILER=#{c_compiler}",
+    "-DCMAKE_CXX_COMPILER=#{cxx_compiler}"
+  ]
+end
+
 #
 #  main
 #
@@ -179,7 +228,9 @@ def process_recipe(name, version)
   message("Using mini_portile version #{MiniPortile::VERSION}\n")
 
   MiniPortileCMake.new(name, version).tap do |recipe|
+    recipe.host = target_host
     recipe.target = File.join(PACKAGE_ROOT_DIR, "ports")
+
     recipe.configure_options += [
       # abseil needs a C++14 compiler
       '-DCMAKE_CXX_STANDARD=17',
@@ -188,6 +239,7 @@ def process_recipe(name, version)
       # ensures pkg-config and installed libraries will be in lib, not lib64
       '-DCMAKE_INSTALL_LIBDIR=lib'
     ]
+    recipe.configure_options += cmake_compile_flags(recipe.host)
 
     yield recipe
 
@@ -268,13 +320,12 @@ def build_with_vendored_libraries
 
   ENV['PKG_CONFIG_PATH'] = pkg_config_paths
   pc_file = File.join(re2_recipe.path, 'lib', 'pkgconfig', 're2.pc')
-  if pkg_config(pc_file)
-    # See https://bugs.ruby-lang.org/issues/18490, broken in Ruby 3.1 but fixed in Ruby 3.2.
-    flags = xpopen(['pkg-config', '--libs', '--static', pc_file], err: %i[child out], &:read)
-    flags.split.each { |flag| append_ldflags(flag) } if $?.success?
-  else
-    raise 'Please install the `pkg-config` utility!'
-  end
+
+  raise 'Please install the `pkg-config` utility!' unless pkg_config('re2')
+
+  # See https://bugs.ruby-lang.org/issues/18490, broken in Ruby 3.1 but fixed in Ruby 3.2.
+  flags = xpopen(['pkg-config', '--libs', '--static', pc_file], err: %i[child out], &:read)
+  flags.split.each { |flag| append_ldflags(flag) } if $?.success?
 
   build_extension
 end
