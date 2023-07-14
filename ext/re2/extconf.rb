@@ -15,12 +15,12 @@ RE2_HELP_MESSAGE = <<~HELP
 
     Flags that are always valid:
 
-      --use-system-libraries
       --enable-system-libraries
-          Use system libraries instead of building and using the packaged libraries. This is the default.
+          Use system libraries instead of building and using the packaged libraries.
 
       --disable-system-libraries
-          Use the packaged libraries, and ignore the system libraries. This overrides `--use-system-libraries`.
+          Use the packaged libraries, and ignore the system libraries. This is the default.
+
 
     Flags only used when using system libraries:
 
@@ -51,9 +51,7 @@ HELP
 #  utility functions
 #
 def config_system_libraries?
-  enable_config("system-libraries", true) do |_, default|
-    arg_config("--use-system-libraries", default)
-  end
+  enable_config("system-libraries", ENV.key?('RE2_USE_SYSTEM_LIBRARIES'))
 end
 
 def concat_flags(*args)
@@ -67,6 +65,15 @@ end
 
 def darwin?
   RbConfig::CONFIG["target_os"].include?("darwin")
+end
+
+def windows?
+  # Use =~ instead of match? to preserve Ruby 2.3 compatibility
+  RbConfig::CONFIG["target_os"] =~ /mingw|mswin/
+end
+
+def freebsd?
+  RbConfig::CONFIG["target_os"].include?("freebsd")
 end
 
 def target_host
@@ -84,13 +91,17 @@ end
 # `--host` parameter.  However, we don't have that feature with
 # cmake. Search for the right compiler for the target architecture using
 # some basic heruistics.
+# See https://github.com/flavorjones/mini_portile/issues/128.
 def find_c_and_cxx_compilers(host)
+  c_compiler = ENV["CC"]
+  cxx_compiler = ENV["CXX"]
+
   if darwin?
-    c_compiler = 'clang'
-    cxx_compiler = 'clang++'
+    c_compiler ||= 'clang'
+    cxx_compiler ||='clang++'
   else
-    c_compiler = 'gcc'
-    cxx_compiler = 'g++'
+    c_compiler ||= 'gcc'
+    cxx_compiler ||= 'g++'
   end
 
   c_platform_compiler = "#{host}-#{c_compiler}"
@@ -101,14 +112,25 @@ def find_c_and_cxx_compilers(host)
   [c_compiler, cxx_compiler]
 end
 
+def cmake_system_name
+  if darwin?
+    'Darwin'
+  elsif windows?
+    'Windows'
+  elsif freebsd?
+    'FreeBSD'
+  else
+    'Linux'
+  end
+end
+
 def cmake_compile_flags(host)
-  system_name = darwin? ? 'Darwin' : 'Linux'
   c_compiler, cxx_compiler = find_c_and_cxx_compilers(host)
 
   # needed to ensure cross-compilation with CMake targets the right CPU and compilers
   [
     "-DCMAKE_SYSTEM_PROCESSOR=#{RbConfig::CONFIG['target_cpu']}",
-    "-DCMAKE_SYSTEM_NAME=#{system_name}",
+    "-DCMAKE_SYSTEM_NAME=#{cmake_system_name}",
     "-DCMAKE_C_COMPILER=#{c_compiler}",
     "-DCMAKE_CXX_COMPILER=#{cxx_compiler}"
   ]
@@ -116,6 +138,7 @@ end
 
 # By default, mini_portile2 might add an unnecessary option:
 # https://github.com/flavorjones/mini_portile/blob/5084a2aeab12076f534cf0cabc81a4d5f84b5c25/lib/mini_portile2/mini_portile_cmake.rb#L17
+# See https://github.com/flavorjones/mini_portile/issues/127.
 def delete_cmake_generator_option!(options)
   indices = []
 
