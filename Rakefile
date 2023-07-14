@@ -25,7 +25,11 @@ end
 CROSS_RUBY_VERSIONS = %w[3.2.0 3.1.0 3.0.0 2.7.0].join(':')
 CROSS_RUBY_PLATFORMS = %w[
   aarch64-linux
+  arm-linux
   arm64-darwin
+  x64-mingw-ucrt
+  x86-linux
+  x86-mingw32
   x86_64-darwin
   x86_64-linux
 ].freeze
@@ -56,7 +60,14 @@ namespace 'gem' do
     # The Linux x86 image (ghcr.io/rake-compiler/rake-compiler-dock-image:1.3.0-mri-x86_64-linux)
     # is based on CentOS 7 and has two versions of cmake installed:
     # a 2.8 version in /usr/bin and a 3.25 in /usr/local/bin. The latter is needed by abseil.
-    cmake = platform == 'x86_64-linux' ? '/usr/local/bin/cmake' : 'cmake'
+    cmake =
+      case platform
+      when 'x86_64-linux', 'x86-linux'
+        '/usr/local/bin/cmake'
+      else
+        'cmake'
+      end
+
     desc "build native gem for #{platform} platform"
     task platform do
       RakeCompilerDock.sh <<~SCRIPT, platform: platform, verbose: true
