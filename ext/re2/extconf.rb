@@ -68,8 +68,7 @@ def darwin?
 end
 
 def windows?
-  # Use =~ instead of match? to preserve Ruby 2.3 compatibility
-  RbConfig::CONFIG["target_os"] =~ /mingw|mswin/
+  RbConfig::CONFIG["target_os"].match?(/mingw|mswin/)
 end
 
 def freebsd?
