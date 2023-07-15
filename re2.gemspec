@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/mudge/re2"
   s.extensions = ["ext/re2/extconf.rb"]
   s.license = "BSD-3-Clause"
+  s.required_ruby_version = ">= 2.7.0"
   s.files = [
     "ext/re2/extconf.rb",
     "ext/re2/re2.cc",
