@@ -355,9 +355,9 @@ def build_with_vendored_libraries
   pkg_config_paths = [
     "#{abseil_recipe.path}/lib/pkgconfig",
     "#{re2_recipe.path}/lib/pkgconfig"
-  ].join(':')
+  ].join(File::PATH_SEPARATOR)
 
-  pkg_config_paths = "#{ENV['PKG_CONFIG_PATH']}:#{pkg_config_paths}" if ENV['PKG_CONFIG_PATH']
+  pkg_config_paths = "#{ENV['PKG_CONFIG_PATH']}#{File::PATH_SEPARATOR}#{pkg_config_paths}" if ENV['PKG_CONFIG_PATH']
 
   ENV['PKG_CONFIG_PATH'] = pkg_config_paths
   pc_file = File.join(re2_recipe.path, 'lib', 'pkgconfig', 're2.pc')
