@@ -3,6 +3,7 @@
 require 'rake/extensiontask'
 require 'rspec/core/rake_task'
 require 'rake_compiler_dock'
+require 'yaml'
 
 CLEAN.include FileList['**/*{.o,.so,.dylib,.bundle}'],
               FileList['**/extconf.h'],
