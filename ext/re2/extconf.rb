@@ -349,6 +349,9 @@ def build_with_vendored_libraries
     recipe.configure_options += ["-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}", '-DCMAKE_CXX_FLAGS=-DNDEBUG']
   end
 
+  dir_config("re2", File.join(re2_recipe.path, 'include'), File.join(re2_recipe.path, 'lib'))
+  dir_config("abseil", File.join(abseil_recipe.path, 'include'), File.join(abseil_recipe.path, 'lib'))
+
   pkg_config_paths = [
     "#{abseil_recipe.path}/lib/pkgconfig",
     "#{re2_recipe.path}/lib/pkgconfig"
@@ -359,7 +362,7 @@ def build_with_vendored_libraries
   ENV['PKG_CONFIG_PATH'] = pkg_config_paths
   pc_file = File.join(re2_recipe.path, 'lib', 'pkgconfig', 're2.pc')
 
-  raise 'Please install the `pkg-config` utility!' unless pkg_config('re2')
+  raise 'Please install the `pkg-config` utility!' unless find_executable('pkg-config')
 
   # See https://bugs.ruby-lang.org/issues/18490, broken in Ruby 3.1 but fixed in Ruby 3.2.
   flags = xpopen(['pkg-config', '--libs', '--static', pc_file], err: %i[child out], &:read)
