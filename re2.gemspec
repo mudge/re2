@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.license = "BSD-3-Clause"
   s.required_ruby_version = ">= 2.7.0"
   s.files = [
+    "dependencies.yml",
     "ext/re2/extconf.rb",
     "ext/re2/re2.cc",
     "lib/re2.rb",
