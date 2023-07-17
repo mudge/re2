@@ -11,3 +11,4 @@ rescue LoadError
 end
 
 require "re2/scanner"
+require "re2/version"
