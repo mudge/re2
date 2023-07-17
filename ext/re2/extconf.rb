@@ -82,6 +82,14 @@ def target_host
   host.gsub(/i386/, "i686")
 end
 
+def with_temp_dir
+  Dir.mktmpdir do |temp_dir|
+    Dir.chdir(temp_dir) do
+      yield
+    end
+  end
+end
+
 #
 #  main
 #
@@ -229,7 +237,9 @@ def process_recipe(name, version)
         end
       end
 
-      recipe.cook
+      # Use a temporary base directory to reduce filename lengths since
+      # Windows can hit a limit of 250 characters (CMAKE_OBJECT_PATH_MAX).
+      with_temp_dir { recipe.cook }
 
       FileUtils.touch(checkpoint)
     end
