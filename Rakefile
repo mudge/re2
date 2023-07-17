@@ -142,5 +142,4 @@ task "set-version-to-timestamp" do
   puts "NOTE: wrote version as \"#{fake_version}\""
 end
 
-task :spec    => :compile
-task :default => :spec
+task default: [:compile, :spec]
