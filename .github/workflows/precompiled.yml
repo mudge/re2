@@ -272,7 +272,7 @@ jobs:
         with:
           name: cruby-x86_64-linux-gem
           path: gems
-      - run: apk add bash
+      - run: apk add bash libstdc++ gcompat
       - run: ./scripts/test-gem-install gems
 
   cruby-x86_64-darwin-install:
