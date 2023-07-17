@@ -266,6 +266,69 @@ def build_with_system_libraries
   build_extension
 end
 
+# pkgconf v1.9.3 on Windows incorrectly sorts the output of `pkg-config
+# --libs --static`, resulting in build failures: https://github.com/pkgconf/pkgconf/issues/268.
+# To work around the issue, store the correct order of abseil flags here and add them manually
+# for Windows.
+ABSL_LDFLAGS = %w[
+  -labsl_flags
+  -labsl_flags_internal
+  -labsl_flags_marshalling
+  -labsl_flags_reflection
+  -labsl_flags_private_handle_accessor
+  -labsl_flags_commandlineflag
+  -labsl_flags_commandlineflag_internal
+  -labsl_flags_config
+  -labsl_flags_program_name
+  -labsl_cord
+  -labsl_cordz_info
+  -labsl_cord_internal
+  -labsl_cordz_functions
+  -labsl_cordz_handle
+  -labsl_crc_cord_state
+  -labsl_crc32c
+  -labsl_crc_internal
+  -labsl_crc_cpu_detect
+  -labsl_hash
+  -labsl_city
+  -labsl_bad_variant_access
+  -labsl_low_level_hash
+  -labsl_raw_hash_set
+  -labsl_hashtablez_sampler
+  -labsl_exponential_biased
+  -labsl_bad_optional_access
+  -labsl_str_format_internal
+  -labsl_synchronization
+  -labsl_graphcycles_internal
+  -labsl_stacktrace
+  -labsl_symbolize
+  -labsl_debugging_internal
+  -labsl_demangle_internal
+  -labsl_malloc_internal
+  -labsl_time
+  -labsl_civil_time
+  -labsl_strings
+  -labsl_strings_internal
+  -labsl_base
+  -labsl_spinlock_wait
+  -labsl_int128
+  -labsl_throw_delegate
+  -labsl_raw_logging_internal
+  -labsl_log_severity
+  -labsl_time_zone
+].freeze
+
+def add_static_ldflags(flags)
+  static_flags = flags.split
+
+  if MiniPortile.windows?
+    static_flags.each { |flag| append_ldflags(flag) unless ABSL_LDFLAGS.include?(flag) }
+    ABSL_LDFLAGS.each { |flag| append_ldflags(flag) }
+  else
+    static_flags.each { |flag| append_ldflags(flag) }
+  end
+end
+
 def build_with_vendored_libraries
   message "Building re2 using packaged libraries.\n"
 
@@ -305,8 +368,10 @@ def build_with_vendored_libraries
 
   # See https://bugs.ruby-lang.org/issues/18490, broken in Ruby 3.1 but fixed in Ruby 3.2.
   flags = xpopen(['pkg-config', '--libs', '--static', pc_file], err: %i[child out], &:read)
-  flags.split.each { |flag| append_ldflags(flag) } if $?.success?
 
+  raise 'Unable to run pkg-config --libs --static' unless $?.success?
+
+  add_static_ldflags(flags)
   build_extension
 end
 
