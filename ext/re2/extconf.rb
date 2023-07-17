@@ -8,7 +8,7 @@ require 'mkmf'
 
 PACKAGE_ROOT_DIR = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
 
-REQUIRED_MINI_PORTILE_VERSION = "~> 2.8.2" # keep this version in sync with the one in the gemspec
+REQUIRED_MINI_PORTILE_VERSION = "~> 2.8.3" # keep this version in sync with the one in the gemspec
 
 RE2_HELP_MESSAGE = <<~HELP
   USAGE: ruby #{$0} [options]
@@ -133,22 +133,6 @@ def cmake_compile_flags(host)
     "-DCMAKE_C_COMPILER=#{c_compiler}",
     "-DCMAKE_CXX_COMPILER=#{cxx_compiler}"
   ]
-end
-
-# By default, mini_portile2 might add an unnecessary option:
-# https://github.com/flavorjones/mini_portile/blob/5084a2aeab12076f534cf0cabc81a4d5f84b5c25/lib/mini_portile2/mini_portile_cmake.rb#L17
-# See https://github.com/flavorjones/mini_portile/issues/127.
-def delete_cmake_generator_option!(options)
-  indices = []
-
-  options.each_with_index do |element, index|
-    if element == '-G' && index + 1 < options.length
-      indices << index
-      indices << index + 1
-    end
-  end
-
-  indices.reverse_each { |index| options.delete_at(index) }
 end
 
 #
@@ -277,7 +261,6 @@ def process_recipe(name, version)
       '-DCMAKE_INSTALL_LIBDIR=lib'
     ]
     recipe.configure_options += cmake_compile_flags(recipe.host)
-    delete_cmake_generator_option!(recipe.configure_options)
 
     yield recipe
 
