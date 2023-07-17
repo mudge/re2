@@ -1,0 +1,32 @@
+#! /usr/bin/env bash
+#
+#  run as part of CI
+#
+if [[ $# -lt 2 ]] ; then
+  echo "usage: $(basename $0) <output_dir> <platform>"
+  exit 1
+fi
+
+set -e -u
+
+OUTPUT_DIR=$1
+BUILD_NATIVE_GEM=$2
+
+test -e /etc/os-release && cat /etc/os-release
+
+set -x
+
+bundle install --local || bundle install
+bundle exec rake set-version-to-timestamp
+
+if [[ "${BUILD_NATIVE_GEM}" == "ruby" ]] ; then
+  # TODO we're only compiling so that we retrieve tarballs, we can do better.
+  bundle exec rake clean compile
+  bundle exec rake gem
+else
+  bundle exec rake gem:${BUILD_NATIVE_GEM}:builder
+fi
+
+mkdir -p ${OUTPUT_DIR}
+cp -v pkg/*.gem ${OUTPUT_DIR}
+ls -l ${OUTPUT_DIR}/*
