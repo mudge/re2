@@ -16,7 +16,6 @@ test -e /etc/os-release && cat /etc/os-release
 set -e -x -u
 
 pushd $GEMS_DIR
-
   gemfile=$(ls *.gem | head -n1)
   ls -l ${gemfile}
   gem install --no-document ${gemfile} -- ${INSTALL_FLAGS}
