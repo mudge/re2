@@ -8,7 +8,7 @@ require 'mkmf'
 
 PACKAGE_ROOT_DIR = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
 
-REQUIRED_MINI_PORTILE_VERSION = "~> 2.8.3" # keep this version in sync with the one in the gemspec
+REQUIRED_MINI_PORTILE_VERSION = "~> 2.8.4" # keep this version in sync with the one in the gemspec
 
 RE2_HELP_MESSAGE = <<~HELP
   USAGE: ruby #{$0} [options]
@@ -80,59 +80,6 @@ def target_host
   # prefer i686 (what external dev tools use) to i386 (what ruby's configure.ac emits).
   host = RbConfig::CONFIG["host_alias"].empty? ? RbConfig::CONFIG["host"] : RbConfig::CONFIG["host_alias"]
   host.gsub(/i386/, "i686")
-end
-
-def find_compiler(compilers)
-  compilers.find { |binary| find_executable(binary) }
-end
-
-# configure automatically searches for the right compiler based on the
-# `--host` parameter.  However, we don't have that feature with
-# cmake. Search for the right compiler for the target architecture using
-# some basic heruistics.
-# See https://github.com/flavorjones/mini_portile/issues/128.
-def find_c_and_cxx_compilers(host)
-  c_compiler = ENV["CC"]
-  cxx_compiler = ENV["CXX"]
-
-  if darwin?
-    c_compiler ||= 'clang'
-    cxx_compiler ||='clang++'
-  else
-    c_compiler ||= 'gcc'
-    cxx_compiler ||= 'g++'
-  end
-
-  c_platform_compiler = "#{host}-#{c_compiler}"
-  cxx_platform_compiler = "#{host}-#{cxx_compiler}"
-  c_compiler = find_compiler([c_platform_compiler, c_compiler])
-  cxx_compiler = find_compiler([cxx_platform_compiler, cxx_compiler])
-
-  [c_compiler, cxx_compiler]
-end
-
-def cmake_system_name
-  if darwin?
-    'Darwin'
-  elsif windows?
-    'Windows'
-  elsif freebsd?
-    'FreeBSD'
-  else
-    'Linux'
-  end
-end
-
-def cmake_compile_flags(host)
-  c_compiler, cxx_compiler = find_c_and_cxx_compilers(host)
-
-  # needed to ensure cross-compilation with CMake targets the right CPU and compilers
-  [
-    "-DCMAKE_SYSTEM_PROCESSOR=#{RbConfig::CONFIG['target_cpu']}",
-    "-DCMAKE_SYSTEM_NAME=#{cmake_system_name}",
-    "-DCMAKE_C_COMPILER=#{c_compiler}",
-    "-DCMAKE_CXX_COMPILER=#{cxx_compiler}"
-  ]
 end
 
 #
@@ -260,7 +207,6 @@ def process_recipe(name, version)
       # ensures pkg-config and installed libraries will be in lib, not lib64
       '-DCMAKE_INSTALL_LIBDIR=lib'
     ]
-    recipe.configure_options += cmake_compile_flags(recipe.host)
 
     yield recipe
 
