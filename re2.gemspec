@@ -1,30 +1,29 @@
-begin
-  require File.expand_path(File.join(File.dirname(__FILE__), "lib/re2/version"))
-rescue LoadError
-  puts "WARNING: Could not load RE2::VERSION"
-end
+require_relative 'lib/re2/version'
 
 Gem::Specification.new do |s|
   s.name = "re2"
   s.summary = "Ruby bindings to re2."
   s.description = 'Ruby bindings to re2, "an efficient, principled regular expression library".'
-  s.version = defined?(RE2::VERSION) ? RE2::VERSION : "0.0.0"
+  s.version = RE2::VERSION
   s.authors = ["Paul Mucur"]
   s.homepage = "https://github.com/mudge/re2"
   s.extensions = ["ext/re2/extconf.rb"]
   s.license = "BSD-3-Clause"
   s.required_ruby_version = ">= 2.7.0"
   s.files = [
+    ".rspec",
     "dependencies.yml",
     "ext/re2/extconf.rb",
     "ext/re2/re2.cc",
+    "Gemfile",
     "lib/re2.rb",
     "lib/re2/scanner.rb",
     "lib/re2/string.rb",
     "lib/re2/version.rb",
     "LICENSE.txt",
     "README.md",
-    "Rakefile"
+    "Rakefile",
+    "re2.gemspec"
   ]
   s.test_files = [
     "spec/spec_helper.rb",
