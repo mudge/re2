@@ -28,5 +28,6 @@ fi
 
 bundle install --local || bundle install
 
-rm -rf lib ext # ensure we don't use the local files
+cd $(dirname `gem which re2`)
+cd ..
 rake spec
