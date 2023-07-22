@@ -107,44 +107,40 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.0"]
+        ruby: ["2.7", "3.0"]
         sys: ["enable", "disable"]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1"
+          ruby-version: "${{matrix.ruby}}"
       - uses: actions/download-artifact@v2
         with:
           name: cruby-gem
           path: gems
-      - run: |
-          gem install --verbose --no-document gems/*.gem
-          gem list -d re2
-          ruby -r re2 -e "puts RE2::Regexp.new('(\\d+)').match('bob 123')"
+      - run: ./scripts/test-gem-install gems
+        shell: bash
 
   cruby-windows-install-ucrt:
     needs: ["cruby-package"]
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.2"]
+        ruby: ["3.1", "3.2"]
         sys: ["enable", "disable"]
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-         ruby-version: "3.2"
+         ruby-version: "${{matrix.ruby}}"
       - uses: actions/download-artifact@v2
         with:
           name: cruby-gem
           path: gems
-      - run: |
-          gem install --verbose --no-document gems/*.gem
-          gem list -d re2
-          ruby -r re2 -e "puts RE2::Regexp.new('(\\d+)').match('bob 123')"
+      - run: ./scripts/test-gem-install gems
+        shell: bash
 
   cruby-native-package:
     needs: ["rcd_image_version"]
@@ -332,6 +328,7 @@ jobs:
           name: cruby-x64-mingw-ucrt-gem
           path: gems
       - run: ./scripts/test-gem-install gems
+        shell: bash
 
   #
   #  SECTION the end-to-end gem installation tests
