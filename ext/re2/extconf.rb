@@ -340,7 +340,7 @@ def build_with_vendored_libraries
       url: "https://github.com/abseil/abseil-cpp/archive/refs/tags/#{recipe.version}.tar.gz",
       sha256: dependencies['abseil']['sha256']
     }]
-    recipe.configure_options += ['-DABSL_PROPAGATE_CXX_STD=ON']
+    recipe.configure_options += ['-DABSL_PROPAGATE_CXX_STD=ON', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
   end
 
   re2_recipe = process_recipe('libre2', dependencies['libre2']['version']) do |recipe|
@@ -348,7 +348,7 @@ def build_with_vendored_libraries
       url: "https://github.com/google/re2/releases/download/#{recipe.version}/re2-#{recipe.version}.tar.gz",
       sha256: dependencies['libre2']['sha256']
     }]
-    recipe.configure_options += ["-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}", '-DCMAKE_CXX_FLAGS=-DNDEBUG']
+    recipe.configure_options += ["-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}", '-DCMAKE_CXX_FLAGS=-DNDEBUG', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
   end
 
   dir_config("re2", File.join(re2_recipe.path, 'include'), File.join(re2_recipe.path, 'lib'))
