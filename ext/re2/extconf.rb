@@ -82,6 +82,10 @@ def target_host
   host.gsub(/i386/, "i686")
 end
 
+def target_arch
+  RbConfig::CONFIG['arch']
+end
+
 def with_temp_dir
   Dir.mktmpdir do |temp_dir|
     Dir.chdir(temp_dir) do
@@ -205,7 +209,11 @@ def process_recipe(name, version)
 
   MiniPortileCMake.new(name, version).tap do |recipe|
     recipe.host = target_host
-    recipe.target = File.join(PACKAGE_ROOT_DIR, "ports")
+    target_dir = File.join(PACKAGE_ROOT_DIR, "ports")
+    # Ensure x64-mingw-ucrt and x64-mingw32 use different library paths since the host
+    # is the same (x86_64-w64-mingw32).
+    target_dir = File.join(target_dir, target_arch) if windows? && !target_arch.empty?
+    recipe.target = target_dir
 
     recipe.configure_options += [
       # abseil needs a C++14 compiler
