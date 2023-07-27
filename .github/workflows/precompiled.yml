@@ -310,6 +310,7 @@ jobs:
           name: cruby-x64-mingw32-gem
           path: gems
       - run: ./scripts/test-gem-install gems
+        shell: bash
 
   cruby-x64-mingw-ucrt-install:
     needs: ["cruby-native-package"]
