@@ -270,6 +270,9 @@ end
 # --libs --static`, resulting in build failures: https://github.com/pkgconf/pkgconf/issues/268.
 # To work around the issue, store the correct order of abseil flags here and add them manually
 # for Windows.
+#
+# Note that `-ldbghelp` is incorrectly added before `-labsl_symbolize` in abseil:
+# https://github.com/abseil/abseil-cpp/issues/1497
 ABSL_LDFLAGS = %w[
   -labsl_flags
   -labsl_flags_internal
@@ -302,6 +305,7 @@ ABSL_LDFLAGS = %w[
   -labsl_graphcycles_internal
   -labsl_stacktrace
   -labsl_symbolize
+  -ldbghelp
   -labsl_debugging_internal
   -labsl_demangle_internal
   -labsl_malloc_internal
@@ -309,6 +313,7 @@ ABSL_LDFLAGS = %w[
   -labsl_civil_time
   -labsl_strings
   -labsl_strings_internal
+  -ladvapi32
   -labsl_base
   -labsl_spinlock_wait
   -labsl_int128
