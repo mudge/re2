@@ -88,7 +88,7 @@ namespace 'gem' do
   end
 
   desc 'build all native gems'
-  task 'native' => CROSS_RUBY_PLATFORMS
+  multitask 'native' => CROSS_RUBY_PLATFORMS
 end
 
 def add_file_to_gem(relative_source_path)
