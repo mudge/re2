@@ -150,10 +150,11 @@ jobs:
         plat:
           - "aarch64-linux"
           - "arm-linux"
-          - "arm64-darwin"
+          - "arm64-darwin" # github actions does not support this runtime as of 2022-12, but let's build anyway
           - "x64-mingw-ucrt"
           - "x64-mingw32"
           - "x86-linux"
+          - "x86-mingw32" # github actions does not support this runtime as of 2022-12, but let's build anyway
           - "x86_64-darwin"
           - "x86_64-linux"
     runs-on: ubuntu-latest
