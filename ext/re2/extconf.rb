@@ -29,6 +29,13 @@ RE2_HELP_MESSAGE = <<~HELP
         --with-re2-dir=DIRECTORY
             Look for re2 headers and library in DIRECTORY.
 
+
+    Flags only used when building and using the packaged libraries:
+
+      --enable-cross-build
+          Enable cross-build mode. (You probably do not want to set this manually.)
+
+
     Environment variables used:
 
       CC
@@ -52,6 +59,10 @@ HELP
 #
 def config_system_libraries?
   enable_config("system-libraries", ENV.key?('RE2_USE_SYSTEM_LIBRARIES'))
+end
+
+def config_cross_build?
+  enable_config("cross-build")
 end
 
 def concat_flags(*args)
@@ -207,12 +218,15 @@ def process_recipe(name, version)
   require "mini_portile2"
   message("Using mini_portile version #{MiniPortile::VERSION}\n")
 
+  cross_build_p = config_cross_build?
+  message "Cross build is #{cross_build_p ? "enabled" : "disabled"}.\n"
+
   MiniPortileCMake.new(name, version).tap do |recipe|
     recipe.host = target_host
     target_dir = File.join(PACKAGE_ROOT_DIR, "ports")
     # Ensure x64-mingw-ucrt and x64-mingw32 use different library paths since the host
     # is the same (x86_64-w64-mingw32).
-    target_dir = File.join(target_dir, target_arch) if windows? && !target_arch.empty?
+    target_dir = File.join(target_dir, target_arch) if cross_build_p
     recipe.target = target_dir
 
     recipe.configure_options += [
