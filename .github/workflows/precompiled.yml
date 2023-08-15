@@ -35,12 +35,12 @@ jobs:
             runs-on: "windows-2022"
     runs-on: ${{matrix.runs-on}}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{matrix.ruby}}
           bundler-cache: true
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ports
           key: ports-${{matrix.runs-on}}-${{hashFiles('ext/re2/extconf.rb')}}
@@ -49,8 +49,8 @@ jobs:
   cruby-package:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
         with:
           path: ports/archives
           key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
@@ -59,11 +59,11 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
       - run: ./scripts/test-gem-build gems ruby
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: cruby-gem
           path: gems
-          retention-days: 1
+          retention-days: 7
 
   cruby-linux-install:
     needs: ["cruby-package"]
@@ -73,11 +73,11 @@ jobs:
         ruby: ["2.7", "3.0", "3.1", "3.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-gem
           path: gems
@@ -92,11 +92,11 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-gem
           path: gems
@@ -111,11 +111,11 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-gem
           path: gems
@@ -131,11 +131,11 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
          ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-gem
           path: gems
@@ -159,8 +159,8 @@ jobs:
           - "x86_64-linux"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
         with:
           path: ports/archives
           key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
@@ -174,7 +174,7 @@ jobs:
         with:
           name: "cruby-${{matrix.plat}}-gem"
           path: gems
-          retention-days: 1
+          retention-days: 7
 
   cruby-x86_64-linux-install:
     needs: ["cruby-native-package"]
@@ -184,11 +184,11 @@ jobs:
         ruby: ["2.7", "3.0", "3.1", "3.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-x86_64-linux-gem
           path: gems
@@ -202,8 +202,8 @@ jobs:
         ruby: ["2.7", "3.0", "3.1", "3.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-x86-linux-gem
           path: gems
@@ -222,8 +222,8 @@ jobs:
         ruby: ["2.7", "3.0", "3.1", "3.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-aarch64-linux-gem
           path: gems
@@ -242,8 +242,8 @@ jobs:
         ruby: ["2.7", "3.0", "3.1", "3.2"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-arm-linux-gem
           path: gems
@@ -264,8 +264,8 @@ jobs:
     container:
       image: "ruby:${{matrix.ruby}}-alpine"
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-x86_64-linux-gem
           path: gems
@@ -280,11 +280,11 @@ jobs:
         ruby: ["2.7", "3.0", "3.1", "3.2"]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-x86_64-darwin-gem
           path: gems
@@ -302,11 +302,11 @@ jobs:
         ruby: ["2.7", "3.0"]
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-x64-mingw32-gem
           path: gems
@@ -321,11 +321,11 @@ jobs:
         ruby: ["3.1", "3.2"]
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: MSP-Greg/setup-ruby-pkgs@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: cruby-x64-mingw-ucrt-gem
           path: gems
