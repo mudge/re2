@@ -1,12 +1,20 @@
 name: re2 Tests
+concurrency:
+  group: "${{github.workflow}}-${{github.ref}}"
+  cancel-in-progress: true
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+      - v*.*.x
+    tags:
+      - v*.*.*
   pull_request:
+
 jobs:
-  test:
-    name: Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
+  compile-and-test-system-dependencies:
+    name: System Dependencies - Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -50,36 +58,310 @@ jobs:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
       - run: bundle exec rake compile -- --enable-system-libraries
-      - run: bundle exec rake
+      - run: bundle exec rake spec
 
-  vendor:
-    name: Ruby ${{ matrix.ruby }} - vendored libre2 and abseil
-    runs-on: ubuntu-20.04
+  compile-and-test-vendored-dependencies:
+    name: Vendored Dependencies - Ruby ${{ matrix.ruby }} - ${{ matrix.runs-on }}
     strategy:
+      fail-fast: false
       matrix:
-        ruby:
-          - '3.2'
-          - '3.1'
-          - '3.0'
-          - '2.7'
+        runs-on: ["ubuntu-latest", "macos-latest"]
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+        include:
+          - ruby: "2.7"
+            runs-on: "windows-2019"
+          - ruby: "3.0"
+            runs-on: "windows-2019"
+          - ruby: "3.1"
+            runs-on: "windows-2022"
+          - ruby: "3.2"
+            runs-on: "windows-2022"
+    runs-on: ${{matrix.runs-on}}
     steps:
       - uses: actions/checkout@v3
-      - name: Install build dependencies
-        run: |
-          sudo apt-get install -y build-essential cmake
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "${{ matrix.ruby }}"
+          ruby-version: ${{matrix.ruby}}
           bundler-cache: true
-      - name: Configure Bundler for Ruby dependencies
-        run: bundle config --local path vendor/bundle
-      - name: Generate Gemfile.lock
-        run: bundle lock
-      - name: Cache Ruby dependencies
-        uses: actions/cache@v3
+      - uses: actions/cache@v3
         with:
-          path: vendor/bundle
-          key: gems-v1-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('Gemfile.lock') }}
-      - run: bundle install --jobs 4
-      - run: bundle exec rake compile -- --disable-system-libraries
-      - run: bundle exec rake
+          path: ports
+          key: ports-${{matrix.runs-on}}-${{hashFiles('ext/re2/extconf.rb')}}
+      - run: bundle exec rake compile spec
+
+  build-cruby-gem:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: ports/archives
+          key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+      - run: ./scripts/test-gem-build gems ruby
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+
+  test-cruby-gem-linux:
+    needs: ["build-cruby-gem"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+
+  test-cruby-gem-macos:
+    needs: ["build-cruby-gem"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+
+  test-cruby-gem-windows:
+    needs: ["build-cruby-gem"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0"]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+        shell: bash
+
+  test-cruby-gem-windows-ucrt:
+    needs: ["build-cruby-gem"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.1", "3.2"]
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+         ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+        shell: bash
+
+  build-precompiled-gems:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - "aarch64-linux"
+          - "arm-linux"
+          - "arm64-darwin" # github actions does not support this runtime as of 2022-12, but let's build anyway
+          - "x64-mingw-ucrt"
+          - "x64-mingw32"
+          - "x86-linux"
+          - "x86-mingw32" # github actions does not support this runtime as of 2022-12, but let's build anyway
+          - "x86_64-darwin"
+          - "x86_64-linux"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: ports/archives
+          key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
+      - run: |
+          docker run --rm -v "$(pwd):/re2" -w /re2 \
+            "ghcr.io/rake-compiler/rake-compiler-dock-image:1.3.0-mri-${{matrix.platform}}" \
+            ./scripts/test-gem-build gems ${{matrix.platform}}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: "cruby-${{matrix.platform}}-gem"
+          path: gems
+
+  test-precompiled-aarch64-linux:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-aarch64-linux-gem
+          path: gems
+      - name: Enable execution of multi-architecture containers by QEMU
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - run: |
+          docker run --rm -v "$(pwd):/re2" -w /re2 \
+            --platform=linux/arm64/v8 \
+            ruby:${{matrix.ruby}} \
+            ./scripts/test-gem-install ./gems
+
+  test-precompiled-arm-linux:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-arm-linux-gem
+          path: gems
+      - name: enable execution of multi-architecture containers by qemu
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - run: |
+          docker run --rm -v "$(pwd):/re2" -w /re2 \
+            --platform=linux/arm/v7 \
+            ruby:${{matrix.ruby}} \
+            ./scripts/test-gem-install ./gems
+
+  test-precompiled-x64-mingw-ucrt:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.1", "3.2"]
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v3
+      - uses: MSP-Greg/setup-ruby-pkgs@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-x64-mingw-ucrt-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+        shell: bash
+
+  test-precompiled-x64-mingw32:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0"]
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-x64-mingw32-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+        shell: bash
+
+  test-precompiled-x86-linux:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-x86-linux-gem
+          path: gems
+      - name: Enable execution of multi-architecture containers by QEMU
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - run: |
+          docker run --rm -v "$(pwd):/re2" -w /re2 \
+            --platform=linux/386 \
+            ruby:${{matrix.ruby}} \
+            ./scripts/test-gem-install ./gems
+
+  test-precompiled-linux-x86_64:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-x86_64-linux-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+
+  test-precompiled-x86_64-darwin:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-x86_64-darwin-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+
+  test-precompiled-x86_64-linux:
+    needs: ["build-precompiled-gems"]
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+    runs-on: ubuntu-latest
+    container:
+      image: "ruby:${{matrix.ruby}}-alpine"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-x86_64-linux-gem
+          path: gems
+      - run: apk add bash libstdc++ gcompat
+      - run: ./scripts/test-gem-install gems
