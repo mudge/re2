@@ -5,10 +5,7 @@
 # Released under the BSD Licence, please see LICENSE.txt
 
 require 'mkmf'
-
-PACKAGE_ROOT_DIR = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
-
-REQUIRED_MINI_PORTILE_VERSION = "~> 2.8.4" # keep this version in sync with the one in the gemspec
+require_relative 'recipes'
 
 RE2_HELP_MESSAGE = <<~HELP
   USAGE: ruby #{$0} [options]
@@ -212,62 +209,46 @@ SRC
   end
 end
 
-def process_recipe(name, version)
-  require "rubygems"
-  gem("mini_portile2", REQUIRED_MINI_PORTILE_VERSION) # gemspec is not respected at install time
-  require "mini_portile2"
-  message("Using mini_portile version #{MiniPortile::VERSION}\n")
-
+def process_recipe(recipe)
   cross_build_p = config_cross_build?
   message "Cross build is #{cross_build_p ? "enabled" : "disabled"}.\n"
 
-  MiniPortileCMake.new(name, version).tap do |recipe|
-    recipe.host = target_host
-    target_dir = File.join(PACKAGE_ROOT_DIR, "ports")
-    # Ensure x64-mingw-ucrt and x64-mingw32 use different library paths since the host
-    # is the same (x86_64-w64-mingw32).
-    target_dir = File.join(target_dir, target_arch) if cross_build_p
-    recipe.target = target_dir
+  recipe.host = target_host
+  # Ensure x64-mingw-ucrt and x64-mingw32 use different library paths since the host
+  # is the same (x86_64-w64-mingw32).
+  recipe.target = File.join(recipe.target, target_arch) if cross_build_p
 
-    recipe.configure_options += [
-      # abseil needs a C++14 compiler
-      '-DCMAKE_CXX_STANDARD=17',
-      # needed for building the C extension shared library with -fPIC
-      '-DCMAKE_POSITION_INDEPENDENT_CODE=ON',
-      # ensures pkg-config and installed libraries will be in lib, not lib64
-      '-DCMAKE_INSTALL_LIBDIR=lib'
-    ]
+  yield recipe
 
-    yield recipe
+  checkpoint = "#{recipe.target}/#{recipe.name}-#{recipe.version}-#{recipe.host}.installed"
+  name = recipe.name
+  version = recipe.version
 
-    checkpoint = "#{recipe.target}/#{recipe.name}-#{recipe.version}-#{recipe.host}.installed"
-
-    if File.exist?(checkpoint)
-      message("Building re2 with a packaged version of #{name}-#{version}.\n")
-    else
-      message(<<~EOM)
+  if File.exist?(checkpoint)
+    message("Building re2 with a packaged version of #{name}-#{version}.\n")
+  else
+    message(<<~EOM)
         ---------- IMPORTANT NOTICE ----------
         Building re2 with a packaged version of #{name}-#{version}.
         Configuration options: #{recipe.configure_options.shelljoin}
       EOM
 
-      unless recipe.patch_files.empty?
-        message("The following patches are being applied:\n")
+    unless recipe.patch_files.empty?
+      message("The following patches are being applied:\n")
 
-        recipe.patch_files.each do |patch|
-          message("  - %s\n" % File.basename(patch))
-        end
+      recipe.patch_files.each do |patch|
+        message("  - %s\n" % File.basename(patch))
       end
-
-      # Use a temporary base directory to reduce filename lengths since
-      # Windows can hit a limit of 250 characters (CMAKE_OBJECT_PATH_MAX).
-      with_temp_dir { recipe.cook }
-
-      FileUtils.touch(checkpoint)
     end
 
-    recipe.activate
+    # Use a temporary base directory to reduce filename lengths since
+    # Windows can hit a limit of 250 characters (CMAKE_OBJECT_PATH_MAX).
+    with_temp_dir { recipe.cook }
+
+    FileUtils.touch(checkpoint)
   end
+
+  recipe.activate
 end
 
 def build_with_system_libraries
@@ -359,23 +340,15 @@ end
 def build_with_vendored_libraries
   message "Building re2 using packaged libraries.\n"
 
-  require 'yaml'
-  dependencies = YAML.load_file(File.join(PACKAGE_ROOT_DIR, 'dependencies.yml'))
+  abseil_recipe, re2_recipe = load_recipes
 
-  abseil_recipe = process_recipe('abseil', dependencies['abseil']['version']) do |recipe|
-    recipe.files = [{
-      url: "https://github.com/abseil/abseil-cpp/archive/refs/tags/#{recipe.version}.tar.gz",
-      sha256: dependencies['abseil']['sha256']
-    }]
+  process_recipe(abseil_recipe) do |recipe|
     recipe.configure_options += ['-DABSL_PROPAGATE_CXX_STD=ON', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
   end
 
-  re2_recipe = process_recipe('libre2', dependencies['libre2']['version']) do |recipe|
-    recipe.files = [{
-      url: "https://github.com/google/re2/releases/download/#{recipe.version}/re2-#{recipe.version}.tar.gz",
-      sha256: dependencies['libre2']['sha256']
-    }]
-    recipe.configure_options += ["-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}", '-DCMAKE_CXX_FLAGS=-DNDEBUG', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
+  process_recipe(re2_recipe) do |recipe|
+    recipe.configure_options += ["-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}", '-DCMAKE_CXX_FLAGS=-DNDEBUG',
+                                 '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
   end
 
   dir_config("re2", File.join(re2_recipe.path, 'include'), File.join(re2_recipe.path, 'lib'))
