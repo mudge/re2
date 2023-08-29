@@ -5,6 +5,8 @@ require 'rspec/core/rake_task'
 require 'rake_compiler_dock'
 require 'yaml'
 
+require_relative 'ext/re2/recipes'
+
 CLEAN.include FileList['**/*{.o,.so,.dylib,.bundle}'],
               FileList['**/extconf.h'],
               FileList['**/Makefile'],
@@ -17,6 +19,14 @@ CLOBBER.include FileList['**/tmp'],
 CLOBBER.add("ports/*").exclude(%r{ports/archives$})
 
 RE2_GEM_SPEC = Gem::Specification.load('re2.gemspec')
+
+task :prepare do
+  puts "Preparing project for gem building..."
+  recipes = load_recipes
+  recipes.each { |recipe| recipe.download }
+end
+
+task gem: :prepare
 
 Gem::PackageTask.new(RE2_GEM_SPEC) do |p|
   p.need_zip = false

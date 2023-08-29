@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
     "dependencies.yml",
     "ext/re2/extconf.rb",
     "ext/re2/re2.cc",
+    "ext/re2/recipes.rb",
     "Gemfile",
     "lib/re2.rb",
     "lib/re2/scanner.rb",
