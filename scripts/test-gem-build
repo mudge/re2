@@ -20,8 +20,7 @@ bundle install --local || bundle install
 bundle exec rake set-version-to-timestamp
 
 if [[ "${BUILD_NATIVE_GEM}" == "ruby" ]] ; then
-  # TODO we're only compiling so that we retrieve tarballs, we can do better.
-  bundle exec rake clean compile
+  bundle exec rake clean
   bundle exec rake gem
 else
   bundle exec rake gem:${BUILD_NATIVE_GEM}:builder
