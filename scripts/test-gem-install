@@ -26,7 +26,15 @@ if [ -n "${BUNDLE_APP_CONFIG:-}" ] ; then
   export BUNDLE_CACHE_PATH="${BUNDLE_APP_CONFIG}/cache"
 fi
 
-cd $(dirname `gem which re2`)
-cd ..
 bundle install --local || bundle install
+
+# Use the cached vendored gems directory if available.
+# This is easier than trying to retrieve the value of `bundle config get path`.
+cached_gems="$(pwd)/vendor/bundle"
+if [ -d "$cached_gems" ]; then
+  export BUNDLE_PATH=$cached_gems
+fi
+
+cd "$(dirname "$(gem which re2)")"
+cd ..
 bundle exec rake spec
