@@ -26,8 +26,7 @@ if [ -n "${BUNDLE_APP_CONFIG:-}" ] ; then
   export BUNDLE_CACHE_PATH="${BUNDLE_APP_CONFIG}/cache"
 fi
 
-bundle install --local || bundle install
-
 cd $(dirname `gem which re2`)
 cd ..
-rake spec
+bundle install --local || bundle install
+bundle exec rake spec
