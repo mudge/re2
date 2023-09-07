@@ -19,10 +19,6 @@ set -x
 
 bundle install --local || bundle install
 
-if [[ "${REF_TYPE}}" != "tag" ]]; then
-  bundle exec rake set-version-to-timestamp
-fi
-
 if [[ "${BUILD_NATIVE_GEM}" == "ruby" ]] ; then
   bundle exec rake clean
   bundle exec rake gem
