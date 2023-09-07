@@ -11,13 +11,17 @@ set -e -u
 
 OUTPUT_DIR=$1
 BUILD_NATIVE_GEM=$2
+REF_TYPE=$3
 
 test -e /etc/os-release && cat /etc/os-release
 
 set -x
 
 bundle install --local || bundle install
-bundle exec rake set-version-to-timestamp
+
+if [[ "${REF_TYPE}}" != "tag" ]]; then
+  bundle exec rake set-version-to-timestamp
+fi
 
 if [[ "${BUILD_NATIVE_GEM}" == "ruby" ]] ; then
   # TODO we're only compiling so that we retrieve tarballs, we can do better.
