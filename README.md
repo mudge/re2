@@ -4,17 +4,22 @@ re2 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/ba
 A Ruby binding to [re2][], an "efficient, principled regular expression
 library".
 
-**Current version:** 1.7.0  
-**Supported Ruby versions:** 1.8.7, 1.9.3, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0, 3.1, 3.2  
+**Current version:** 2.0.0.beta1  
+**Supported Ruby versions:** 2.7, 3.0, 3.1, 3.2  
+**Bundled re2 version:** libre2.11 (2023-07-01)  
 **Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01), libre2.10 (2022-12-01), libre2.11 (2023-07-01)
 
 Installation
 ------------
 
-You will need [re2][] installed as well as a C++ compiler such as [gcc][] (on
-Debian and Ubuntu, this is provided by the [build-essential][] package). If
-you are using Mac OS X, I recommend installing re2 with [Homebrew][] by
-running the following:
+The gem comes bundled with a version of [re2][] and will compile itself (and
+any dependencies) on install. As compilation can take a while, precompiled
+native gems are available for Linux, Windows and macOS.
+
+If you wish to opt out of using the bundled libraries, you will need re2
+installed as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this
+is provided by the [build-essential][] package). If you are using Mac OS X, I
+recommend installing re2 with [Homebrew][] by running the following:
 
     $ brew install re2
 
@@ -22,15 +27,17 @@ If you are using Debian, you can install the [libre2-dev][] package like so:
 
     $ sudo apt-get install libre2-dev
 
-Recent versions of re2 require a compiler with C++14 support such as [clang](http://clang.llvm.org/) 3.4 or [gcc](https://gcc.gnu.org/) 5.
+Recent versions of re2 require a compiler with C++14 support such as
+[clang](http://clang.llvm.org/) 3.4 or [gcc](https://gcc.gnu.org/) 5.
 
 If you are using a packaged Ruby distribution, make sure you also have the
 Ruby header files installed such as those provided by the [ruby-dev][] package
 on Debian and Ubuntu.
 
-You can then install the library via RubyGems with `gem install re2` or `gem
-install re2 -- --with-re2-dir=/path/to/re2/prefix` if re2 is not installed in
-any of the following default locations:
+You can then install the library via RubyGems with `gem install re2 --
+--enable-system-libraries` or `gem install re2 -- --enable-system-libraries
+--with-re2-dir=/path/to/re2/prefix` if re2 is not installed in any of the
+following default locations:
 
 * `/usr/local`
 * `/opt/homebrew`
@@ -214,7 +221,7 @@ Contributions
 * Thanks to [Jason Woods](https://github.com/driskell) who contributed the
   original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`;
 * Thanks to [Stefano Rivera](https://github.com/stefanor) who first contributed C++11 support;
-* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan` and for contributing support for libre2.11 (2023-07-01);
+* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan`, contributing support for libre2.11 (2023-07-01) and for vendoring re2 and abseil and compiling native gems in 2.0;
 * Thanks to [Sebastian Reitenbach](https://github.com/buzzdeee) for reporting
   the deprecation and removal of the `utf8` encoding option in re2;
 * Thanks to [Sergio Medina](https://github.com/serch) for reporting a bug when
