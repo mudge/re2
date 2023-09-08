@@ -117,7 +117,7 @@ if ENV["CXX"]
   RbConfig::CONFIG["CXX"] = ENV["CXX"]
 end
 
-def build_extension
+def build_extension(static_p = false)
   $CFLAGS << " -Wall -Wextra -funroll-loops"
 
   # Pass -x c++ to force gcc to compile the test program
@@ -128,7 +128,7 @@ def build_extension
   have_header("stdint.h")
   have_func("rb_str_sublen")
 
-  unless have_library("re2")
+  if !static_p and !have_library("re2")
     abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
   end
 
@@ -326,14 +326,65 @@ ABSL_LDFLAGS = %w[
   -labsl_time_zone
 ].freeze
 
-def add_static_ldflags(flags)
-  static_flags = flags.split
+def libflag_to_filename(ldflag)
+  case ldflag
+  when /\A-l(.+)/
+    "lib#{Regexp.last_match(1)}.#{$LIBEXT}"
+  end
+end
+
+# This method does a number of things to ensure the final shared library
+# is compiled statically with the vendored libraries:
+#
+# 1. For -L<path> flags, ensure that any `ports` paths are prioritized just
+#    in case there are installed libraries that might take precedence.
+# 2. For -l<lib> flags, convert the library to the static library with a
+#    full path and substitute the absolute static library.  For example,
+#    -lre2 maps to /path/to/ports/<arch>/libre2/<version>/lib/libre2.a.
+#
+# This is needed because when building the extension, Ruby appears to
+# insert `-L#{RbConfig::CONFIG['exec_prefix']}/lib` first. If libre2 is
+# in installed in that location then the extension will link against the
+# system library instead of the vendored library.
+def add_flag(arg, lib_paths)
+  case arg
+  when /\A-L(.+)\z/
+    # Prioritize ports' directories
+    lib_dir = Regexp.last_match(1)
+    $LIBPATH =
+      if lib_dir.start_with?(PACKAGE_ROOT_DIR + "/")
+        [lib_dir] | $LIBPATH
+      else
+        $LIBPATH | [lib_dir]
+      end
+  when /\A-l./
+    filename = libflag_to_filename(arg)
+
+    added = false
+    lib_paths.each do |path|
+      static_lib = File.join(path, filename)
+
+      next unless File.exist?(static_lib)
+
+      $LDFLAGS << " " << static_lib
+      added = true
+      break
+    end
+
+    append_ldflags(arg.shellescape) unless added
+  else
+    append_ldflags(arg.shellescape)
+  end
+end
+
+def add_static_ldflags(flags, lib_paths)
+  static_flags = flags.strip.shellsplit
 
   if MiniPortile.windows?
-    static_flags.each { |flag| append_ldflags(flag) unless ABSL_LDFLAGS.include?(flag) }
-    ABSL_LDFLAGS.each { |flag| append_ldflags(flag) }
+    static_flags.each { |flag| add_flag(flag, lib_paths) unless ABSL_LDFLAGS.include?(flag) }
+    ABSL_LDFLAGS.each { |flag| add_flag(flag, lib_paths) }
   else
-    static_flags.each { |flag| append_ldflags(flag) }
+    static_flags.each { |flag| add_flag(flag, lib_paths) }
   end
 end
 
@@ -371,8 +422,9 @@ def build_with_vendored_libraries
 
   raise 'Unable to run pkg-config --libs --static' unless $?.success?
 
-  add_static_ldflags(flags)
-  build_extension
+  lib_paths = [File.join(abseil_recipe.path, 'lib'), File.join(re2_recipe.path, 'lib')]
+  add_static_ldflags(flags, lib_paths)
+  build_extension(true)
 end
 
 if config_system_libraries?
