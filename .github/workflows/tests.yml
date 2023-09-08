@@ -15,10 +15,11 @@ on:
 jobs:
   compile-and-test-system-dependencies:
     needs: ["build-cruby-gem"]
-    name: System Dependencies - Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
+    name: System Dependencies - ${{ matrix.sys }} vendored libs - Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
+        sys: ["enable", "disable"]
         ruby:
           - '3.2'
           - '3.1'
@@ -62,7 +63,9 @@ jobs:
         with:
           name: cruby-gem
           path: gems
-      - run: ./scripts/test-gem-install gems --enable-system-libraries
+      - name: "Link libre2 into Ruby's exec_prefix"
+        run: ln -s /usr/lib/libre2.so `ruby -e "puts RbConfig::CONFIG['exec_prefix']"`/lib/libre2.so
+      - run: ./scripts/test-gem-install gems --${{matrix.sys}}-system-libraries
 
   compile-and-test-vendored-dependencies:
     name: Vendored Dependencies - Ruby ${{ matrix.ruby }} - ${{ matrix.runs-on }}
