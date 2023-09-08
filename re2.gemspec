@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.summary = "Ruby bindings to re2."
   s.description = 'Ruby bindings to re2, "an efficient, principled regular expression library".'
   s.version = RE2::VERSION
-  s.authors = ["Paul Mucur"]
+  s.authors = ["Paul Mucur", "Stan Hu"]
   s.homepage = "https://github.com/mudge/re2"
   s.extensions = ["ext/re2/extconf.rb"]
   s.license = "BSD-3-Clause"

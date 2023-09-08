@@ -5,6 +5,23 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.0.0.beta1] - 2023-09-08
+### Added
+- The gem now comes bundled with the underlying re2 library and its dependency,
+  abseil. Installing the gem will compile those dependencies automatically. As
+  this can take a while, precompiled native gems are available for Linux,
+  Windows and macOS. (Thanks to Stan Hu for contributing this.)
+
+### Changed
+- By default, the gem will use its own bundled version of re2 rather than
+  looking for the library on the system. To opt back into that behaviour, pass
+  `--enable-system-libraries` when installing. (Thanks to Stan Hu for
+  contributing this.)
+
+### Removed
+- Due to the new dependency on MiniPortile2, the gem no longer supports Ruby
+  versions older than 2.7.
+
 ## [1.7.0] - 2023-07-04
 ### Added
 - Added support for libre2.11 (thanks to Stan Hu for contributing this)
@@ -82,6 +99,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.0.0.beta1]: https://github.com/mudge/re2/releases/tag/v2.0.0.beta1
 [1.7.0]: https://github.com/mudge/re2/releases/tag/v1.7.0
 [1.6.0]: https://github.com/mudge/re2/releases/tag/v1.6.0
 [1.5.0]: https://github.com/mudge/re2/releases/tag/v1.5.0
