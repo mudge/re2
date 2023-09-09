@@ -16,6 +16,17 @@ The gem comes bundled with a version of [re2][] and will compile itself (and
 any dependencies) on install. As compilation can take a while, precompiled
 native gems are available for Linux, Windows and macOS.
 
+In v2.0 and later, precompiled native gems are available for Ruby 2.7 to 3.2
+on these platforms:
+
+- `aarch64-linux` (requires: glibc >= 2.29)
+- `arm-linux` (requires: glibc >= 2.29)
+- `arm64-darwin`
+- `x64-mingw32` / `x64-mingw-ucrt`
+- `x86-linux` (requires: glibc >= 2.17)
+- `x86_64-darwin`
+- `x86_64-linux` (requires: glibc >= 2.17)
+
 If you wish to opt out of using the bundled libraries, you will need re2
 installed as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this
 is provided by the [build-essential][] package). If you are using Mac OS X, I
