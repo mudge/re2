@@ -398,6 +398,8 @@ def build_with_vendored_libraries
 
   process_recipe(abseil_recipe) do |recipe|
     recipe.configure_options += ['-DABSL_PROPAGATE_CXX_STD=ON', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
+    # Workaround for https://github.com/abseil/abseil-cpp/issues/1510
+    recipe.configure_options += ['-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4'] if windows?
   end
 
   process_recipe(re2_recipe) do |recipe|
