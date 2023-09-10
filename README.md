@@ -62,6 +62,13 @@ If you're using Bundler, you can use the
 [`force_ruby_platform`](https://bundler.io/v2.3/man/gemfile.5.html#FORCE_RUBY_PLATFORM)
 option in your Gemfile.
 
+Windows users attempting to compile [abseil] must use pkgconf 2.1.0 or
+later, or builds will fail with [`undefined reference` errors](https://github.com/pkgconf/pkgconf/issues/322):
+
+    pacman -Sy mingw64/mingw-w64-x86_64-pkgconf
+
+This is not needed when using the precompiled gem or building against a system RE2 library.
+
 Documentation
 -------------
 
