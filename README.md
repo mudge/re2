@@ -45,14 +45,18 @@ If you are using a packaged Ruby distribution, make sure you also have the
 Ruby header files installed such as those provided by the [ruby-dev][] package
 on Debian and Ubuntu.
 
-You can then install the library via RubyGems with `gem install re2 --
---enable-system-libraries` or `gem install re2 -- --enable-system-libraries
+You can then install the library via RubyGems with `gem install re2 --platform=ruby --
+--enable-system-libraries` or `gem install re2 --platform=ruby -- --enable-system-libraries
 --with-re2-dir=/path/to/re2/prefix` if re2 is not installed in any of the
 following default locations:
 
 * `/usr/local`
 * `/opt/homebrew`
 * `/usr`
+
+If you're using Bundler, you can use the
+[`force_ruby_platform`](https://bundler.io/v2.3/man/gemfile.5.html#FORCE_RUBY_PLATFORM)
+option in your Gemfile.
 
 Documentation
 -------------
