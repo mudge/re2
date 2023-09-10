@@ -129,27 +129,4 @@ task gem_build_path do
   add_vendored_libraries
 end
 
-desc "Temporarily set VERSION to a unique timestamp"
-task "set-version-to-timestamp" do
-  # this task is used by bin/test-gem-build
-  # to test building, packaging, and installing a precompiled gem
-  version_constant_re = /^\s*VERSION\s*=\s*["'](.*)["']$/
-
-  version_file_path = File.join(__dir__, "lib/re2/version.rb")
-  version_file_contents = File.read(version_file_path)
-
-  current_version_string = version_constant_re.match(version_file_contents)[1]
-  current_version = Gem::Version.new(current_version_string)
-
-  fake_version = Gem::Version.new(format("%s.test.%s", current_version.bump, Time.now.strftime("%Y.%m%d.%H%M")))
-
-  unless version_file_contents.gsub!(version_constant_re, "    VERSION = \"#{fake_version}\"")
-    raise("Could not hack the VERSION constant")
-  end
-
-  File.open(version_file_path, "w") { |f| f.write(version_file_contents) }
-
-  puts "NOTE: wrote version as \"#{fake_version}\""
-end
-
 task default: [:compile, :spec]
