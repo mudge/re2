@@ -296,17 +296,18 @@ ABSL_LDFLAGS = %w[
   -labsl_crc32c
   -labsl_crc_internal
   -labsl_crc_cpu_detect
+  -labsl_raw_hash_set
   -labsl_hash
   -labsl_city
   -labsl_bad_variant_access
   -labsl_low_level_hash
-  -labsl_raw_hash_set
   -labsl_hashtablez_sampler
   -labsl_exponential_biased
   -labsl_bad_optional_access
   -labsl_str_format_internal
   -labsl_synchronization
   -labsl_graphcycles_internal
+  -labsl_kernel_timeout_internal
   -labsl_stacktrace
   -labsl_symbolize
   -ldbghelp
@@ -316,9 +317,10 @@ ABSL_LDFLAGS = %w[
   -labsl_time
   -labsl_civil_time
   -labsl_strings
+  -labsl_string_view
   -labsl_strings_internal
-  -ladvapi32
   -labsl_base
+  -ladvapi32
   -labsl_spinlock_wait
   -labsl_int128
   -labsl_throw_delegate
