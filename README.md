@@ -6,7 +6,7 @@ library".
 
 **Current version:** 2.0.0.beta1  
 **Supported Ruby versions:** 2.7, 3.0, 3.1, 3.2  
-**Bundled re2 version:** libre2.11 (2023-07-01)  
+**Bundled re2 version:** libre2.11 (2023-09-01)  
 **Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01), libre2.10 (2022-12-01), libre2.11 (2023-07-01)
 
 Installation
