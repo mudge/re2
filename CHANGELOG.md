@@ -5,6 +5,20 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.0.0.beta2] - 2023-09-10
+### Added
+- Restored support for Ruby 2.6.
+
+### Changed
+- Upgraded the vendored version of RE2 to 2023-09-01.
+
+### Fixed
+- When using the Ruby platform gem (skipping the precompiled, native gems) and
+  opting out of the vendored dependencies in favour of a system install of
+  RE2 with `--enable-system-libraries`, the gem will now compile correctly
+  against the library if it is installed in Ruby's `exec_prefix` directory.
+  (Thanks to Stan Hu.)
+
 ## [2.0.0.beta1] - 2023-09-08
 ### Added
 - The gem now comes bundled with the underlying re2 library and its dependency,
@@ -99,6 +113,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.0.0.beta2]: https://github.com/mudge/re2/releases/tag/v2.0.0.beta2
 [2.0.0.beta1]: https://github.com/mudge/re2/releases/tag/v2.0.0.beta1
 [1.7.0]: https://github.com/mudge/re2/releases/tag/v1.7.0
 [1.6.0]: https://github.com/mudge/re2/releases/tag/v1.6.0
