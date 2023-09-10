@@ -118,7 +118,9 @@ if ENV["CXX"]
 end
 
 def build_extension(static_p = false)
+  # Enable optional warnings but disable deprecated register warning for Ruby 2.6 support
   $CFLAGS << " -Wall -Wextra -funroll-loops"
+  $CPPFLAGS << " -Wno-register"
 
   # Pass -x c++ to force gcc to compile the test program
   # as C++ (as it will end in .c by default).
