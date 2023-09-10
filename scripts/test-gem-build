@@ -23,6 +23,7 @@ if [[ "${BUILD_NATIVE_GEM}" == "ruby" ]] ; then
   bundle exec rake clean
   bundle exec rake gem
 else
+  export MACOSX_DEPLOYMENT_TARGET=10.14
   bundle exec rake gem:${BUILD_NATIVE_GEM}:builder
 fi
 

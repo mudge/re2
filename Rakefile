@@ -84,6 +84,7 @@ namespace 'gem' do
     task platform do
       RakeCompilerDock.sh <<~SCRIPT, platform: platform, verbose: true
         gem install bundler --no-document &&
+        export MACOSX_DEPLOYMENT_TARGET=10.14 &&
         bundle &&
         bundle exec rake gem:#{platform}:builder CMAKE=#{cmake}
       SCRIPT
