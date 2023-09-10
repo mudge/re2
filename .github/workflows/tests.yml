@@ -144,6 +144,8 @@ jobs:
         with:
           name: cruby-gem
           path: gems
+      - name: Show pkg-config version
+        run: pkg-config --version
       - run: ./scripts/test-gem-install gems
         shell: bash
 
