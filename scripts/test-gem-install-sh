@@ -1,0 +1,9 @@
+#! /usr/bin/env sh
+#
+#  run as part of CI
+#
+if [ -f /etc/alpine-release ]; then
+    apk add bash gcompat
+fi
+
+./scripts/test-gem-install $@

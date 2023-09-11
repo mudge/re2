@@ -242,8 +242,8 @@ jobs:
       - run: |
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/arm64/v8 \
-            ruby:${{matrix.ruby}} \
-            ./scripts/test-gem-install ./gems
+            ruby:${{matrix.ruby}}-alpine \
+            ./scripts/test-gem-install-sh ./gems
 
   test-precompiled-arm-linux:
     needs: ["build-precompiled-gems"]
@@ -263,8 +263,8 @@ jobs:
       - run: |
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/arm/v7 \
-            ruby:${{matrix.ruby}} \
-            ./scripts/test-gem-install ./gems
+            ruby:${{matrix.ruby}}-alpine \
+            ./scripts/test-gem-install-sh ./gems
 
   test-precompiled-x64-mingw-ucrt:
     needs: ["build-precompiled-gems"]
