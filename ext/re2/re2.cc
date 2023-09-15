@@ -39,17 +39,8 @@ using std::vector;
       rb_enc_associate_index(_string, _enc); \
       _string; \
     })
-  #define ENCODED_STR_NEW2(str, length, str2) \
-    ({ \
-      VALUE _string = rb_str_new(str, length); \
-      int _enc = rb_enc_get_index(str2); \
-      rb_enc_associate_index(_string, _enc); \
-      _string; \
-    })
 #else
   #define ENCODED_STR_NEW(str, length, encoding) \
-    rb_str_new((const char *)str, (long)length)
-  #define ENCODED_STR_NEW2(str, length, str2) \
     rb_str_new((const char *)str, (long)length)
 #endif
 
@@ -284,6 +275,10 @@ static VALUE re2_scanner_rewind(VALUE self) {
  * Scan the given text incrementally for matches, returning an array of
  * matches on each subsequent call. Returns nil if no matches are found.
  *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ *
  * @return [Array<String>] the matches.
  * @example
  *   s = RE2::Regexp.new('(\w+)').scan("Foo bar baz")
@@ -503,6 +498,10 @@ static VALUE re2_regexp_allocate(VALUE klass) {
 /*
  * Returns the array of matches.
  *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ *
  * @return [Array<String, nil>] the array of matches
  * @example
  *   m = RE2::Regexp.new('(\d+)').match("bob 123")
@@ -577,6 +576,10 @@ static VALUE re2_matchdata_named_match(const char* name, VALUE self) {
 
 /*
  * Retrieve zero, one or more matches by index or name.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
  *
  * @return [Array<String, nil>, String, Boolean]
  *
@@ -689,6 +692,10 @@ static VALUE re2_matchdata_inspect(VALUE self) {
 /*
  * Returns the array of submatches for pattern matching.
  *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ *
  * @return [Array<String, nil>] the array of submatches
  * @example
  *   m = RE2::Regexp.new('(\d+)').match("bob 123")
@@ -733,6 +740,10 @@ static VALUE re2_matchdata_deconstruct(VALUE self) {
  * As this is used by Ruby's pattern matching, it will return an empty hash if given
  * more keys than there are capturing groups. Given keys will populate the hash in
  * order but an invalid name will cause the hash to be immediately returned.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
  *
  * @return [Hash] a hash of capturing group names to submatches
  * @param [Array<Symbol>, nil] keys an array of Symbol capturing group names or nil to return all names
@@ -1389,6 +1400,10 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
  * Returns a copy of +str+ with the first occurrence +pattern+
  * replaced with +rewrite+.
  *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ *
  * @param [String] str the string to modify
  * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
  * @param [String] rewrite the string to replace with
@@ -1419,14 +1434,18 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
     RE2::Replace(&str_as_string, StringValuePtr(pattern),
         StringValuePtr(rewrite));
 
-    return ENCODED_STR_NEW2(str_as_string.data(), str_as_string.size(),
-        pattern);
+    return ENCODED_STR_NEW(str_as_string.data(), str_as_string.size(),
+        "UTF-8");
   }
 
 }
 
 /*
  * Return a copy of +str+ with +pattern+ replaced by +rewrite+.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
  *
  * @param [String] str the string to modify
  * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
@@ -1458,8 +1477,8 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
     RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern),
                        StringValuePtr(rewrite));
 
-    return ENCODED_STR_NEW2(str_as_string.data(), str_as_string.size(),
-        pattern);
+    return ENCODED_STR_NEW(str_as_string.data(), str_as_string.size(),
+        "UTF-8");
   }
 }
 

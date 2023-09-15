@@ -44,23 +44,23 @@ RSpec.describe RE2 do
     end
 
     it "returns UTF-8 strings if the pattern is UTF-8" do
-      original = "Foo".encode("Shift_JIS")
+      original = "Foo".encode("ISO-8859-1")
       replacement = RE2.Replace(original, "oo", "ah")
 
       expect(replacement.encoding).to eq(Encoding::UTF_8)
     end
 
     it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
-      original = "Foo".encode("Shift_JIS")
+      original = "Foo"
       replacement = RE2.Replace(original, RE2("oo", :utf8 => false), "ah")
 
       expect(replacement.encoding).to eq(Encoding::ISO_8859_1)
     end
 
-    it "returns strings in the encoding of the given String pattern" do
-      replacement = RE2.Replace("Foo", "oo".encode("Shift_JIS"), "ah")
+    it "returns UTF-8 strings when given a String pattern" do
+      replacement = RE2.Replace("Foo", "oo".encode("ISO-8859-1"), "ah")
 
-      expect(replacement.encoding).to eq(Encoding::Shift_JIS)
+      expect(replacement.encoding).to eq(Encoding::UTF_8)
     end
 
     it "raises a Type Error for input that can't be converted to String" do
@@ -121,23 +121,23 @@ RSpec.describe RE2 do
     end
 
     it "returns UTF-8 strings if the pattern is UTF-8" do
-      original = "Foo".encode("Shift_JIS")
+      original = "Foo".encode("ISO-8859-1")
       replacement = RE2.GlobalReplace(original, "oo", "ah")
 
       expect(replacement.encoding).to eq(Encoding::UTF_8)
     end
 
     it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
-      original = "Foo".encode("Shift_JIS")
+      original = "Foo"
       replacement = RE2.GlobalReplace(original, RE2("oo", :utf8 => false), "ah")
 
       expect(replacement.encoding).to eq(Encoding::ISO_8859_1)
     end
 
-    it "returns strings in the encoding of the given String pattern" do
-      replacement = RE2.GlobalReplace("Foo", "oo".encode("Shift_JIS"), "ah")
+    it "returns UTF-8 strings when given a String pattern" do
+      replacement = RE2.GlobalReplace("Foo", "oo".encode("ISO-8859-1"), "ah")
 
-      expect(replacement.encoding).to eq(Encoding::Shift_JIS)
+      expect(replacement.encoding).to eq(Encoding::UTF_8)
     end
 
     it "raises a Type Error for input that can't be converted to String" do
