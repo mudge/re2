@@ -1,18 +1,19 @@
 re2 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 ===
 
-A Ruby binding to [re2][], an "efficient, principled regular expression
-library".
+Ruby bindings to [RE2][], a "fast, safe, thread-friendly alternative to
+backtracking regular expression engines like those used in PCRE, Perl, and
+Python".
 
 **Current version:** 2.0.0  
 **Supported Ruby versions:** 2.6, 2.7, 3.0, 3.1, 3.2  
-**Bundled re2 version:** libre2.11 (2023-09-01)  
-**Supported re2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01), libre2.10 (2022-12-01), libre2.11 (2023-07-01)
+**Bundled RE2 version:** libre2.11 (2023-09-01)  
+**Supported RE2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01), libre2.10 (2022-12-01), libre2.11 (2023-07-01)
 
 Installation
 ------------
 
-The gem comes bundled with a version of [re2][] and will compile itself (and
+The gem comes bundled with a version of [RE2][] and will compile itself (and
 any dependencies) on install. As compilation can take a while, precompiled
 native gems are available for Linux, Windows and macOS.
 
@@ -27,10 +28,10 @@ on these platforms:
 - `x86_64-darwin`
 - `x86_64-linux` (requires: glibc >= 2.17)
 
-If you wish to opt out of using the bundled libraries, you will need re2
+If you wish to opt out of using the bundled libraries, you will need RE2
 installed as well as a C++ compiler such as [gcc][] (on Debian and Ubuntu, this
-is provided by the [build-essential][] package). If you are using Mac OS X, I
-recommend installing re2 with [Homebrew][] by running the following:
+is provided by the [build-essential][] package). If you are using macOS, I
+recommend installing RE2 with [Homebrew][] by running the following:
 
     $ brew install re2
 
@@ -38,7 +39,7 @@ If you are using Debian, you can install the [libre2-dev][] package like so:
 
     $ sudo apt-get install libre2-dev
 
-Recent versions of re2 require a compiler with C++14 support such as
+Recent versions of RE2 require a compiler with C++14 support such as
 [clang](http://clang.llvm.org/) 3.4 or [gcc](https://gcc.gnu.org/) 5.
 
 If you are using a packaged Ruby distribution, make sure you also have the
@@ -47,7 +48,7 @@ on Debian and Ubuntu.
 
 You can then install the library via RubyGems with `gem install re2 --platform=ruby --
 --enable-system-libraries` or `gem install re2 --platform=ruby -- --enable-system-libraries
---with-re2-dir=/path/to/re2/prefix` if re2 is not installed in any of the
+--with-re2-dir=/path/to/re2/prefix` if RE2 is not installed in any of the
 following default locations:
 
 * `/usr/local`
@@ -66,7 +67,7 @@ Documentation
 Full documentation automatically generated from the latest version is
 available at <http://mudge.name/re2/>.
 
-Note that re2's regular expression syntax differs from PCRE and Ruby's
+Note that RE2's regular expression syntax differs from PCRE and Ruby's
 built-in [`Regexp`][Regexp] library, see the [official syntax page][] for more
 details.
 
@@ -192,6 +193,24 @@ end
 # My name is Alice and I am 42 years old
 ```
 
+Encoding
+--------
+
+Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+`RE2::Regexp` is set to false (any other encoding's behaviour is undefined).
+
+For backward compatibility: re2 won't automatically convert string inputs to
+the right encoding so this is the responsibility of the caller, e.g.
+
+```ruby
+# By default, RE2 will process patterns and text as UTF-8
+RE2(non_utf8_pattern.encode("UTF-8")).match(non_utf8_text.encode("UTF-8"))
+
+# If the :utf8 option is false, RE2 will process patterns and text as ISO-8859-1
+RE2(non_latin1_pattern.encode("ISO-8859-1"), :utf8 => false).match(non_latin1_text.encode("ISO-8859-1"))
+```
+
 Features
 --------
 
@@ -238,9 +257,9 @@ Contributions
 * Thanks to [Jason Woods](https://github.com/driskell) who contributed the
   original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`;
 * Thanks to [Stefano Rivera](https://github.com/stefanor) who first contributed C++11 support;
-* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan`, contributing support for libre2.11 (2023-07-01) and for vendoring re2 and abseil and compiling native gems in 2.0;
+* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan`, contributing support for libre2.11 (2023-07-01) and for vendoring RE2 and abseil and compiling native gems in 2.0;
 * Thanks to [Sebastian Reitenbach](https://github.com/buzzdeee) for reporting
-  the deprecation and removal of the `utf8` encoding option in re2;
+  the deprecation and removal of the `utf8` encoding option in RE2;
 * Thanks to [Sergio Medina](https://github.com/serch) for reporting a bug when
   using `RE2::Scanner#scan` with an invalid regular expression;
 * Thanks to [Pritam Baral](https://github.com/pritambaral) for contributed the
@@ -251,7 +270,7 @@ Contact
 
 All issues and suggestions should go to [GitHub Issues](https://github.com/mudge/re2/issues).
 
-  [re2]: https://github.com/google/re2
+  [RE2]: https://github.com/google/re2
   [gcc]: http://gcc.gnu.org/
   [ruby-dev]: http://packages.debian.org/ruby-dev
   [build-essential]: http://packages.debian.org/build-essential

@@ -2,8 +2,8 @@ require_relative 'lib/re2/version'
 
 Gem::Specification.new do |s|
   s.name = "re2"
-  s.summary = "Ruby bindings to re2."
-  s.description = 'Ruby bindings to re2, "an efficient, principled regular expression library".'
+  s.summary = "Ruby bindings to RE2."
+  s.description = 'Ruby bindings to RE2, "a fast, safe, thread-friendly alternative to backtracking regular expression engines like those used in PCRE, Perl, and Python".'
   s.version = RE2::VERSION
   s.authors = ["Paul Mucur", "Stan Hu"]
   s.homepage = "https://github.com/mudge/re2"
@@ -36,8 +36,8 @@ Gem::Specification.new do |s|
     "spec/re2/set_spec.rb",
     "spec/re2/scanner_spec.rb"
   ]
-  s.add_development_dependency "rake-compiler", "~> 1.2.1"
-  s.add_development_dependency "rake-compiler-dock", "~> 1.3.0"
+  s.add_development_dependency("rake-compiler", "~> 1.2.1")
+  s.add_development_dependency("rake-compiler-dock", "~> 1.3.0")
   s.add_development_dependency("rspec", "~> 3.2")
   s.add_runtime_dependency("mini_portile2", "~> 2.8.4") # keep version in sync with extconf.rb
 end
