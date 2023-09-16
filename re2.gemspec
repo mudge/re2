@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
     "lib/re2/string.rb",
     "lib/re2/version.rb",
     "LICENSE.txt",
+    "LICENSE-DEPENDENCIES.txt",
     "README.md",
     "Rakefile",
     "re2.gemspec"

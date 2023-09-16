@@ -270,6 +270,18 @@ Contact
 
 All issues and suggestions should go to [GitHub Issues](https://github.com/mudge/re2/issues).
 
+License
+-------
+
+This library is licensed under the BSD 3-Clause License, see `LICENSE.txt`.
+
+Dependencies
+------------
+
+The source code of [RE2][] is distributed in the `ruby` platform gem. This code is licensed under the BSD 3-Clause License, see `LICENSE-DEPENDENCIES.txt`.
+
+The source code of [Abseil][] is distributed in the `ruby` platform gem. This code is licensed under the Apache License 2.0, see `LICENSE-DEPENDENCIES.txt`.
+
   [RE2]: https://github.com/google/re2
   [gcc]: http://gcc.gnu.org/
   [ruby-dev]: http://packages.debian.org/ruby-dev
@@ -279,4 +291,4 @@ All issues and suggestions should go to [GitHub Issues](https://github.com/mudge
   [Homebrew]: http://mxcl.github.com/homebrew
   [libre2-dev]: http://packages.debian.org/search?keywords=libre2-dev
   [official syntax page]: https://github.com/google/re2/wiki/Syntax
-
+  [Abseil]: https://abseil.io
