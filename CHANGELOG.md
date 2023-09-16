@@ -5,6 +5,23 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.1.0] - 2023-09-16
+### Fixed
+- As RE2 only supports UTF-8 and ISO-8859-1 encodings, fix an inconsistency
+  when using string patterns with `RE2.Replace` and `RE2.GlobalReplace` where
+  the result would match the encoding of the pattern rather than UTF-8 which is
+  what RE2 will use. This behaviour and limitation is now documented on all
+  APIs that produce string results.
+
+### Added
+- The `RE2::Set` API now accepts anything that can be coerced to a string where
+  previously only strings were permitted, e.g. `RE2::Set#add`,
+  `RE2::Set#match`.
+- Added the licences of all vendored dependencies: RE2 and Abseil.
+- Document the behaviour of `RE2::Regexp#match` when given a pattern with no
+  capturing groups: it will return true or false whether there was a match or
+  not rather than a `RE2::MatchData` instance.
+
 ## [2.0.0] - 2023-09-13
 ### Added
 - The gem now comes bundled with the underlying RE2 library and its dependency,
@@ -130,6 +147,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.1.0]: https://github.com/mudge/re2/releases/tag/v2.1.0
 [2.0.0]: https://github.com/mudge/re2/releases/tag/v2.0.0
 [2.0.0.beta2]: https://github.com/mudge/re2/releases/tag/v2.0.0.beta2
 [2.0.0.beta1]: https://github.com/mudge/re2/releases/tag/v2.0.0.beta1
