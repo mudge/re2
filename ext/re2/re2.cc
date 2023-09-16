@@ -1252,16 +1252,23 @@ static VALUE re2_regexp_named_capturing_groups(VALUE self) {
  * @return [Boolean, RE2::MatchData]
  *
  * @overload match(text)
- *   Returns an {RE2::MatchData} containing the matching
- *   pattern and all subpatterns resulting from looking for
- *   the regexp in +text+.
+ *   Returns an {RE2::MatchData} containing the matching pattern and all
+ *   subpatterns resulting from looking for the regexp in +text+ if the pattern
+ *   contains capturing groups.
+ *
+ *   Returns either true or false indicating whether a successful match was
+ *   made if the pattern contains no capturing groups.
  *
  *   @param [String] text the text to search
- *   @return [RE2::MatchData] the matches
+ *   @return [RE2::MatchData] if the pattern contains capturing groups
+ *   @return [Boolean] if the pattern does not contain capturing groups
  *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
- *   @example
+ *   @example Matching with capturing groups
  *     r = RE2::Regexp.new('w(o)(o)')
  *     r.match('woo')    #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
+ *   @example Matching without capturing groups
+ *     r = RE2::Regexp.new('woo')
+ *     r.match('woo')    #=> true
  *
  * @overload match(text, 0)
  *   Returns either true or false indicating whether a

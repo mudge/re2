@@ -287,6 +287,12 @@ RSpec.describe RE2::Regexp do
       expect(re.match("My age is 99", 0)).to eq(false)
     end
 
+    it "returns only true or false if the pattern has no capturing groups" do
+      re = RE2::Regexp.new('My name is')
+
+      expect(re.match('My name is Robert Paulson')).to eq(true)
+    end
+
     it "raises an exception when given nil" do
       expect { re.match(nil) }.to raise_error(TypeError)
     end
