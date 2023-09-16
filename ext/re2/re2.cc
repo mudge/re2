@@ -648,6 +648,10 @@ static VALUE re2_matchdata_to_s(VALUE self) {
 /*
  * Returns a printable version of the match.
  *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ *
  * @return [String] a printable version of the match
  * @example
  *   m = RE2::Regexp.new('(\d+)').match("bob 123")
@@ -876,6 +880,10 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 /*
  * Returns a printable version of the regular expression +re2+.
  *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ *
  * @return [String] a printable version of the regular expression
  * @example
  *   re2 = RE2::Regexp.new("woo?")
@@ -898,6 +906,10 @@ static VALUE re2_regexp_inspect(VALUE self) {
 
 /*
  * Returns a string version of the regular expression +re2+.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
  *
  * @return [String] a string version of the regular expression
  * @example
@@ -1126,6 +1138,10 @@ static VALUE re2_regexp_error(VALUE self) {
  * If the RE2 could not be created properly, returns
  * the offending portion of the regexp otherwise returns nil.
  *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ *
  * @return [String, nil] the offending portion of the regexp or nil
  */
 static VALUE re2_regexp_error_arg(VALUE self) {
@@ -1221,6 +1237,10 @@ static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
 
 /*
  * Returns a hash of names to capturing indices of groups.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
+ * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
  *
  * @return [Hash] a hash of names to capturing indices
  */
