@@ -6,7 +6,7 @@
 <title>
   Module: RE2
   
-    &mdash; RE2: Ruby bindings to re2
+    &mdash; RE2: Ruby bindings to RE2
   
 </title>
 
@@ -109,7 +109,7 @@
         <dt id="VERSION-constant" class="">VERSION =
           
         </dt>
-        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2.0.0</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2.1.0</span><span class='tstring_end'>&quot;</span></span></pre></dd>
       
     </dl>
   
@@ -223,6 +223,8 @@
     
 <p>Return a copy of <code>str</code> with <code>pattern</code> replaced by <code>rewrite</code>.</p>
 
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
+
 
   </div>
 </div>
@@ -315,38 +317,42 @@
       <pre class="lines">
 
 
-1439
-1440
-1441
-1442
-1443
-1444
-1445
-1446
-1447
-1448
-1449
-1450
-1451
-1452
-1453
-1454
-1455
-1456
-1457
-1458
-1459
-1460
-1461</pre>
+1486
+1487
+1488
+1489
+1490
+1491
+1492
+1493
+1494
+1495
+1496
+1497
+1498
+1499
+1500
+1501
+1502
+1503
+1504
+1505
+1506
+1507
+1508
+1509
+1510</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1439</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1486</span>
 
 static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
                                VALUE rewrite) {
   UNUSED(self);
 
-  /* Convert all the inputs to be pumped into RE2::GlobalReplace. */
+  /* Take a copy of str so it can be modified in-place by
+   * RE2::GlobalReplace.
+   */
   re2_pattern *p;
   string str_as_string(StringValuePtr(str));
 
@@ -361,8 +367,8 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
     RE2::GlobalReplace(&amp;str_as_string, StringValuePtr(pattern),
                        StringValuePtr(rewrite));
 
-    return ENCODED_STR_NEW2(str_as_string.data(), str_as_string.size(),
-        pattern);
+    return ENCODED_STR_NEW(str_as_string.data(), str_as_string.size(),
+        &quot;UTF-8&quot;);
   }
 }</pre>
     </td>
@@ -442,14 +448,14 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
       <pre class="lines">
 
 
-1473
-1474
-1475
-1476
-1477</pre>
+1522
+1523
+1524
+1525
+1526</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1473</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1522</span>
 
 static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   UNUSED(self);
@@ -474,6 +480,8 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   <div class="discussion">
     
 <p>Returns a copy of <code>str</code> with the first occurrence <code>pattern</code> replaced with <code>rewrite</code>.</p>
+
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
 
 
   </div>
@@ -567,40 +575,44 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
       <pre class="lines">
 
 
-1402
-1403
-1404
-1405
-1406
-1407
-1408
-1409
-1410
-1411
-1412
-1413
-1414
-1415
-1416
-1417
-1418
-1419
-1420
-1421
-1422
-1423
-1424
-1425</pre>
+1443
+1444
+1445
+1446
+1447
+1448
+1449
+1450
+1451
+1452
+1453
+1454
+1455
+1456
+1457
+1458
+1459
+1460
+1461
+1462
+1463
+1464
+1465
+1466
+1467
+1468</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1402</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1443</span>
 
 static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
     VALUE rewrite) {
   UNUSED(self);
   re2_pattern *p;
 
-  /* Convert all the inputs to be pumped into RE2::Replace. */
+  /* Take a copy of str so it can be modified in-place by
+   * RE2::Replace.
+   */
   string str_as_string(StringValuePtr(str));
 
   /* Do the replacement. */
@@ -614,8 +626,8 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
     RE2::Replace(&amp;str_as_string, StringValuePtr(pattern),
         StringValuePtr(rewrite));
 
-    return ENCODED_STR_NEW2(str_as_string.data(), str_as_string.size(),
-        pattern);
+    return ENCODED_STR_NEW(str_as_string.data(), str_as_string.size(),
+        &quot;UTF-8&quot;);
   }
 
 }</pre>
@@ -629,7 +641,7 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
 </div>
 
       <div id="footer">
-  Generated on Wed Sep 13 18:35:57 2023 by
+  Generated on Sat Sep 16 13:53:22 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

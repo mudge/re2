@@ -6,7 +6,7 @@
 <title>
   Class: RE2::MatchData
   
-    &mdash; RE2: Ruby bindings to re2
+    &mdash; RE2: Ruby bindings to RE2
   
 </title>
 
@@ -433,6 +433,8 @@
     
 <p>Retrieve zero, one or more matches by index or name.</p>
 
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
+
 
   </div>
 </div>
@@ -736,8 +738,6 @@
       <pre class="lines">
 
 
-622
-623
 624
 625
 626
@@ -749,10 +749,12 @@
 632
 633
 634
-635</pre>
+635
+636
+637</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 622</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 624</span>
 
 static VALUE re2_matchdata_aref(int argc, VALUE *argv, VALUE self) {
   VALUE idx, rest;
@@ -847,6 +849,12 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, VALUE self) {
       <pre class="lines">
 
 
+413
+414
+415
+416
+417
+418
 419
 420
 421
@@ -859,16 +867,10 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, VALUE self) {
 428
 429
 430
-431
-432
-433
-434
-435
-436
-437</pre>
+431</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 419</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 413</span>
 
 static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
   re2_matchdata *m;
@@ -907,6 +909,8 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
   <div class="discussion">
     
 <p>Returns the array of submatches for pattern matching.</p>
+
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
 
 
   </div>
@@ -959,16 +963,6 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
       <pre class="lines">
 
 
-706
-707
-708
-709
-710
-711
-712
-713
-714
-715
 716
 717
 718
@@ -982,10 +976,20 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
 726
 727
 728
-729</pre>
+729
+730
+731
+732
+733
+734
+735
+736
+737
+738
+739</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 706</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 716</span>
 
 static VALUE re2_matchdata_deconstruct(VALUE self) {
   int i;
@@ -1031,6 +1035,8 @@ static VALUE re2_matchdata_deconstruct(VALUE self) {
 <p>Returns a hash of capturing group names to submatches for pattern matching.</p>
 
 <p>As this is used by Ruby’s pattern matching, it will return an empty hash if given more keys than there are capturing groups. Given keys will populate the hash in order but an invalid name will cause the hash to be immediately returned.</p>
+
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
 
 
   </div>
@@ -1106,20 +1112,6 @@ static VALUE re2_matchdata_deconstruct(VALUE self) {
       <pre class="lines">
 
 
-755
-756
-757
-758
-759
-760
-761
-762
-763
-764
-765
-766
-767
-768
 769
 770
 771
@@ -1145,10 +1137,24 @@ static VALUE re2_matchdata_deconstruct(VALUE self) {
 791
 792
 793
-794</pre>
+794
+795
+796
+797
+798
+799
+800
+801
+802
+803
+804
+805
+806
+807
+808</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 755</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 769</span>
 
 static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
   int i;
@@ -1269,6 +1275,12 @@ static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
       <pre class="lines">
 
 
+443
+444
+445
+446
+447
+448
 449
 450
 451
@@ -1282,16 +1294,10 @@ static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
 459
 460
 461
-462
-463
-464
-465
-466
-467
-468</pre>
+462</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 449</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 443</span>
 
 static VALUE re2_matchdata_end(VALUE self, VALUE n) {
   re2_matchdata *m;
@@ -1332,6 +1338,8 @@ static VALUE re2_matchdata_end(VALUE self, VALUE n) {
     
 <p>Returns a printable version of the match.</p>
 
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
+
 
   </div>
 </div>
@@ -1371,12 +1379,6 @@ static VALUE re2_matchdata_end(VALUE self, VALUE n) {
       <pre class="lines">
 
 
-654
-655
-656
-657
-658
-659
 660
 661
 662
@@ -1405,10 +1407,16 @@ static VALUE re2_matchdata_end(VALUE self, VALUE n) {
 685
 686
 687
-688</pre>
+688
+689
+690
+691
+692
+693
+694</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 654</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 660</span>
 
 static VALUE re2_matchdata_inspect(VALUE self) {
   int i;
@@ -1504,15 +1512,15 @@ static VALUE re2_matchdata_inspect(VALUE self) {
       <pre class="lines">
 
 
-402
-403
-404
-405
-406
-407</pre>
+396
+397
+398
+399
+400
+401</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 402</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 396</span>
 
 static VALUE re2_matchdata_size(VALUE self) {
   re2_matchdata *m;
@@ -1578,14 +1586,14 @@ static VALUE re2_matchdata_size(VALUE self) {
       <pre class="lines">
 
 
-478
-479
-480
-481
-482</pre>
+472
+473
+474
+475
+476</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 478</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 472</span>
 
 static VALUE re2_matchdata_regexp(VALUE self) {
   re2_matchdata *m;
@@ -1651,15 +1659,15 @@ static VALUE re2_matchdata_regexp(VALUE self) {
       <pre class="lines">
 
 
-402
-403
-404
-405
-406
-407</pre>
+396
+397
+398
+399
+400
+401</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 402</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 396</span>
 
 static VALUE re2_matchdata_size(VALUE self) {
   re2_matchdata *m;
@@ -1725,15 +1733,15 @@ static VALUE re2_matchdata_size(VALUE self) {
       <pre class="lines">
 
 
-225
-226
-227
-228
-229
-230</pre>
+216
+217
+218
+219
+220
+221</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 225</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 216</span>
 
 static VALUE re2_matchdata_string(VALUE self) {
   re2_matchdata *m;
@@ -1759,6 +1767,8 @@ static VALUE re2_matchdata_string(VALUE self) {
   <div class="discussion">
     
 <p>Returns the array of matches.</p>
+
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
 
 
   </div>
@@ -1799,6 +1809,8 @@ static VALUE re2_matchdata_string(VALUE self) {
       <pre class="lines">
 
 
+510
+511
 512
 513
 514
@@ -1820,12 +1832,10 @@ static VALUE re2_matchdata_string(VALUE self) {
 530
 531
 532
-533
-534
-535</pre>
+533</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 512</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 510</span>
 
 static VALUE re2_matchdata_to_a(VALUE self) {
   int i;
@@ -1900,12 +1910,12 @@ static VALUE re2_matchdata_to_a(VALUE self) {
       <pre class="lines">
 
 
-642
-643
-644</pre>
+644
+645
+646</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 642</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 644</span>
 
 <span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_matchdata_to_s'>re2_matchdata_to_s</span><span class='lparen'>(</span><span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_re2_matchdata_nth_match'>re2_matchdata_nth_match</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rparen'>)</span><span class='semicolon'>;</span>
@@ -1920,7 +1930,7 @@ static VALUE re2_matchdata_to_a(VALUE self) {
 </div>
 
       <div id="footer">
-  Generated on Wed Sep 13 18:35:57 2023 by
+  Generated on Sat Sep 16 13:53:22 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

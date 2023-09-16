@@ -6,7 +6,7 @@
 <title>
   Class: RE2::Scanner
   
-    &mdash; RE2: Ruby bindings to re2
+    &mdash; RE2: Ruby bindings to RE2
   
 </title>
 
@@ -368,15 +368,15 @@
       <pre class="lines">
 
 
-255
-256
-257
-258
-259
-260</pre>
+246
+247
+248
+249
+250
+251</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 255</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 246</span>
 
 static VALUE re2_scanner_eof(VALUE self) {
   re2_scanner *c;
@@ -442,15 +442,15 @@ static VALUE re2_scanner_eof(VALUE self) {
       <pre class="lines">
 
 
-492
-493
-494
-495
-496
-497</pre>
+486
+487
+488
+489
+490
+491</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 492</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 486</span>
 
 static VALUE re2_scanner_regexp(VALUE self) {
   re2_scanner *c;
@@ -502,18 +502,18 @@ static VALUE re2_scanner_regexp(VALUE self) {
       <pre class="lines">
 
 
-273
-274
-275
-276
-277
-278
-279
-280
-281</pre>
+264
+265
+266
+267
+268
+269
+270
+271
+272</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 273</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 264</span>
 
 static VALUE re2_scanner_rewind(VALUE self) {
   re2_scanner *c;
@@ -542,6 +542,8 @@ static VALUE re2_scanner_rewind(VALUE self) {
   <div class="discussion">
     
 <p>Scan the given text incrementally for matches, returning an array of matches on each subsequent call. Returns nil if no matches are found.</p>
+
+<p>Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the RE2::Regexp is set to false (any other encoding’s behaviour is undefined).</p>
 
 
   </div>
@@ -583,6 +585,11 @@ static VALUE re2_scanner_rewind(VALUE self) {
       <pre class="lines">
 
 
+288
+289
+290
+291
+292
 293
 294
 295
@@ -632,16 +639,10 @@ static VALUE re2_scanner_rewind(VALUE self) {
 339
 340
 341
-342
-343
-344
-345
-346
-347
-348</pre>
+342</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 293</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 288</span>
 
 static VALUE re2_scanner_scan(VALUE self) {
   int i;
@@ -665,7 +666,6 @@ static VALUE re2_scanner_scan(VALUE self) {
   original_input_size = c-&gt;input-&gt;size();
 
   for (i = 0; i &lt; c-&gt;number_of_capturing_groups; i++) {
-    matches[i] = &quot;&quot;;
     argv[i] = &amp;matches[i];
     args[i] = &amp;argv[i];
   }
@@ -757,15 +757,15 @@ static VALUE re2_scanner_scan(VALUE self) {
       <pre class="lines">
 
 
-240
-241
-242
-243
-244
-245</pre>
+231
+232
+233
+234
+235
+236</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 240</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 231</span>
 
 static VALUE re2_scanner_string(VALUE self) {
   re2_scanner *c;
@@ -783,7 +783,7 @@ static VALUE re2_scanner_string(VALUE self) {
 </div>
 
       <div id="footer">
-  Generated on Wed Sep 13 18:35:57 2023 by
+  Generated on Sat Sep 16 13:53:22 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
