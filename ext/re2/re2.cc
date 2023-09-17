@@ -65,7 +65,7 @@ static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
           id_perl_classes, id_word_boundary, id_one_line,
           id_unanchored, id_anchor_start, id_anchor_both, id_exception;
 
-void parse_re2_options(RE2::Options& re2_options, VALUE options) {
+static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
   if (TYPE(options) != T_HASH) {
     rb_raise(rb_eArgError, "options should be a hash");
   }
@@ -75,57 +75,57 @@ void parse_re2_options(RE2::Options& re2_options, VALUE options) {
 
   utf8 = rb_hash_aref(options, ID2SYM(id_utf8));
   if (!NIL_P(utf8)) {
-    re2_options.set_encoding(RTEST(utf8) ? RE2::Options::EncodingUTF8 : RE2::Options::EncodingLatin1);
+    re2_options->set_encoding(RTEST(utf8) ? RE2::Options::EncodingUTF8 : RE2::Options::EncodingLatin1);
   }
 
   posix_syntax = rb_hash_aref(options, ID2SYM(id_posix_syntax));
   if (!NIL_P(posix_syntax)) {
-    re2_options.set_posix_syntax(RTEST(posix_syntax));
+    re2_options->set_posix_syntax(RTEST(posix_syntax));
   }
 
   longest_match = rb_hash_aref(options, ID2SYM(id_longest_match));
   if (!NIL_P(longest_match)) {
-    re2_options.set_longest_match(RTEST(longest_match));
+    re2_options->set_longest_match(RTEST(longest_match));
   }
 
   log_errors = rb_hash_aref(options, ID2SYM(id_log_errors));
   if (!NIL_P(log_errors)) {
-    re2_options.set_log_errors(RTEST(log_errors));
+    re2_options->set_log_errors(RTEST(log_errors));
   }
 
   max_mem = rb_hash_aref(options, ID2SYM(id_max_mem));
   if (!NIL_P(max_mem)) {
-    re2_options.set_max_mem(NUM2INT(max_mem));
+    re2_options->set_max_mem(NUM2INT(max_mem));
   }
 
   literal = rb_hash_aref(options, ID2SYM(id_literal));
   if (!NIL_P(literal)) {
-    re2_options.set_literal(RTEST(literal));
+    re2_options->set_literal(RTEST(literal));
   }
 
   never_nl = rb_hash_aref(options, ID2SYM(id_never_nl));
   if (!NIL_P(never_nl)) {
-    re2_options.set_never_nl(RTEST(never_nl));
+    re2_options->set_never_nl(RTEST(never_nl));
   }
 
   case_sensitive = rb_hash_aref(options, ID2SYM(id_case_sensitive));
   if (!NIL_P(case_sensitive)) {
-    re2_options.set_case_sensitive(RTEST(case_sensitive));
+    re2_options->set_case_sensitive(RTEST(case_sensitive));
   }
 
   perl_classes = rb_hash_aref(options, ID2SYM(id_perl_classes));
   if (!NIL_P(perl_classes)) {
-    re2_options.set_perl_classes(RTEST(perl_classes));
+    re2_options->set_perl_classes(RTEST(perl_classes));
   }
 
   word_boundary = rb_hash_aref(options, ID2SYM(id_word_boundary));
   if (!NIL_P(word_boundary)) {
-    re2_options.set_word_boundary(RTEST(word_boundary));
+    re2_options->set_word_boundary(RTEST(word_boundary));
   }
 
   one_line = rb_hash_aref(options, ID2SYM(id_one_line));
   if (!NIL_P(one_line)) {
-    re2_options.set_one_line(RTEST(one_line));
+    re2_options->set_one_line(RTEST(one_line));
   }
 }
 
@@ -824,7 +824,7 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 
   if (RTEST(options)) {
     RE2::Options re2_options;
-    parse_re2_options(re2_options, options);
+    parse_re2_options(&re2_options, options);
 
     p->pattern = new(std::nothrow) RE2(StringValuePtr(pattern), re2_options);
   } else {
@@ -1548,7 +1548,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
   Data_Get_Struct(self, re2_set, s);
 
   if (RTEST(options)) {
-    parse_re2_options(re2_options, options);
+    parse_re2_options(&re2_options, options);
   }
   if (NIL_P(anchor)) {
     re2_anchor = RE2::UNANCHORED;
