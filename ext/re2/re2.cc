@@ -7,6 +7,7 @@
  */
 
 #include <ruby.h>
+#include <ruby/encoding.h>
 #include <re2/re2.h>
 #include <re2/set.h>
 #include <stdint.h>
@@ -18,43 +19,13 @@
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
 #define UNUSED(x) ((void)x)
 
-#ifndef RSTRING_LEN
-  #define RSTRING_LEN(x) (RSTRING(x)->len)
-#endif
-
-#ifndef RSTRING_PTR
-  #define RSTRING_PTR(x) (RSTRING(x)->ptr)
-#endif
-
-#ifdef HAVE_RUBY_ENCODING_H
-  #include <ruby/encoding.h>
-  #define ENCODED_STR_NEW(str, length, encoding) \
-    ({ \
-      VALUE _string = rb_str_new(str, length); \
-      int _enc = rb_enc_find_index(encoding); \
-      rb_enc_associate_index(_string, _enc); \
-      _string; \
-    })
-#else
-  #define ENCODED_STR_NEW(str, length, encoding) \
-    rb_str_new((const char *)str, (long)length)
-#endif
-
-#ifdef HAVE_RB_STR_SUBLEN
-  #define ENCODED_STR_SUBLEN(str, offset, encoding) \
-     LONG2NUM(rb_str_sublen(str, offset))
-#else
-  #ifdef HAVE_RUBY_ENCODING_H
-    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
-      ({ \
-        VALUE _string = ENCODED_STR_NEW(RSTRING_PTR(str), offset, encoding); \
-        rb_str_length(_string); \
-      })
-  #else
-    #define ENCODED_STR_SUBLEN(str, offset, encoding) \
-      LONG2NUM(offset)
-  #endif
-#endif
+#define ENCODED_STR_NEW(str, length, encoding) \
+  ({ \
+    VALUE _string = rb_str_new(str, length); \
+    int _enc = rb_enc_find_index(encoding); \
+    rb_enc_associate_index(_string, _enc); \
+    _string; \
+  })
 
 #ifdef HAVE_ENDPOS_ARGUMENT
   #define match(pattern, text, startpos, endpos, anchor, match, nmatch) \
@@ -420,8 +391,7 @@ static VALUE re2_matchdata_begin(VALUE self, VALUE n) {
   } else {
     offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text));
 
-    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
-           p->pattern->options().encoding() == RE2::Options::EncodingUTF8 ? "UTF-8" : "ISO-8859-1");
+    return LONG2NUM(rb_str_sublen(StringValue(m->text), offset));
   }
 }
 
@@ -451,8 +421,7 @@ static VALUE re2_matchdata_end(VALUE self, VALUE n) {
   } else {
     offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size();
 
-    return ENCODED_STR_SUBLEN(StringValue(m->text), offset,
-           p->pattern->options().encoding() == RE2::Options::EncodingUTF8 ? "UTF-8" : "ISO-8859-1");
+    return LONG2NUM(rb_str_sublen(StringValue(m->text), offset));
   }
 }
 
