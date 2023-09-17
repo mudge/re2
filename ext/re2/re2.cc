@@ -377,12 +377,10 @@ static VALUE re2_matchdata_size(const VALUE self) {
  */
 static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
   re2_matchdata *m;
-  re2_pattern *p;
   re2::StringPiece *match;
   long offset;
 
   Data_Get_Struct(self, re2_matchdata, m);
-  Data_Get_Struct(m->regexp, re2_pattern, p);
 
   match = re2_matchdata_find_match(n, self);
   if (match == NULL) {
@@ -406,12 +404,10 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
  */
 static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
   re2_matchdata *m;
-  re2_pattern *p;
   re2::StringPiece *match;
   long offset;
 
   Data_Get_Struct(self, re2_matchdata, m);
-  Data_Get_Struct(m->regexp, re2_pattern, p);
 
   match = re2_matchdata_find_match(n, self);
 
