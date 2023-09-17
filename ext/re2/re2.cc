@@ -344,7 +344,6 @@ re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
   int id;
   re2_matchdata *m;
   re2_pattern *p;
-  std::map<std::string, int> groups;
   std::string name;
   re2::StringPiece *match;
 
@@ -360,10 +359,10 @@ re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
       name = StringValuePtr(idx);
     }
 
-    groups = p->pattern->NamedCapturingGroups();
+    const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
 
-    if (groups.count(name) == 1) {
-      id = groups[name];
+    if (std::map<std::string, int>::const_iterator search = groups.find(name); search != groups.end()) {
+      id = search->second;
     } else {
       return NULL;
     }
@@ -554,16 +553,15 @@ static VALUE re2_matchdata_named_match(const char* name, VALUE self) {
   int idx;
   re2_matchdata *m;
   re2_pattern *p;
-  std::map<std::string, int> groups;
   std::string name_as_string(name);
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
-  groups = p->pattern->NamedCapturingGroups();
+  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
 
-  if (groups.count(name_as_string) == 1) {
-    idx = groups[name_as_string];
+  if (std::map<std::string, int>::const_iterator search = groups.find(name_as_string); search != groups.end()) {
+    idx = search->second;
     return re2_matchdata_nth_match(idx, self);
   } else {
     return Qnil;
@@ -767,20 +765,18 @@ static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
   VALUE capturing_groups, key;
   re2_matchdata *m;
   re2_pattern *p;
-  std::map<std::string, int> groups;
-  std::map<std::string, int>::iterator iterator;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
-  groups = p->pattern->NamedCapturingGroups();
+  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
   capturing_groups = rb_hash_new();
 
   if (NIL_P(keys)) {
-    for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
+    for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
       rb_hash_aset(capturing_groups,
-          ID2SYM(rb_intern(iterator->first.data())),
-          re2_matchdata_nth_match(iterator->second, self));
+          ID2SYM(rb_intern(it->first.data())),
+          re2_matchdata_nth_match(it->second, self));
     }
   } else {
     Check_Type(keys, T_ARRAY);
@@ -791,11 +787,11 @@ static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
         Check_Type(key, T_SYMBOL);
         std::string name(rb_id2name(SYM2ID(key)));
 
-        if (groups.count(name) == 0) {
+        if (std::map<std::string, int>::const_iterator search = groups.find(name); search != groups.end()) {
+          rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(search->second, self));
+        } else {
           break;
         }
-
-        rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(groups[name], self));
       }
     }
   }
@@ -1243,18 +1239,16 @@ static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
 static VALUE re2_regexp_named_capturing_groups(VALUE self) {
   VALUE capturing_groups;
   re2_pattern *p;
-  std::map<std::string, int> groups;
-  std::map<std::string, int>::iterator iterator;
 
   Data_Get_Struct(self, re2_pattern, p);
-  groups = p->pattern->NamedCapturingGroups();
+  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
   capturing_groups = rb_hash_new();
 
-  for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
+  for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
     rb_hash_aset(capturing_groups,
-        ENCODED_STR_NEW(iterator->first.data(), iterator->first.size(),
+        ENCODED_STR_NEW(it->first.data(), it->first.size(),
           p->pattern->options().encoding() == RE2::Options::EncodingUTF8 ? "UTF-8" : "ISO-8859-1"),
-        INT2FIX(iterator->second));
+        INT2FIX(it->second));
   }
 
   return capturing_groups;
