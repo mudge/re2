@@ -315,7 +315,6 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
   int id;
   re2_matchdata *m;
   re2_pattern *p;
-  std::string name;
   re2::StringPiece *match;
 
   Data_Get_Struct(self, re2_matchdata, m);
@@ -324,6 +323,8 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
   if (FIXNUM_P(idx)) {
     id = FIX2INT(idx);
   } else {
+    const char *name;
+
     if (SYMBOL_P(idx)) {
       name = rb_id2name(SYM2ID(idx));
     } else {
@@ -522,14 +523,13 @@ static VALUE re2_matchdata_named_match(const char* name, const VALUE self) {
   int idx;
   re2_matchdata *m;
   re2_pattern *p;
-  std::string name_as_string(name);
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
 
-  if (std::map<std::string, int>::const_iterator search = groups.find(name_as_string); search != groups.end()) {
+  if (std::map<std::string, int>::const_iterator search = groups.find(name); search != groups.end()) {
     idx = search->second;
     return re2_matchdata_nth_match(idx, self);
   } else {
@@ -754,7 +754,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
       for (i = 0; i < RARRAY_LEN(keys); i++) {
         key = rb_ary_entry(keys, i);
         Check_Type(key, T_SYMBOL);
-        std::string name(rb_id2name(SYM2ID(key)));
+        const char *name = rb_id2name(SYM2ID(key));
 
         if (std::map<std::string, int>::const_iterator search = groups.find(name); search != groups.end()) {
           rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(search->second, self));
