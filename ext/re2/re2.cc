@@ -13,11 +13,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-using std::string;
-using std::ostringstream;
-using std::nothrow;
-using std::map;
-using std::vector;
+#include <map>
 
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
 #define UNUSED(x) ((void)x)
@@ -265,7 +261,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
   re2_scanner *c;
   Data_Get_Struct(self, re2_scanner, c);
 
-  c->input = new(nothrow) re2::StringPiece(StringValuePtr(c->text));
+  c->input = new(std::nothrow) re2::StringPiece(StringValuePtr(c->text));
   c->eof = false;
 
   return self;
@@ -296,9 +292,9 @@ static VALUE re2_scanner_scan(VALUE self) {
   Data_Get_Struct(self, re2_scanner, c);
   Data_Get_Struct(c->regexp, re2_pattern, p);
 
-  vector<RE2::Arg> argv(c->number_of_capturing_groups);
-  vector<RE2::Arg*> args(c->number_of_capturing_groups);
-  vector<string> matches(c->number_of_capturing_groups);
+  std::vector<RE2::Arg> argv(c->number_of_capturing_groups);
+  std::vector<RE2::Arg*> args(c->number_of_capturing_groups);
+  std::vector<std::string> matches(c->number_of_capturing_groups);
 
   if (c->eof) {
     return Qnil;
@@ -348,8 +344,8 @@ re2::StringPiece *re2_matchdata_find_match(VALUE idx, VALUE self) {
   int id;
   re2_matchdata *m;
   re2_pattern *p;
-  map<string, int> groups;
-  string name;
+  std::map<std::string, int> groups;
+  std::string name;
   re2::StringPiece *match;
 
   Data_Get_Struct(self, re2_matchdata, m);
@@ -558,8 +554,8 @@ static VALUE re2_matchdata_named_match(const char* name, VALUE self) {
   int idx;
   re2_matchdata *m;
   re2_pattern *p;
-  map<string, int> groups;
-  string name_as_string(name);
+  std::map<std::string, int> groups;
+  std::string name_as_string(name);
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
@@ -662,7 +658,7 @@ static VALUE re2_matchdata_inspect(VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
   VALUE match, result;
-  ostringstream output;
+  std::ostringstream output;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
@@ -771,8 +767,8 @@ static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
   VALUE capturing_groups, key;
   re2_matchdata *m;
   re2_pattern *p;
-  map<string, int> groups;
-  map<string, int>::iterator iterator;
+  std::map<std::string, int> groups;
+  std::map<std::string, int>::iterator iterator;
 
   Data_Get_Struct(self, re2_matchdata, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
@@ -793,7 +789,7 @@ static VALUE re2_matchdata_deconstruct_keys(VALUE self, VALUE keys) {
       for (i = 0; i < RARRAY_LEN(keys); i++) {
         key = rb_ary_entry(keys, i);
         Check_Type(key, T_SYMBOL);
-        string name(rb_id2name(SYM2ID(key)));
+        std::string name(rb_id2name(SYM2ID(key)));
 
         if (groups.count(name) == 0) {
           break;
@@ -865,9 +861,9 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
     RE2::Options re2_options;
     parse_re2_options(re2_options, options);
 
-    p->pattern = new(nothrow) RE2(StringValuePtr(pattern), re2_options);
+    p->pattern = new(std::nothrow) RE2(StringValuePtr(pattern), re2_options);
   } else {
-    p->pattern = new(nothrow) RE2(StringValuePtr(pattern));
+    p->pattern = new(std::nothrow) RE2(StringValuePtr(pattern));
   }
 
   if (p->pattern == 0) {
@@ -892,7 +888,7 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 static VALUE re2_regexp_inspect(VALUE self) {
   re2_pattern *p;
   VALUE result;
-  ostringstream output;
+  std::ostringstream output;
 
   Data_Get_Struct(self, re2_pattern, p);
 
@@ -1247,8 +1243,8 @@ static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
 static VALUE re2_regexp_named_capturing_groups(VALUE self) {
   VALUE capturing_groups;
   re2_pattern *p;
-  map<string, int> groups;
-  map<string, int>::iterator iterator;
+  std::map<std::string, int> groups;
+  std::map<std::string, int>::iterator iterator;
 
   Data_Get_Struct(self, re2_pattern, p);
   groups = p->pattern->NamedCapturingGroups();
@@ -1355,7 +1351,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
 
     matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
     Data_Get_Struct(matchdata, re2_matchdata, m);
-    m->matches = new(nothrow) re2::StringPiece[n];
+    m->matches = new(std::nothrow) re2::StringPiece[n];
     m->regexp = self;
     m->text = rb_str_dup(text);
     rb_str_freeze(m->text);
@@ -1408,7 +1404,7 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
   scanner = rb_class_new_instance(0, 0, re2_cScanner);
   Data_Get_Struct(scanner, re2_scanner, c);
 
-  c->input = new(nothrow) re2::StringPiece(StringValuePtr(text));
+  c->input = new(std::nothrow) re2::StringPiece(StringValuePtr(text));
   c->regexp = self;
   c->text = text;
 
@@ -1448,7 +1444,7 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
   /* Take a copy of str so it can be modified in-place by
    * RE2::Replace.
    */
-  string str_as_string(StringValuePtr(str));
+  std::string str_as_string(StringValuePtr(str));
 
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
@@ -1491,7 +1487,7 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
    * RE2::GlobalReplace.
    */
   re2_pattern *p;
-  string str_as_string(StringValuePtr(str));
+  std::string str_as_string(StringValuePtr(str));
 
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
@@ -1521,7 +1517,7 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
  */
 static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   UNUSED(self);
-  string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+  std::string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }
 
@@ -1607,7 +1603,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
     }
   }
 
-  s->set = new(nothrow) RE2::Set(re2_options, re2_anchor);
+  s->set = new(std::nothrow) RE2::Set(re2_options, re2_anchor);
   if (s->set == 0) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2::Set object");
   }
