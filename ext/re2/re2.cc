@@ -253,9 +253,6 @@ static VALUE re2_scanner_rewind(VALUE self) {
  *   s.scan #=> ["bar"]
  */
 static VALUE re2_scanner_scan(VALUE self) {
-  int i;
-  size_t original_input_size, new_input_size;
-  bool input_advanced;
   re2_pattern *p;
   re2_scanner *c;
   VALUE result;
@@ -271,20 +268,21 @@ static VALUE re2_scanner_scan(VALUE self) {
     return Qnil;
   }
 
-  original_input_size = c->input->size();
+  re2::StringPiece::size_type original_input_size = c->input->size();
 
-  for (i = 0; i < c->number_of_capturing_groups; i++) {
+  for (int i = 0; i < c->number_of_capturing_groups; i++) {
     argv[i] = &matches[i];
     args[i] = &argv[i];
   }
 
   if (RE2::FindAndConsumeN(c->input, *p->pattern, &args[0],
         c->number_of_capturing_groups)) {
-    result = rb_ary_new2(c->number_of_capturing_groups);
-    new_input_size = c->input->size();
-    input_advanced = new_input_size < original_input_size;
+    re2::StringPiece::size_type new_input_size = c->input->size();
+    bool input_advanced = new_input_size < original_input_size;
 
-    for (i = 0; i < c->number_of_capturing_groups; i++) {
+    result = rb_ary_new2(c->number_of_capturing_groups);
+
+    for (int i = 0; i < c->number_of_capturing_groups; i++) {
       if (matches[i].empty()) {
         rb_ary_push(result, Qnil);
       } else {
@@ -390,7 +388,7 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text));
+    offset = match->data() - StringValuePtr(m->text);
 
     return LONG2NUM(rb_str_sublen(StringValue(m->text), offset));
   }
@@ -420,7 +418,7 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    offset = reinterpret_cast<uintptr_t>(match->data()) - reinterpret_cast<uintptr_t>(StringValuePtr(m->text)) + match->size();
+    offset = (match->data() - StringValuePtr(m->text)) + match->size();
 
     return LONG2NUM(rb_str_sublen(StringValue(m->text), offset));
   }
@@ -1304,8 +1302,8 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   }
 
   if (n == 0) {
-    matched = match(p->pattern, StringValuePtr(text), 0,
-        static_cast<int>(RSTRING_LEN(text)), RE2::UNANCHORED, 0, 0);
+    matched = match(p->pattern, StringValuePtr(text), 0, RSTRING_LEN(text),
+        RE2::UNANCHORED, 0, 0);
     return BOOL2RUBY(matched);
   } else {
     /* Because match returns the whole match as well. */
@@ -1326,8 +1324,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     m->number_of_matches = n;
 
     matched = match(p->pattern, StringValuePtr(m->text), 0,
-                    static_cast<int>(RSTRING_LEN(m->text)),
-                    RE2::UNANCHORED, m->matches, n);
+        RSTRING_LEN(m->text), RE2::UNANCHORED, m->matches, n);
 
     if (matched) {
       return matchdata;
@@ -1422,7 +1419,6 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
     return ENCODED_STR_NEW(str_as_string.data(), str_as_string.size(),
         "UTF-8");
   }
-
 }
 
 /*
@@ -1713,7 +1709,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
           rb_raise(re2_eSetMatchError, "Unknown RE2::Set::ErrorKind: %d", e.kind);
       }
     } else {
-      for (size_t i = 0; i < v.size(); i++) {
+      for (std::vector<int>::size_type i = 0; i < v.size(); i++) {
         rb_ary_push(result, INT2FIX(v[i]));
       }
     }
@@ -1727,7 +1723,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     VALUE result = rb_ary_new2(v.size());
 
     if (matched) {
-      for (size_t i = 0; i < v.size(); i++) {
+      for (std::vector<int>::size_type i = 0; i < v.size(); i++) {
         rb_ary_push(result, INT2FIX(v[i]));
       }
     }
