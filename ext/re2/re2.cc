@@ -6,15 +6,17 @@
  * Released under the BSD Licence, please see LICENSE.txt
  */
 
-#include <ruby.h>
-#include <ruby/encoding.h>
+#include <stdint.h>
+
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <re2/re2.h>
 #include <re2/set.h>
-#include <stdint.h>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <map>
+#include <ruby.h>
+#include <ruby/encoding.h>
 
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
 #define UNUSED(x) ((void)x)
