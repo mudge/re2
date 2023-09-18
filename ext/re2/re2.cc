@@ -1853,7 +1853,7 @@ void Init_re2(void) {
   rb_define_singleton_method(re2_cRegexp, "compile",
       RUBY_METHOD_FUNC(rb_class_new_instance), -1);
 
-  rb_define_global_function("RE2", RUBY_METHOD_FUNC(re2_re2), -1);
+  rb_define_module_function(rb_mKernel, "RE2", RUBY_METHOD_FUNC(re2_re2), -1);
 
   /* Create the symbols used in options. */
   id_utf8 = rb_intern("utf8");
