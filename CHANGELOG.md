@@ -5,6 +5,15 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.1.1] - 2023-09-18
+### Fixed
+- Worked around a deprecation warning re the use of ANYARGS when compiling
+  against recent Ruby versions.
+
+### Changed
+- Various internal C++ style improvements to reduce unnecessary memory usage
+  when accessing named capturing groups.
+
 ## [2.1.0] - 2023-09-16
 ### Fixed
 - As RE2 only supports UTF-8 and ISO-8859-1 encodings, fix an inconsistency
@@ -147,6 +156,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.1.1]: https://github.com/mudge/re2/releases/tag/v2.1.1
 [2.1.0]: https://github.com/mudge/re2/releases/tag/v2.1.0
 [2.0.0]: https://github.com/mudge/re2/releases/tag/v2.0.0
 [2.0.0.beta2]: https://github.com/mudge/re2/releases/tag/v2.0.0.beta2
