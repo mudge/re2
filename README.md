@@ -262,7 +262,7 @@ Contributions
   the deprecation and removal of the `utf8` encoding option in RE2;
 * Thanks to [Sergio Medina](https://github.com/serch) for reporting a bug when
   using `RE2::Scanner#scan` with an invalid regular expression;
-* Thanks to [Pritam Baral](https://github.com/pritambaral) for contributed the
+* Thanks to [Pritam Baral](https://github.com/pritambaral) for contributing the
   initial support for `RE2::Set`.
 
 Contact
