@@ -69,10 +69,10 @@
   <dl>
     <dt>Inherits:</dt>
     <dd>
-      <span class="inheritName">Object</span>
+      <span class="inheritName"><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></span>
       
         <ul class="fullTree">
-          <li>Object</li>
+          <li><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></li>
           
             <li class="next">RE2::Regexp</li>
           
@@ -1290,31 +1290,31 @@
       <pre class="lines">
 
 
-857
-858
-859
-860
-861
-862
-863
-864
-865
-866
-867
-868
-869
-870
-871
-872
-873
-874
-875
-876
-877
-878</pre>
+783
+784
+785
+786
+787
+788
+789
+790
+791
+792
+793
+794
+795
+796
+797
+798
+799
+800
+801
+802
+803
+804</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 857</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 783</span>
 
 static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
   VALUE pattern, options;
@@ -1325,11 +1325,11 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 
   if (RTEST(options)) {
     RE2::Options re2_options;
-    parse_re2_options(re2_options, options);
+    parse_re2_options(&amp;re2_options, options);
 
-    p-&gt;pattern = new(nothrow) RE2(StringValuePtr(pattern), re2_options);
+    p-&gt;pattern = new(std::nothrow) RE2(StringValuePtr(pattern), re2_options);
   } else {
-    p-&gt;pattern = new(nothrow) RE2(StringValuePtr(pattern));
+    p-&gt;pattern = new(std::nothrow) RE2(StringValuePtr(pattern));
   }
 
   if (p-&gt;pattern == 0) {
@@ -1353,7 +1353,7 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
       <div class="method_details first">
   <h3 class="signature first" id="compile-class_method">
   
-    .<strong>compile</strong>  &#x21d2; <tt>Object</tt> 
+    .<strong>compile</strong>  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
@@ -1385,7 +1385,7 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.5-2.0?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &quot;1\.5\-2\.0\?&quot;</span></code></pre>
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.5-2.0?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &quot;1\.5\-2\.0\?&quot;</span></code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -1434,18 +1434,20 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
       <pre class="lines">
 
 
-1522
-1523
-1524
-1525
-1526</pre>
+1459
+1460
+1461
+1462
+1463
+1464</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1522</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1459</span>
 
 static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   UNUSED(self);
-  string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+  std::string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }</pre>
     </td>
@@ -1476,7 +1478,7 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_escape'><span class='object_link'><a href="#escape-class_method" title="RE2::Regexp.escape (method)">escape</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.5-2.0?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &quot;1\.5\-2\.0\?&quot;</span></code></pre>
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.5-2.0?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &quot;1\.5\-2\.0\?&quot;</span></code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -1525,18 +1527,20 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
       <pre class="lines">
 
 
-1522
-1523
-1524
-1525
-1526</pre>
+1459
+1460
+1461
+1462
+1463
+1464</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1522</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1459</span>
 
 static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
   UNUSED(self);
-  string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+  std::string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }</pre>
     </td>
@@ -1594,21 +1598,17 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
       <pre class="lines">
 
 
-1388
-1389
-1390
-1391
-1392
-1393
-1394</pre>
+1331
+1332
+1333
+1334
+1335</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1388</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1331</span>
 
-static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
-  VALUE argv[2];
-  argv[0] = text;
-  argv[1] = INT2FIX(0);
+static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
+  VALUE argv[2] = { text, INT2FIX(0) };
 
   return re2_regexp_match(2, argv, self);
 }</pre>
@@ -1661,21 +1661,17 @@ static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-1388
-1389
-1390
-1391
-1392
-1393
-1394</pre>
+1331
+1332
+1333
+1334
+1335</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1388</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1331</span>
 
-static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
-  VALUE argv[2];
-  argv[0] = text;
-  argv[1] = INT2FIX(0);
+static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
+  VALUE argv[2] = { text, INT2FIX(0) };
 
   return re2_regexp_match(2, argv, self);
 }</pre>
@@ -1707,7 +1703,7 @@ static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_case_insensitive?'>case_insensitive?</span>    <span class='comment'>#=&gt; false
 </span><span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_casefold?'>casefold?</span>    <span class='comment'>#=&gt; false</span></code></pre>
     
@@ -1738,14 +1734,14 @@ static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-1072
-1073
-1074</pre>
+1006
+1007
+1008</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1072</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1006</span>
 
-<span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
+<span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='id identifier rubyid_const'>const</span> <span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
   <span class='kw'>return</span> <span class='const'>BOOL2RUBY</span><span class='lparen'>(</span><span class='id identifier rubyid_re2_regexp_case_sensitive'>re2_regexp_case_sensitive</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='op'>!=</span> <span class='const'>Qtrue</span><span class='rparen'>)</span><span class='semicolon'>;</span>
 <span class='rbrace'>}</span></pre>
     </td>
@@ -1776,7 +1772,7 @@ static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_case_sensitive?'>case_sensitive?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -1806,18 +1802,20 @@ static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-1056
-1057
-1058
-1059
-1060</pre>
+989
+990
+991
+992
+993
+994</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1056</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 989</span>
 
-static VALUE re2_regexp_case_sensitive(VALUE self) {
+static VALUE re2_regexp_case_sensitive(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().case_sensitive());
 }</pre>
     </td>
@@ -1848,7 +1846,7 @@ static VALUE re2_regexp_case_sensitive(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:case_sensitive</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_case_insensitive?'>case_insensitive?</span>    <span class='comment'>#=&gt; false
 </span><span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_casefold?'>casefold?</span>    <span class='comment'>#=&gt; false</span></code></pre>
     
@@ -1879,14 +1877,14 @@ static VALUE re2_regexp_case_sensitive(VALUE self) {
       <pre class="lines">
 
 
-1072
-1073
-1074</pre>
+1006
+1007
+1008</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1072</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1006</span>
 
-<span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
+<span class='id identifier rubyid_static'>static</span> <span class='const'>VALUE</span> <span class='id identifier rubyid_re2_regexp_case_insensitive'>re2_regexp_case_insensitive</span><span class='lparen'>(</span><span class='id identifier rubyid_const'>const</span> <span class='const'>VALUE</span> <span class='kw'>self</span><span class='rparen'>)</span> <span class='lbrace'>{</span>
   <span class='kw'>return</span> <span class='const'>BOOL2RUBY</span><span class='lparen'>(</span><span class='id identifier rubyid_re2_regexp_case_sensitive'>re2_regexp_case_sensitive</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='op'>!=</span> <span class='const'>Qtrue</span><span class='rparen'>)</span><span class='semicolon'>;</span>
 <span class='rbrace'>}</span></pre>
     </td>
@@ -1938,22 +1936,24 @@ static VALUE re2_regexp_case_sensitive(VALUE self) {
       <pre class="lines">
 
 
-1127
-1128
-1129
-1130
-1131
-1132
-1133
-1134
-1135</pre>
+1064
+1065
+1066
+1067
+1068
+1069
+1070
+1071
+1072
+1073</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1127</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1064</span>
 
-static VALUE re2_regexp_error(VALUE self) {
+static VALUE re2_regexp_error(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   if (p-&gt;pattern-&gt;ok()) {
     return Qnil;
   } else {
@@ -2011,30 +2011,32 @@ static VALUE re2_regexp_error(VALUE self) {
       <pre class="lines">
 
 
-1147
-1148
-1149
-1150
-1151
-1152
-1153
-1154
-1155
-1156
-1157</pre>
+1085
+1086
+1087
+1088
+1089
+1090
+1091
+1092
+1093
+1094
+1095
+1096</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1147</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1085</span>
 
-static VALUE re2_regexp_error_arg(VALUE self) {
+static VALUE re2_regexp_error_arg(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   if (p-&gt;pattern-&gt;ok()) {
     return Qnil;
   } else {
-    return ENCODED_STR_NEW(p-&gt;pattern-&gt;error_arg().data(),
+    return encoded_str_new(p-&gt;pattern-&gt;error_arg().data(),
         p-&gt;pattern-&gt;error_arg().size(),
-        p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+        p-&gt;pattern-&gt;options().encoding());
   }
 }</pre>
     </td>
@@ -2067,7 +2069,7 @@ static VALUE re2_regexp_error_arg(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span>    <span class='comment'>#=&gt; &quot;#&lt;RE2::Regexp /woo?/&gt;&quot;</span></code></pre>
     
   </div>
@@ -2097,37 +2099,33 @@ static VALUE re2_regexp_error_arg(VALUE self) {
       <pre class="lines">
 
 
-892
-893
-894
-895
-896
-897
-898
-899
-900
-901
-902
-903
-904
-905</pre>
+818
+819
+820
+821
+822
+823
+824
+825
+826
+827
+828
+829</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 892</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 818</span>
 
-static VALUE re2_regexp_inspect(VALUE self) {
+static VALUE re2_regexp_inspect(const VALUE self) {
   re2_pattern *p;
-  VALUE result;
-  ostringstream output;
 
   Data_Get_Struct(self, re2_pattern, p);
 
+  std::ostringstream output;
+
   output &lt;&lt; &quot;#&lt;RE2::Regexp /&quot; &lt;&lt; p-&gt;pattern-&gt;pattern() &lt;&lt; &quot;/&gt;&quot;;
 
-  result = ENCODED_STR_NEW(output.str().data(), output.str().length(),
-      p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
-
-  return result;
+  return encoded_str_new(output.str().data(), output.str().length(),
+      p-&gt;pattern-&gt;options().encoding());
 }</pre>
     </td>
   </tr>
@@ -2157,7 +2155,7 @@ static VALUE re2_regexp_inspect(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:literal</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:literal</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_literal?'>literal?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -2187,18 +2185,20 @@ static VALUE re2_regexp_inspect(VALUE self) {
       <pre class="lines">
 
 
-1026
-1027
-1028
-1029
-1030</pre>
+957
+958
+959
+960
+961
+962</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1026</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 957</span>
 
-static VALUE re2_regexp_literal(VALUE self) {
+static VALUE re2_regexp_literal(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().literal());
 }</pre>
     </td>
@@ -2229,7 +2229,7 @@ static VALUE re2_regexp_literal(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:log_errors</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:log_errors</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_log_errors?'>log_errors?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -2259,18 +2259,20 @@ static VALUE re2_regexp_literal(VALUE self) {
       <pre class="lines">
 
 
-996
-997
-998
-999
-1000</pre>
+925
+926
+927
+928
+929
+930</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 996</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 925</span>
 
-static VALUE re2_regexp_log_errors(VALUE self) {
+static VALUE re2_regexp_log_errors(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().log_errors());
 }</pre>
     </td>
@@ -2301,7 +2303,7 @@ static VALUE re2_regexp_log_errors(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:longest_match</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:longest_match</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_longest_match?'>longest_match?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -2331,18 +2333,20 @@ static VALUE re2_regexp_log_errors(VALUE self) {
       <pre class="lines">
 
 
-981
-982
-983
-984
-985</pre>
+909
+910
+911
+912
+913
+914</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 981</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 909</span>
 
-static VALUE re2_regexp_longest_match(VALUE self) {
+static VALUE re2_regexp_longest_match(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().longest_match());
 }</pre>
     </td>
@@ -2401,7 +2405,7 @@ static VALUE re2_regexp_longest_match(VALUE self) {
 <p>Matching with capturing groups</p>
 </div></p>
       
-      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; #&lt;RE2::MatchData &quot;woo&quot; 1:&quot;o&quot; 2:&quot;o&quot;&gt;</span></code></pre>
     
       
@@ -2409,7 +2413,7 @@ static VALUE re2_regexp_longest_match(VALUE self) {
 <p>Matching without capturing groups</p>
 </div></p>
       
-      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -2505,7 +2509,7 @@ static VALUE re2_regexp_longest_match(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='comment'>#=&gt; true
 </span><span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bob</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='comment'>#=&gt; false</span></code></pre>
     
@@ -2588,7 +2592,7 @@ static VALUE re2_regexp_longest_match(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_r'>r</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>w(o)(o)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='comment'>#=&gt; #&lt;RE2::MatchData &quot;woo&quot; 1:&quot;o&quot;&gt;
 </span><span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>woo</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>3</span><span class='rparen'>)</span> <span class='comment'>#=&gt; #&lt;RE2::MatchData &quot;woo&quot; 1:&quot;o&quot; 2:&quot;o&quot; 3:nil&gt;</span></code></pre>
     
@@ -2706,85 +2710,92 @@ static VALUE re2_regexp_longest_match(VALUE self) {
       <pre class="lines">
 
 
+1255
+1256
+1257
+1258
+1259
+1260
+1261
+1262
+1263
+1264
+1265
+1266
+1267
+1268
+1269
+1270
+1271
+1272
+1273
+1274
+1275
+1276
+1277
+1278
+1279
+1280
+1281
+1282
+1283
+1284
+1285
+1286
+1287
+1288
+1289
+1290
+1291
+1292
+1293
+1294
+1295
+1296
+1297
+1298
+1299
+1300
+1301
+1302
+1303
+1304
+1305
+1306
+1307
+1308
+1309
+1310
+1311
+1312
+1313
+1314
+1315
+1316
+1317
+1318
 1319
 1320
 1321
 1322
-1323
-1324
-1325
-1326
-1327
-1328
-1329
-1330
-1331
-1332
-1333
-1334
-1335
-1336
-1337
-1338
-1339
-1340
-1341
-1342
-1343
-1344
-1345
-1346
-1347
-1348
-1349
-1350
-1351
-1352
-1353
-1354
-1355
-1356
-1357
-1358
-1359
-1360
-1361
-1362
-1363
-1364
-1365
-1366
-1367
-1368
-1369
-1370
-1371
-1372
-1373
-1374
-1375
-1376
-1377
-1378
-1379
-1380</pre>
+1323</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1319</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1255</span>
 
-static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
-  int n;
-  bool matched;
+static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   re2_pattern *p;
   re2_matchdata *m;
-  VALUE text, number_of_matches, matchdata;
+  VALUE text, number_of_matches;
 
   rb_scan_args(argc, argv, &quot;11&quot;, &amp;text, &amp;number_of_matches);
 
   /* Ensure text is a string. */
-  text = StringValue(text);
+  StringValue(text);
 
   Data_Get_Struct(self, re2_pattern, p);
+
+  int n;
 
   if (RTEST(number_of_matches)) {
     n = NUM2INT(number_of_matches);
@@ -2801,17 +2812,21 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
   }
 
   if (n == 0) {
-    matched = match(p-&gt;pattern, StringValuePtr(text), 0,
-        static_cast&lt;int&gt;(RSTRING_LEN(text)), RE2::UNANCHORED, 0, 0);
+#ifdef HAVE_ENDPOS_ARGUMENT
+    bool matched = p-&gt;pattern-&gt;Match(StringValuePtr(text), 0,
+        RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
+#else
+    bool matched = p-&gt;pattern-&gt;Match(StringValuePtr(text), 0, RE2::UNANCHORED,
+        0, 0);
+#endif
     return BOOL2RUBY(matched);
   } else {
-
     /* Because match returns the whole match as well. */
     n += 1;
 
-    matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
+    VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
     Data_Get_Struct(matchdata, re2_matchdata, m);
-    m-&gt;matches = new(nothrow) re2::StringPiece[n];
+    m-&gt;matches = new(std::nothrow) re2::StringPiece[n];
     m-&gt;regexp = self;
     m-&gt;text = rb_str_dup(text);
     rb_str_freeze(m-&gt;text);
@@ -2823,10 +2838,13 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
 
     m-&gt;number_of_matches = n;
 
-    matched = match(p-&gt;pattern, StringValuePtr(m-&gt;text), 0,
-                    static_cast&lt;int&gt;(RSTRING_LEN(m-&gt;text)),
-                    RE2::UNANCHORED, m-&gt;matches, n);
-
+#ifdef HAVE_ENDPOS_ARGUMENT
+    bool matched = p-&gt;pattern-&gt;Match(StringValuePtr(m-&gt;text), 0,
+        RSTRING_LEN(m-&gt;text), RE2::UNANCHORED, m-&gt;matches, n);
+#else
+    bool matched = p-&gt;pattern-&gt;Match(StringValuePtr(m-&gt;text), 0,
+        RE2::UNANCHORED, m-&gt;matches, n);
+#endif
     if (matched) {
       return matchdata;
     } else {
@@ -2883,21 +2901,17 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, VALUE self) {
       <pre class="lines">
 
 
-1388
-1389
-1390
-1391
-1392
-1393
-1394</pre>
+1331
+1332
+1333
+1334
+1335</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1388</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1331</span>
 
-static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
-  VALUE argv[2];
-  argv[0] = text;
-  argv[1] = INT2FIX(0);
+static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
+  VALUE argv[2] = { text, INT2FIX(0) };
 
   return re2_regexp_match(2, argv, self);
 }</pre>
@@ -2929,7 +2943,7 @@ static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:max_mem</span> <span class='op'>=&gt;</span> <span class='int'>1024</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:max_mem</span> <span class='op'>=&gt;</span> <span class='int'>1024</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_max_mem'>max_mem</span>    <span class='comment'>#=&gt; 1024</span></code></pre>
     
   </div>
@@ -2959,18 +2973,20 @@ static VALUE re2_regexp_match_p(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-1011
-1012
-1013
-1014
-1015</pre>
+941
+942
+943
+944
+945
+946</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1011</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 941</span>
 
-static VALUE re2_regexp_max_mem(VALUE self) {
+static VALUE re2_regexp_max_mem(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return INT2FIX(p-&gt;pattern-&gt;options().max_mem());
 }</pre>
     </td>
@@ -3024,44 +3040,38 @@ static VALUE re2_regexp_max_mem(VALUE self) {
       <pre class="lines">
 
 
-1247
-1248
-1249
-1250
-1251
-1252
-1253
-1254
-1255
-1256
-1257
-1258
-1259
-1260
-1261
-1262
-1263
-1264
-1265</pre>
+1186
+1187
+1188
+1189
+1190
+1191
+1192
+1193
+1194
+1195
+1196
+1197
+1198
+1199
+1200
+1201</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1247</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1186</span>
 
-static VALUE re2_regexp_named_capturing_groups(VALUE self) {
-  VALUE capturing_groups;
+static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
   re2_pattern *p;
-  map&lt;string, int&gt; groups;
-  map&lt;string, int&gt;::iterator iterator;
 
   Data_Get_Struct(self, re2_pattern, p);
-  groups = p-&gt;pattern-&gt;NamedCapturingGroups();
-  capturing_groups = rb_hash_new();
+  const std::map&lt;std::string, int&gt;&amp; groups = p-&gt;pattern-&gt;NamedCapturingGroups();
+  VALUE capturing_groups = rb_hash_new();
 
-  for (iterator = groups.begin(); iterator != groups.end(); iterator++) {
+  for (std::map&lt;std::string, int&gt;::const_iterator it = groups.begin(); it != groups.end(); ++it) {
     rb_hash_aset(capturing_groups,
-        ENCODED_STR_NEW(iterator-&gt;first.data(), iterator-&gt;first.size(),
-          p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;),
-        INT2FIX(iterator-&gt;second));
+        encoded_str_new(it-&gt;first.data(), it-&gt;first.size(),
+          p-&gt;pattern-&gt;options().encoding()),
+        INT2FIX(it-&gt;second));
   }
 
   return capturing_groups;
@@ -3094,7 +3104,7 @@ static VALUE re2_regexp_named_capturing_groups(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:never_nl</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:never_nl</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_never_nl?'>never_nl?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -3124,18 +3134,20 @@ static VALUE re2_regexp_named_capturing_groups(VALUE self) {
       <pre class="lines">
 
 
-1041
-1042
-1043
-1044
-1045</pre>
+973
+974
+975
+976
+977
+978</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1041</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 973</span>
 
-static VALUE re2_regexp_never_nl(VALUE self) {
+static VALUE re2_regexp_never_nl(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().never_nl());
 }</pre>
     </td>
@@ -3187,20 +3199,20 @@ static VALUE re2_regexp_never_nl(VALUE self) {
       <pre class="lines">
 
 
-1231
-1232
-1233
-1234
-1235
-1236</pre>
+1170
+1171
+1172
+1173
+1174
+1175</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1231</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1170</span>
 
-static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
+static VALUE re2_regexp_number_of_capturing_groups(const VALUE self) {
   re2_pattern *p;
-
   Data_Get_Struct(self, re2_pattern, p);
+
   return INT2FIX(p-&gt;pattern-&gt;NumberOfCapturingGroups());
 }</pre>
     </td>
@@ -3231,7 +3243,7 @@ static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_ok?'>ok?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -3261,18 +3273,20 @@ static VALUE re2_regexp_number_of_capturing_groups(VALUE self) {
       <pre class="lines">
 
 
-936
-937
-938
-939
-940</pre>
+861
+862
+863
+864
+865
+866</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 936</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 861</span>
 
-static VALUE re2_regexp_ok(VALUE self) {
+static VALUE re2_regexp_ok(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;ok());
 }</pre>
     </td>
@@ -3303,7 +3317,7 @@ static VALUE re2_regexp_ok(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:one_line</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:one_line</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_one_line?'>one_line?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -3333,18 +3347,20 @@ static VALUE re2_regexp_ok(VALUE self) {
       <pre class="lines">
 
 
-1115
-1116
-1117
-1118
-1119</pre>
+1051
+1052
+1053
+1054
+1055
+1056</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1115</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1051</span>
 
-static VALUE re2_regexp_one_line(VALUE self) {
+static VALUE re2_regexp_one_line(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().one_line());
 }</pre>
     </td>
@@ -3396,61 +3412,59 @@ static VALUE re2_regexp_one_line(VALUE self) {
       <pre class="lines">
 
 
-1178
-1179
-1180
-1181
-1182
-1183
-1184
-1185
-1186
-1187
-1188
-1189
-1190
-1191
-1192
-1193
-1194
-1195
-1196
-1197
-1198
-1199
-1200
-1201
-1202
-1203
-1204
-1205
-1206
-1207
-1208
-1209
-1210
-1211
-1212
-1213
-1214
-1215
-1216
-1217
-1218
-1219
-1220
-1221
-1222</pre>
+1118
+1119
+1120
+1121
+1122
+1123
+1124
+1125
+1126
+1127
+1128
+1129
+1130
+1131
+1132
+1133
+1134
+1135
+1136
+1137
+1138
+1139
+1140
+1141
+1142
+1143
+1144
+1145
+1146
+1147
+1148
+1149
+1150
+1151
+1152
+1153
+1154
+1155
+1156
+1157
+1158
+1159
+1160
+1161</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1178</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1118</span>
 
-static VALUE re2_regexp_options(VALUE self) {
-  VALUE options;
+static VALUE re2_regexp_options(const VALUE self) {
   re2_pattern *p;
 
   Data_Get_Struct(self, re2_pattern, p);
-  options = rb_hash_new();
+  VALUE options = rb_hash_new();
 
   rb_hash_aset(options, ID2SYM(id_utf8),
       BOOL2RUBY(p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8));
@@ -3520,7 +3534,7 @@ static VALUE re2_regexp_options(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
     
   </div>
@@ -3550,23 +3564,25 @@ static VALUE re2_regexp_options(VALUE self) {
       <pre class="lines">
 
 
-919
-920
-921
-922
-923
-924
-925</pre>
+843
+844
+845
+846
+847
+848
+849
+850</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 919</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 843</span>
 
-static VALUE re2_regexp_to_s(VALUE self) {
+static VALUE re2_regexp_to_s(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
-  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+
+  return encoded_str_new(p-&gt;pattern-&gt;pattern().data(),
       p-&gt;pattern-&gt;pattern().size(),
-      p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+      p-&gt;pattern-&gt;options().encoding());
 }</pre>
     </td>
   </tr>
@@ -3596,7 +3612,7 @@ static VALUE re2_regexp_to_s(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:perl_classes</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:perl_classes</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_perl_classes?'>perl_classes?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -3626,18 +3642,20 @@ static VALUE re2_regexp_to_s(VALUE self) {
       <pre class="lines">
 
 
-1085
-1086
-1087
-1088
-1089</pre>
+1019
+1020
+1021
+1022
+1023
+1024</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1085</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1019</span>
 
-static VALUE re2_regexp_perl_classes(VALUE self) {
+static VALUE re2_regexp_perl_classes(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().perl_classes());
 }</pre>
     </td>
@@ -3668,7 +3686,7 @@ static VALUE re2_regexp_perl_classes(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:posix_syntax</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:posix_syntax</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_posix_syntax?'>posix_syntax?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -3698,18 +3716,20 @@ static VALUE re2_regexp_perl_classes(VALUE self) {
       <pre class="lines">
 
 
-966
-967
-968
-969
-970</pre>
+893
+894
+895
+896
+897
+898</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 966</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 893</span>
 
-static VALUE re2_regexp_posix_syntax(VALUE self) {
+static VALUE re2_regexp_posix_syntax(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().posix_syntax());
 }</pre>
     </td>
@@ -3761,18 +3781,20 @@ static VALUE re2_regexp_posix_syntax(VALUE self) {
       <pre class="lines">
 
 
-1166
-1167
-1168
-1169
-1170</pre>
+1105
+1106
+1107
+1108
+1109
+1110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1166</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1105</span>
 
-static VALUE re2_regexp_program_size(VALUE self) {
+static VALUE re2_regexp_program_size(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return INT2FIX(p-&gt;pattern-&gt;ProgramSize());
 }</pre>
     </td>
@@ -3783,7 +3805,7 @@ static VALUE re2_regexp_program_size(VALUE self) {
       <div class="method_details ">
   <h3 class="signature " id="scan-instance_method">
   
-    #<strong>scan</strong>(text)  &#x21d2; <tt>Object</tt> 
+    #<strong>scan</strong>(text)  &#x21d2; <tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt> 
   
 
   
@@ -3803,7 +3825,7 @@ static VALUE re2_regexp_program_size(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_c'>c</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(\w+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Foo bar baz</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span></code></pre>
+      <pre class="example code"><code><span class='id identifier rubyid_c'>c</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>(\w+)</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Foo bar baz</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span></code></pre>
     
   </div>
 
@@ -3814,43 +3836,41 @@ static VALUE re2_regexp_program_size(VALUE self) {
       <pre class="lines">
 
 
-1402
-1403
-1404
-1405
-1406
-1407
-1408
-1409
-1410
-1411
-1412
-1413
-1414
-1415
-1416
-1417
-1418
-1419
-1420
-1421
-1422
-1423
-1424</pre>
+1343
+1344
+1345
+1346
+1347
+1348
+1349
+1350
+1351
+1352
+1353
+1354
+1355
+1356
+1357
+1358
+1359
+1360
+1361
+1362
+1363
+1364</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1402</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1343</span>
 
-static VALUE re2_regexp_scan(VALUE self, VALUE text) {
+static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   re2_pattern *p;
   re2_scanner *c;
-  VALUE scanner;
 
   Data_Get_Struct(self, re2_pattern, p);
-  scanner = rb_class_new_instance(0, 0, re2_cScanner);
+  VALUE scanner = rb_class_new_instance(0, 0, re2_cScanner);
   Data_Get_Struct(scanner, re2_scanner, c);
 
-  c-&gt;input = new(nothrow) re2::StringPiece(StringValuePtr(text));
+  c-&gt;input = new(std::nothrow) re2::StringPiece(StringValuePtr(text));
   c-&gt;regexp = self;
   c-&gt;text = text;
 
@@ -3894,7 +3914,7 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
     
   </div>
@@ -3924,23 +3944,25 @@ static VALUE re2_regexp_scan(VALUE self, VALUE text) {
       <pre class="lines">
 
 
-919
-920
-921
-922
-923
-924
-925</pre>
+843
+844
+845
+846
+847
+848
+849
+850</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 919</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 843</span>
 
-static VALUE re2_regexp_to_s(VALUE self) {
+static VALUE re2_regexp_to_s(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
-  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+
+  return encoded_str_new(p-&gt;pattern-&gt;pattern().data(),
       p-&gt;pattern-&gt;pattern().size(),
-      p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+      p-&gt;pattern-&gt;options().encoding());
 }</pre>
     </td>
   </tr>
@@ -3972,7 +3994,7 @@ static VALUE re2_regexp_to_s(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
     
   </div>
@@ -4002,23 +4024,25 @@ static VALUE re2_regexp_to_s(VALUE self) {
       <pre class="lines">
 
 
-919
-920
-921
-922
-923
-924
-925</pre>
+843
+844
+845
+846
+847
+848
+849
+850</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 919</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 843</span>
 
-static VALUE re2_regexp_to_s(VALUE self) {
+static VALUE re2_regexp_to_s(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
-  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+
+  return encoded_str_new(p-&gt;pattern-&gt;pattern().data(),
       p-&gt;pattern-&gt;pattern().size(),
-      p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+      p-&gt;pattern-&gt;options().encoding());
 }</pre>
     </td>
   </tr>
@@ -4050,7 +4074,7 @@ static VALUE re2_regexp_to_s(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>    <span class='comment'>#=&gt; &quot;woo?&quot;</span></code></pre>
     
   </div>
@@ -4080,23 +4104,25 @@ static VALUE re2_regexp_to_s(VALUE self) {
       <pre class="lines">
 
 
-919
-920
-921
-922
-923
-924
-925</pre>
+843
+844
+845
+846
+847
+848
+849
+850</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 919</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 843</span>
 
-static VALUE re2_regexp_to_s(VALUE self) {
+static VALUE re2_regexp_to_s(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
-  return ENCODED_STR_NEW(p-&gt;pattern-&gt;pattern().data(),
+
+  return encoded_str_new(p-&gt;pattern-&gt;pattern().data(),
       p-&gt;pattern-&gt;pattern().size(),
-      p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8 ? &quot;UTF-8&quot; : &quot;ISO-8859-1&quot;);
+      p-&gt;pattern-&gt;options().encoding());
 }</pre>
     </td>
   </tr>
@@ -4126,7 +4152,7 @@ static VALUE re2_regexp_to_s(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:utf8</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:utf8</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_utf8?'>utf8?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -4156,18 +4182,20 @@ static VALUE re2_regexp_to_s(VALUE self) {
       <pre class="lines">
 
 
-951
-952
-953
-954
-955</pre>
+877
+878
+879
+880
+881
+882</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 951</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 877</span>
 
-static VALUE re2_regexp_utf8(VALUE self) {
+static VALUE re2_regexp_utf8(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().encoding() == RE2::Options::EncodingUTF8);
 }</pre>
     </td>
@@ -4198,7 +4226,7 @@ static VALUE re2_regexp_utf8(VALUE self) {
     <p class="tag_title">Examples:</p>
     
       
-      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../RE2.html" title="RE2 (module)">RE2</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="RE2::Regexp (class)">Regexp</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="RE2::Regexp#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:word_boundary</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
+      <pre class="example code"><code><span class='id identifier rubyid_re2'>re2</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Object.html#RE2-class_method" title="Object.RE2 (method)">RE2</a></span></span><span class='op'>::</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>woo?</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:word_boundary</span> <span class='op'>=&gt;</span> <span class='kw'>true</span><span class='rparen'>)</span>
 <span class='id identifier rubyid_re2'>re2</span><span class='period'>.</span><span class='id identifier rubyid_word_boundary?'>word_boundary?</span>    <span class='comment'>#=&gt; true</span></code></pre>
     
   </div>
@@ -4228,18 +4256,20 @@ static VALUE re2_regexp_utf8(VALUE self) {
       <pre class="lines">
 
 
-1100
-1101
-1102
-1103
-1104</pre>
+1035
+1036
+1037
+1038
+1039
+1040</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1100</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1035</span>
 
-static VALUE re2_regexp_word_boundary(VALUE self) {
+static VALUE re2_regexp_word_boundary(const VALUE self) {
   re2_pattern *p;
   Data_Get_Struct(self, re2_pattern, p);
+
   return BOOL2RUBY(p-&gt;pattern-&gt;options().word_boundary());
 }</pre>
     </td>
@@ -4252,7 +4282,7 @@ static VALUE re2_regexp_word_boundary(VALUE self) {
 </div>
 
       <div id="footer">
-  Generated on Sat Sep 16 13:53:22 2023 by
+  Generated on Tue Sep 19 12:01:35 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
