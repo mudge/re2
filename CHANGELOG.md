@@ -5,6 +5,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.1.2] - 2023-09-20
+### Fixed
+- Removed use of a C++17 extension from the gem to restore support for users
+  compiling against system libraries with older C compilers.
+
 ## [2.1.1] - 2023-09-18
 ### Fixed
 - Worked around a deprecation warning re the use of ANYARGS when compiling
@@ -156,6 +161,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.1.2]: https://github.com/mudge/re2/releases/tag/v2.1.2
 [2.1.1]: https://github.com/mudge/re2/releases/tag/v2.1.1
 [2.1.0]: https://github.com/mudge/re2/releases/tag/v2.1.0
 [2.0.0]: https://github.com/mudge/re2/releases/tag/v2.0.0
