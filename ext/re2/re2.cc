@@ -19,7 +19,6 @@
 #include <ruby/encoding.h>
 
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
-#define UNUSED(x) ((void)x)
 
 typedef struct {
   RE2 *pattern;
@@ -742,9 +741,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
  * @see RE2::Regexp#initialize
  *
  */
-static VALUE re2_re2(int argc, VALUE *argv, VALUE self) {
-  UNUSED(self);
-
+static VALUE re2_re2(int argc, VALUE *argv, VALUE) {
   return rb_class_new_instance(argc, argv, re2_cRegexp);
 }
 
@@ -1383,9 +1380,8 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
  *   re2 = RE2::Regexp.new("hel+o")
  *   RE2.Replace("hello there", re2, "yo")        #=> "yo there"
  */
-static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
+static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
     VALUE rewrite) {
-  UNUSED(self);
   re2_pattern *p;
 
   /* Take a copy of str so it can be modified in-place by
@@ -1424,10 +1420,8 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
  *   RE2.GlobalReplace("whoops-doops", re2, "e")  #=> "wheps-deps"
  *   RE2.GlobalReplace("hello there", "e", "i")   #=> "hillo thiri"
  */
-static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
+static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
                                VALUE rewrite) {
-  UNUSED(self);
-
   /* Take a copy of str so it can be modified in-place by
    * RE2::GlobalReplace.
    */
@@ -1459,8 +1453,7 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
  * @example
  *   RE2::Regexp.escape("1.5-2.0?")    #=> "1\.5\-2\.0\?"
  */
-static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
-  UNUSED(self);
+static VALUE re2_QuoteMeta(VALUE, VALUE unquoted) {
   std::string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
 
   return rb_str_new(quoted_string.data(), quoted_string.size());
@@ -1606,8 +1599,7 @@ static VALUE re2_set_compile(VALUE self) {
  *
  * @return [Bool] whether the underlying re2 outputs error information from Set matches
  */
-static VALUE re2_set_match_raises_errors_p(VALUE self) {
-  UNUSED(self);
+static VALUE re2_set_match_raises_errors_p(VALUE) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
   return Qtrue;
 #else
