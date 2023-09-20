@@ -318,8 +318,9 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
   } else {
     const char *name = SYMBOL_P(idx) ? rb_id2name(SYM2ID(idx)) : StringValuePtr(idx);
     const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+    std::map<std::string, int>::const_iterator search = groups.find(name);
 
-    if (std::map<std::string, int>::const_iterator search = groups.find(name); search != groups.end()) {
+    if (search != groups.end()) {
       id = search->second;
     } else {
       return NULL;
@@ -502,8 +503,9 @@ static VALUE re2_matchdata_named_match(const char* name, const VALUE self) {
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+  std::map<std::string, int>::const_iterator search = groups.find(name);
 
-  if (std::map<std::string, int>::const_iterator search = groups.find(name); search != groups.end()) {
+  if (search != groups.end()) {
     return re2_matchdata_nth_match(search->second, self);
   } else {
     return Qnil;
@@ -719,8 +721,9 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
         VALUE key = rb_ary_entry(keys, i);
         Check_Type(key, T_SYMBOL);
         const char *name = rb_id2name(SYM2ID(key));
+        std::map<std::string, int>::const_iterator search = groups.find(name);
 
-        if (std::map<std::string, int>::const_iterator search = groups.find(name); search != groups.end()) {
+        if (search != groups.end()) {
           rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(search->second, self));
         } else {
           break;
