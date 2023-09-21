@@ -7,99 +7,14 @@ on:
   push:
     branches:
       - main
-      - v*.*.x
+      - v*.*
     tags:
       - v*.*.*
   pull_request:
 
 jobs:
-  compile-and-test-system-dependencies:
-    needs: ["build-cruby-gem"]
-    name: System Dependencies - ${{ matrix.sys }} vendored libs - Ruby ${{ matrix.ruby }} - libre2 ABI version ${{ matrix.libre2.soname }}
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        sys: ["enable", "disable"]
-        ruby:
-          - '3.2'
-          - '3.1'
-          - '3.0'
-          - '2.7'
-          - '2.6'
-        libre2:
-          - version: "20150501"
-            soname: 0
-          - version: "20200302"
-            soname: 1
-          - version: "20200303"
-            soname: 6
-          - version: "20200501"
-            soname: 7
-          - version: "20200706"
-            soname: 8
-          - version: "20201101"
-            soname: 9
-          - version: "20221201"
-            soname: 10
-          - version: "20230701"
-            soname: 11
-    steps:
-      - uses: actions/checkout@v4
-      - name: Remove any existing libre2 installation
-        run: sudo apt-get remove -y libre2-dev libre2-5
-      - name: Install Abseil for newer re2 releases
-        run: |
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository ppa:savoury1/build-tools
-          sudo apt-get install -y libabsl-dev
-      - name: Download and install specific release of libre2
-        run: |
-          curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v2/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
-          sudo dpkg -i libre2-dev.deb
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "${{ matrix.ruby }}"
-          bundler-cache: true
-      - uses: actions/download-artifact@v3
-        with:
-          name: cruby-gem
-          path: gems
-      - name: "Link libre2 into Ruby's exec_prefix"
-        run: ln -s /usr/lib/libre2.so `ruby -e "puts RbConfig::CONFIG['exec_prefix']"`/lib/libre2.so
-      - run: ./scripts/test-gem-install gems --${{matrix.sys}}-system-libraries
-
-  compile-and-test-vendored-dependencies:
-    name: Vendored Dependencies - Ruby ${{ matrix.ruby }} - ${{ matrix.runs-on }}
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on: ["ubuntu-latest", "macos-latest"]
-        ruby: ["2.6", "2.7", "3.0", "3.1", "3.2"]
-        include:
-          - ruby: "2.6"
-            runs-on: "windows-2019"
-          - ruby: "2.7"
-            runs-on: "windows-2019"
-          - ruby: "3.0"
-            runs-on: "windows-2019"
-          - ruby: "3.1"
-            runs-on: "windows-2022"
-          - ruby: "3.2"
-            runs-on: "windows-2022"
-    runs-on: ${{matrix.runs-on}}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{matrix.ruby}}
-          bundler-cache: true
-      - uses: actions/cache@v3
-        with:
-          path: ports
-          key: ports-${{matrix.runs-on}}-${{hashFiles('ext/re2/extconf.rb')}}
-      - run: bundle exec rake compile spec
-
   build-cruby-gem:
+    name: "Build CRuby gem"
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
@@ -117,81 +32,8 @@ jobs:
           name: cruby-gem
           path: gems
 
-  test-cruby-gem-linux:
-    needs: ["build-cruby-gem"]
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["2.6", "2.7", "3.0", "3.1", "3.2"]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
-        with:
-          name: cruby-gem
-          path: gems
-      - run: ./scripts/test-gem-install gems
-
-  test-cruby-gem-macos:
-    needs: ["build-cruby-gem"]
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["2.6", "2.7", "3.0", "3.1", "3.2"]
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
-        with:
-          name: cruby-gem
-          path: gems
-      - run: ./scripts/test-gem-install gems
-
-  test-cruby-gem-windows:
-    needs: ["build-cruby-gem"]
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["2.6", "2.7", "3.0"]
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
-        with:
-          name: cruby-gem
-          path: gems
-      - run: ./scripts/test-gem-install gems
-        shell: bash
-
-  test-cruby-gem-windows-ucrt:
-    needs: ["build-cruby-gem"]
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["3.1", "3.2"]
-    runs-on: windows-2022
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-         ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
-        with:
-          name: cruby-gem
-          path: gems
-      - run: ./scripts/test-gem-install gems
-        shell: bash
-
   build-precompiled-gems:
+    name: "Precompile ${{ matrix.platform }} gem"
     strategy:
       fail-fast: false
       matrix:
@@ -221,7 +63,115 @@ jobs:
           name: "cruby-${{matrix.platform}}-gem"
           path: gems
 
+  compile-and-test-system-dependencies:
+    name: System libre2.${{ matrix.libre2.soname }} - Ruby ${{ matrix.ruby }}
+    needs: ["build-cruby-gem"]
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        ruby:
+          - '3.2'
+          - '3.1'
+          - '3.0'
+          - '2.7'
+          - '2.6'
+        libre2:
+          - version: "20150501"
+            soname: 0
+          - version: "20200302"
+            soname: 1
+          - version: "20200303"
+            soname: 6
+          - version: "20200501"
+            soname: 7
+          - version: "20200706"
+            soname: 8
+          - version: "20201101"
+            soname: 9
+          - version: "20221201"
+            soname: 10
+          - version: "20230701"
+            soname: 11
+            needs_abseil: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove any existing libre2 installation
+        run: sudo apt-get remove -y libre2-dev libre2-5
+      - name: Install Abseil for newer re2 releases
+        if: ${{ matrix.libre2.needs_abseil }}
+        run: |
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:savoury1/build-tools
+          sudo apt-get install -y libabsl-dev
+      - name: Download and install specific release of libre2
+        run: |
+          curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v2/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
+          sudo dpkg -i libre2-dev.deb
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{ matrix.ruby }}"
+          bundler-cache: true
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems --enable-system-libraries
+
+  compile-and-test-vendored-dependencies:
+    name: Vendored - Ruby ${{ matrix.ruby }} - ${{ matrix.runs-on }}
+    needs: ["build-cruby-gem"]
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: ["ubuntu-latest", "macos-latest"]
+        ruby: ["2.6", "2.7", "3.0", "3.1", "3.2"]
+        include:
+          - ruby: "2.6"
+            runs-on: "windows-2019"
+          - ruby: "2.7"
+            runs-on: "windows-2019"
+          - ruby: "3.0"
+            runs-on: "windows-2019"
+          - ruby: "3.1"
+            runs-on: "windows-2022"
+          - ruby: "3.2"
+            runs-on: "windows-2022"
+    runs-on: ${{matrix.runs-on}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{matrix.ruby}}
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+        shell: bash
+
+  compile-and-test-vendored-dependencies-with-system-install:
+    name: Vendored - system libre2-dev - Ruby 3.2
+    needs: ["build-cruby-gem"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install RE2
+        run: sudo apt-get install -y libre2-dev
+      - uses: ruby/setup-ruby@v1
+        id: setup-ruby
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+      - uses: actions/download-artifact@v3
+        with:
+          name: cruby-gem
+          path: gems
+      - name: "Link libre2 into Ruby's lib directory"
+        run: ln -s /usr/lib/x86_64-linux-gnu/libre2.so ${{ steps.setup-ruby.outputs.ruby-prefix }}/lib/libre2.so
+      - run: ./scripts/test-gem-install gems
+
   test-precompiled-aarch64-linux:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - aarch64-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -243,6 +193,7 @@ jobs:
             ./scripts/test-gem-install ./gems
 
   test-precompiled-arm-linux:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - arm-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -264,6 +215,7 @@ jobs:
             ./scripts/test-gem-install ./gems
 
   test-precompiled-x64-mingw-ucrt:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - x64-mingw-ucrt
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -283,6 +235,7 @@ jobs:
         shell: bash
 
   test-precompiled-x64-mingw32:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - x64-mingw32
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -302,6 +255,7 @@ jobs:
         shell: bash
 
   test-precompiled-x86-linux:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - x86-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -322,7 +276,8 @@ jobs:
             ruby:${{matrix.ruby}} \
             ./scripts/test-gem-install ./gems
 
-  test-precompiled-linux-x86_64:
+  test-precompiled-x86_64-linux:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - x86_64-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -341,6 +296,7 @@ jobs:
       - run: ./scripts/test-gem-install gems
 
   test-precompiled-x86_64-darwin:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - x86_64-darwin
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -358,7 +314,8 @@ jobs:
           path: gems
       - run: ./scripts/test-gem-install gems
 
-  test-precompiled-x86_64-linux:
+  test-precompiled-x86_64-alpine:
+    name: Precompiled - Ruby ${{ matrix.ruby }} - x86_64-alpine
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
