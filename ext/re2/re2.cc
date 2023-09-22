@@ -227,6 +227,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
   re2_scanner *c;
   Data_Get_Struct(self, re2_scanner, c);
 
+  delete c->input;
   c->input = new(std::nothrow) re2::StringPiece(StringValuePtr(c->text));
   c->eof = false;
 
@@ -785,6 +786,10 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
   re2_pattern *p;
 
   rb_scan_args(argc, argv, "11", &pattern, &options);
+
+  /* Ensure pattern is a string. */
+  StringValue(pattern);
+
   Data_Get_Struct(self, re2_pattern, p);
 
   if (RTEST(options)) {
@@ -1341,6 +1346,9 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
  *   c = RE2::Regexp.new('(\w+)').scan("Foo bar baz")
  */
 static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
+  /* Ensure text is a string. */
+  StringValue(text);
+
   re2_pattern *p;
   re2_scanner *c;
 
@@ -1382,6 +1390,9 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
  */
 static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
     VALUE rewrite) {
+  /* Ensure rewrite is a string. */
+  StringValue(rewrite);
+
   re2_pattern *p;
 
   /* Take a copy of str so it can be modified in-place by
@@ -1397,6 +1408,9 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
+    /* Ensure pattern is a string. */
+    StringValue(pattern);
+
     RE2::Replace(&str_as_string, StringValuePtr(pattern),
         StringValuePtr(rewrite));
 
@@ -1422,6 +1436,9 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
  */
 static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
                                VALUE rewrite) {
+  /* Ensure rewrite is a string. */
+  StringValue(rewrite);
+
   /* Take a copy of str so it can be modified in-place by
    * RE2::GlobalReplace.
    */
@@ -1436,6 +1453,9 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
+    /* Ensure pattern is a string. */
+    StringValue(pattern);
+
     RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern),
                        StringValuePtr(rewrite));
 
@@ -1563,13 +1583,23 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
 static VALUE re2_set_add(VALUE self, VALUE pattern) {
   StringValue(pattern);
   re2::StringPiece regex(RSTRING_PTR(pattern), RSTRING_LEN(pattern));
-  std::string err;
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
 
-  int index = s->set->Add(regex, &err);
+  /* To prevent the memory of the err string leaking when we call rb_raise,
+   * take a copy of it and let it go out of scope.
+   */
+  char msg[100];
+  int index;
+
+  {
+    std::string err;
+    index = s->set->Add(regex, &err);
+    strncpy(msg, err.c_str(), sizeof(msg));
+  }
+
   if (index < 0) {
-    rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", err.c_str());
+    rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", msg);
   }
 
   return INT2FIX(index);
