@@ -1583,13 +1583,23 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
 static VALUE re2_set_add(VALUE self, VALUE pattern) {
   StringValue(pattern);
   re2::StringPiece regex(RSTRING_PTR(pattern), RSTRING_LEN(pattern));
-  std::string err;
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
 
-  int index = s->set->Add(regex, &err);
+  /* To prevent the memory of the err string leaking when we call rb_raise,
+   * take a copy of it and let it go out of scope.
+   */
+  char msg[100];
+  int index;
+
+  {
+    std::string err;
+    index = s->set->Add(regex, &err);
+    strncpy(msg, err.c_str(), sizeof(msg));
+  }
+
   if (index < 0) {
-    rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", err.c_str());
+    rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", msg);
   }
 
   return INT2FIX(index);
