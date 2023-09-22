@@ -227,6 +227,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
   re2_scanner *c;
   Data_Get_Struct(self, re2_scanner, c);
 
+  delete c->input;
   c->input = new(std::nothrow) re2::StringPiece(StringValuePtr(c->text));
   c->eof = false;
 
@@ -785,6 +786,10 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
   re2_pattern *p;
 
   rb_scan_args(argc, argv, "11", &pattern, &options);
+
+  /* Ensure pattern is a string. */
+  StringValue(pattern);
+
   Data_Get_Struct(self, re2_pattern, p);
 
   if (RTEST(options)) {
@@ -1341,6 +1346,9 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
  *   c = RE2::Regexp.new('(\w+)').scan("Foo bar baz")
  */
 static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
+  /* Ensure text is a string. */
+  StringValue(text);
+
   re2_pattern *p;
   re2_scanner *c;
 
@@ -1382,6 +1390,9 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
  */
 static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
     VALUE rewrite) {
+  /* Ensure rewrite is a string. */
+  StringValue(rewrite);
+
   re2_pattern *p;
 
   /* Take a copy of str so it can be modified in-place by
@@ -1397,6 +1408,9 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
+    /* Ensure pattern is a string. */
+    StringValue(pattern);
+
     RE2::Replace(&str_as_string, StringValuePtr(pattern),
         StringValuePtr(rewrite));
 
@@ -1422,6 +1436,9 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
  */
 static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
                                VALUE rewrite) {
+  /* Ensure rewrite is a string. */
+  StringValue(rewrite);
+
   /* Take a copy of str so it can be modified in-place by
    * RE2::GlobalReplace.
    */
@@ -1436,6 +1453,9 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
+    /* Ensure pattern is a string. */
+    StringValue(pattern);
+
     RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern),
                        StringValuePtr(rewrite));
 
