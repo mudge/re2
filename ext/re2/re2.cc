@@ -270,7 +270,7 @@ static VALUE re2_scanner_scan(VALUE self) {
     args[i] = &argv[i];
   }
 
-  if (RE2::FindAndConsumeN(c->input, *p->pattern, &args[0],
+  if (RE2::FindAndConsumeN(c->input, *p->pattern, args.data(),
         c->number_of_capturing_groups)) {
     re2::StringPiece::size_type new_input_size = c->input->size();
     bool input_advanced = new_input_size < original_input_size;
