@@ -40,6 +40,13 @@ RSpec.describe RE2::Set do
         "anchor should be one of: :unanchored, :anchor_start, :anchor_both"
       )
     end
+
+    it "raises an error if given an invalid anchor and options" do
+      expect { RE2::Set.new(:not_a_valid_anchor, :case_sensitive => false) }.to raise_error(
+        ArgumentError,
+        "anchor should be one of: :unanchored, :anchor_start, :anchor_both"
+      )
+    end
   end
 
   describe "#add" do
@@ -54,7 +61,13 @@ RSpec.describe RE2::Set do
     it "rejects invalid patterns when added" do
       set = RE2::Set.new(:unanchored, :log_errors => false)
 
-      expect { set.add("???") }.to raise_error(ArgumentError, /str rejected by RE2::Set->Add()/)
+      expect { set.add("???") }.to raise_error(ArgumentError, /str rejected by RE2::Set->Add\(\)/)
+    end
+
+    it "truncates error messages to 100 characters" do
+      set = RE2::Set.new(:unanchored, :log_errors => false)
+
+      expect { set.add("(?P<#{'o' * 200}") }.to raise_error(ArgumentError, "str rejected by RE2::Set->Add(): invalid named capture group: (?P<oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
     end
 
     it "raises an error if called after #compile" do
