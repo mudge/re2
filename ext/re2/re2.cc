@@ -1595,7 +1595,7 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
   {
     std::string err;
     index = s->set->Add(regex, &err);
-    strncpy(msg, err.c_str(), sizeof(msg));
+    strlcpy(msg, err.c_str(), sizeof(msg));
   }
 
   if (index < 0) {
