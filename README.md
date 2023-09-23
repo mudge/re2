@@ -5,7 +5,7 @@ Ruby bindings to [RE2][], a "fast, safe, thread-friendly alternative to
 backtracking regular expression engines like those used in PCRE, Perl, and
 Python".
 
-**Current version:** 2.1.2  
+**Current version:** 2.1.3  
 **Supported Ruby versions:** 2.6, 2.7, 3.0, 3.1, 3.2  
 **Bundled RE2 version:** libre2.11 (2023-09-01)  
 **Supported RE2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01), libre2.10 (2022-12-01), libre2.11 (2023-07-01)
@@ -264,6 +264,11 @@ Contributions
   using `RE2::Scanner#scan` with an invalid regular expression;
 * Thanks to [Pritam Baral](https://github.com/pritambaral) for contributing the
   initial support for `RE2::Set`.
+* Thanks to [Mike Dalessio](https://github.com/flavorjones) for reviewing the
+  precompilation of native gems in 2.0.
+* Thanks to [Peter Zhu](https://github.com/peterzhu2118) for
+  [ruby_memcheck](https://github.com/Shopify/ruby_memcheck) and helping find
+  the memory leaks fixed in 2.1.3.
 
 Contact
 -------

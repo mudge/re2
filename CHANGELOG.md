@@ -5,6 +5,15 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.1.3] - 2023-09-23
+### Fixed
+- Fixed memory leaks reported by
+  [ruby_memcheck](https://github.com/Shopify/ruby_memcheck) when rewinding an
+  `RE2::Scanner` and when passing invalid input to `RE2::Regexp#scan`,
+  `RE2::Regexp#initialize`, `RE2.Replace`, `RE2.GlobalReplace` and
+  `RE2::Set#add`. Thanks to @peterzhu2118 for maintaining ruby_memcheck and
+  their assistance in finding the source of these leaks.
+
 ## [2.1.2] - 2023-09-20
 ### Fixed
 - Removed use of a C++17 extension from the gem to restore support for users
@@ -161,6 +170,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.1.3]: https://github.com/mudge/re2/releases/tag/v2.1.3
 [2.1.2]: https://github.com/mudge/re2/releases/tag/v2.1.2
 [2.1.1]: https://github.com/mudge/re2/releases/tag/v2.1.1
 [2.1.0]: https://github.com/mudge/re2/releases/tag/v2.1.0
