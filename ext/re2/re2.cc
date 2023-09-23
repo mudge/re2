@@ -1744,12 +1744,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   }
 }
 
-/* Forward declare Init_re2 to be called by C code but define it separately so
- * that YARD can parse it.
- */
-extern "C" void Init_re2(void);
-
-void Init_re2(void) {
+extern "C" void Init_re2(void) {
   re2_mRE2 = rb_define_module("RE2");
   re2_cRegexp = rb_define_class_under(re2_mRE2, "Regexp", rb_cObject);
   re2_cMatchData = rb_define_class_under(re2_mRE2, "MatchData", rb_cObject);
