@@ -228,7 +228,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
   Data_Get_Struct(self, re2_scanner, c);
 
   delete c->input;
-  c->input = new(std::nothrow) re2::StringPiece(StringValuePtr(c->text));
+  c->input = new(std::nothrow) re2::StringPiece(RSTRING_PTR(c->text));
   c->eof = false;
 
   return self;
@@ -373,9 +373,9 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    long offset = match->data() - StringValuePtr(m->text);
+    long offset = match->data() - RSTRING_PTR(m->text);
 
-    return LONG2NUM(rb_str_sublen(StringValue(m->text), offset));
+    return LONG2NUM(rb_str_sublen(m->text, offset));
   }
 }
 
@@ -398,9 +398,9 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    long offset = (match->data() - StringValuePtr(m->text)) + match->size();
+    long offset = (match->data() - RSTRING_PTR(m->text)) + match->size();
 
-    return LONG2NUM(rb_str_sublen(StringValue(m->text), offset));
+    return LONG2NUM(rb_str_sublen(m->text, offset));
   }
 }
 
@@ -564,7 +564,7 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, const VALUE self) {
   rb_scan_args(argc, argv, "11", &idx, &rest);
 
   if (TYPE(idx) == T_STRING) {
-    return re2_matchdata_named_match(StringValuePtr(idx), self);
+    return re2_matchdata_named_match(RSTRING_PTR(idx), self);
   } else if (SYMBOL_P(idx)) {
     return re2_matchdata_named_match(rb_id2name(SYM2ID(idx)), self);
   } else if (!NIL_P(rest) || !FIXNUM_P(idx) || FIX2INT(idx) < 0) {
@@ -617,7 +617,7 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
     if (match == Qnil) {
       output << "nil";
     } else {
-      output << "\"" << StringValuePtr(match) << "\"";
+      output << "\"" << RSTRING_PTR(match) << "\"";
     }
   }
 
@@ -796,9 +796,9 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
     RE2::Options re2_options;
     parse_re2_options(&re2_options, options);
 
-    p->pattern = new(std::nothrow) RE2(StringValuePtr(pattern), re2_options);
+    p->pattern = new(std::nothrow) RE2(RSTRING_PTR(pattern), re2_options);
   } else {
-    p->pattern = new(std::nothrow) RE2(StringValuePtr(pattern));
+    p->pattern = new(std::nothrow) RE2(RSTRING_PTR(pattern));
   }
 
   if (p->pattern == 0) {
@@ -1287,10 +1287,10 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
   if (n == 0) {
 #ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(StringValuePtr(text), 0,
+    bool matched = p->pattern->Match(RSTRING_PTR(text), 0,
         RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
 #else
-    bool matched = p->pattern->Match(StringValuePtr(text), 0, RE2::UNANCHORED,
+    bool matched = p->pattern->Match(RSTRING_PTR(text), 0, RE2::UNANCHORED,
         0, 0);
 #endif
     return BOOL2RUBY(matched);
@@ -1313,10 +1313,10 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     m->number_of_matches = n;
 
 #ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(StringValuePtr(m->text), 0,
+    bool matched = p->pattern->Match(RSTRING_PTR(m->text), 0,
         RSTRING_LEN(m->text), RE2::UNANCHORED, m->matches, n);
 #else
-    bool matched = p->pattern->Match(StringValuePtr(m->text), 0,
+    bool matched = p->pattern->Match(RSTRING_PTR(m->text), 0,
         RE2::UNANCHORED, m->matches, n);
 #endif
     if (matched) {
@@ -1356,7 +1356,7 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   VALUE scanner = rb_class_new_instance(0, 0, re2_cScanner);
   Data_Get_Struct(scanner, re2_scanner, c);
 
-  c->input = new(std::nothrow) re2::StringPiece(StringValuePtr(text));
+  c->input = new(std::nothrow) re2::StringPiece(RSTRING_PTR(text));
   c->regexp = self;
   c->text = text;
 
@@ -1403,7 +1403,7 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     Data_Get_Struct(pattern, re2_pattern, p);
-    RE2::Replace(&str_as_string, *p->pattern, StringValuePtr(rewrite));
+    RE2::Replace(&str_as_string, *p->pattern, RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
@@ -1411,8 +1411,7 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
     /* Ensure pattern is a string. */
     StringValue(pattern);
 
-    RE2::Replace(&str_as_string, StringValuePtr(pattern),
-        StringValuePtr(rewrite));
+    RE2::Replace(&str_as_string, RSTRING_PTR(pattern), RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(), RE2::Options::EncodingUTF8);
   }
@@ -1448,7 +1447,7 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     Data_Get_Struct(pattern, re2_pattern, p);
-    RE2::GlobalReplace(&str_as_string, *p->pattern, StringValuePtr(rewrite));
+    RE2::GlobalReplace(&str_as_string, *p->pattern, RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
@@ -1456,8 +1455,8 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
     /* Ensure pattern is a string. */
     StringValue(pattern);
 
-    RE2::GlobalReplace(&str_as_string, StringValuePtr(pattern),
-                       StringValuePtr(rewrite));
+    RE2::GlobalReplace(&str_as_string, RSTRING_PTR(pattern),
+        RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(), RE2::Options::EncodingUTF8);
   }
@@ -1474,7 +1473,9 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
  *   RE2::Regexp.escape("1.5-2.0?")    #=> "1\.5\-2\.0\?"
  */
 static VALUE re2_QuoteMeta(VALUE, VALUE unquoted) {
-  std::string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+  StringValue(unquoted);
+
+  std::string quoted_string = RE2::QuoteMeta(RSTRING_PTR(unquoted));
 
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }
@@ -1537,15 +1538,12 @@ static VALUE re2_set_allocate(VALUE klass) {
 static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
   VALUE anchor, options;
   re2_set *s;
-  RE2::Anchor re2_anchor = RE2::UNANCHORED;
-  RE2::Options re2_options;
 
   rb_scan_args(argc, argv, "02", &anchor, &options);
   Data_Get_Struct(self, re2_set, s);
 
-  if (RTEST(options)) {
-    parse_re2_options(&re2_options, options);
-  }
+  RE2::Anchor re2_anchor = RE2::UNANCHORED;
+
   if (!NIL_P(anchor)) {
     Check_Type(anchor, T_SYMBOL);
     ID id_anchor = SYM2ID(anchor);
@@ -1558,6 +1556,12 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
     } else {
       rb_raise(rb_eArgError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both");
     }
+  }
+
+  RE2::Options re2_options;
+
+  if (RTEST(options)) {
+    parse_re2_options(&re2_options, options);
   }
 
   s->set = new(std::nothrow) RE2::Set(re2_options, re2_anchor);
@@ -1582,7 +1586,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
  */
 static VALUE re2_set_add(VALUE self, VALUE pattern) {
   StringValue(pattern);
-  re2::StringPiece regex(RSTRING_PTR(pattern), RSTRING_LEN(pattern));
+
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
 
@@ -1594,7 +1598,7 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
 
   {
     std::string err;
-    index = s->set->Add(regex, &err);
+    index = s->set->Add(RSTRING_PTR(pattern), &err);
     strlcpy(msg, err.c_str(), sizeof(msg));
   }
 
@@ -1683,7 +1687,6 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   rb_scan_args(argc, argv, "11", &str, &options);
 
   StringValue(str);
-  re2::StringPiece data(RSTRING_PTR(str), RSTRING_LEN(str));
   re2_set *s;
   Data_Get_Struct(self, re2_set, s);
 
@@ -1701,7 +1704,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   if (raise_exception) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
     RE2::Set::ErrorInfo e;
-    bool match_failed = !s->set->Match(data, &v, &e);
+    bool match_failed = !s->set->Match(RSTRING_PTR(str), &v, &e);
     VALUE result = rb_ary_new2(v.size());
 
     if (match_failed) {
@@ -1728,7 +1731,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match() does not output error information, :exception option can only be set to false");
 #endif
   } else {
-    bool matched = s->set->Match(data, &v);
+    bool matched = s->set->Match(RSTRING_PTR(str), &v);
     VALUE result = rb_ary_new2(v.size());
 
     if (matched) {
