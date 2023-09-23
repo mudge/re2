@@ -761,7 +761,7 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, const VALUE self) {
   rb_scan_args(argc, argv, &quot;11&quot;, &amp;idx, &amp;rest);
 
   if (TYPE(idx) == T_STRING) {
-    return re2_matchdata_named_match(StringValuePtr(idx), self);
+    return re2_matchdata_named_match(RSTRING_PTR(idx), self);
   } else if (SYMBOL_P(idx)) {
     return re2_matchdata_named_match(rb_id2name(SYM2ID(idx)), self);
   } else if (!NIL_P(rest) || !FIXNUM_P(idx) || FIX2INT(idx) &lt; 0) {
@@ -876,9 +876,9 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    long offset = match-&gt;data() - StringValuePtr(m-&gt;text);
+    long offset = match-&gt;data() - RSTRING_PTR(m-&gt;text);
 
-    return LONG2NUM(rb_str_sublen(StringValue(m-&gt;text), offset));
+    return LONG2NUM(rb_str_sublen(m-&gt;text, offset));
   }
 }</pre>
     </td>
@@ -1280,9 +1280,9 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
   if (match == NULL) {
     return Qnil;
   } else {
-    long offset = (match-&gt;data() - StringValuePtr(m-&gt;text)) + match-&gt;size();
+    long offset = (match-&gt;data() - RSTRING_PTR(m-&gt;text)) + match-&gt;size();
 
-    return LONG2NUM(rb_str_sublen(StringValue(m-&gt;text), offset));
+    return LONG2NUM(rb_str_sublen(m-&gt;text, offset));
   }
 }</pre>
     </td>
@@ -1402,7 +1402,7 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
     if (match == Qnil) {
       output &lt;&lt; &quot;nil&quot;;
     } else {
-      output &lt;&lt; &quot;\&quot;&quot; &lt;&lt; StringValuePtr(match) &lt;&lt; &quot;\&quot;&quot;;
+      output &lt;&lt; &quot;\&quot;&quot; &lt;&lt; RSTRING_PTR(match) &lt;&lt; &quot;\&quot;&quot;;
     }
   }
 
@@ -1693,15 +1693,15 @@ static VALUE re2_matchdata_size(const VALUE self) {
       <pre class="lines">
 
 
+178
 179
 180
 181
 182
-183
-184</pre>
+183</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 179</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 178</span>
 
 static VALUE re2_matchdata_string(const VALUE self) {
   re2_matchdata *m;
@@ -1884,7 +1884,7 @@ static VALUE re2_matchdata_to_a(const VALUE self) {
 </div>
 
       <div id="footer">
-  Generated on Wed Sep 20 08:42:46 2023 by
+  Generated on Sat Sep 23 19:11:27 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

@@ -317,15 +317,6 @@
       <pre class="lines">
 
 
-1427
-1428
-1429
-1430
-1431
-1432
-1433
-1434
-1435
 1436
 1437
 1438
@@ -340,14 +331,28 @@
 1447
 1448
 1449
-1450</pre>
+1450
+1451
+1452
+1453
+1454
+1455
+1456
+1457
+1458
+1459
+1460
+1461
+1462
+1463</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1427</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1436</span>
 
-static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
+static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
                                VALUE rewrite) {
-  UNUSED(self);
+  /* Ensure rewrite is a string. */
+  StringValue(rewrite);
 
   /* Take a copy of str so it can be modified in-place by
    * RE2::GlobalReplace.
@@ -358,13 +363,16 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     Data_Get_Struct(pattern, re2_pattern, p);
-    RE2::GlobalReplace(&amp;str_as_string, *p-&gt;pattern, StringValuePtr(rewrite));
+    RE2::GlobalReplace(&amp;str_as_string, *p-&gt;pattern, RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p-&gt;pattern-&gt;options().encoding());
   } else {
-    RE2::GlobalReplace(&amp;str_as_string, StringValuePtr(pattern),
-                       StringValuePtr(rewrite));
+    /* Ensure pattern is a string. */
+    StringValue(pattern);
+
+    RE2::GlobalReplace(&amp;str_as_string, RSTRING_PTR(pattern),
+        RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(), RE2::Options::EncodingUTF8);
   }
@@ -446,19 +454,21 @@ static VALUE re2_GlobalReplace(VALUE self, VALUE str, VALUE pattern,
       <pre class="lines">
 
 
-1462
-1463
-1464
-1465
-1466
-1467</pre>
+1475
+1476
+1477
+1478
+1479
+1480
+1481</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1462</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1475</span>
 
-static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
-  UNUSED(self);
-  std::string quoted_string = RE2::QuoteMeta(StringValuePtr(unquoted));
+static VALUE re2_QuoteMeta(VALUE, VALUE unquoted) {
+  StringValue(unquoted);
+
+  std::string quoted_string = RE2::QuoteMeta(RSTRING_PTR(unquoted));
 
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }</pre>
@@ -575,11 +585,6 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
       <pre class="lines">
 
 
-1386
-1387
-1388
-1389
-1390
 1391
 1392
 1393
@@ -598,14 +603,25 @@ static VALUE re2_QuoteMeta(VALUE self, VALUE unquoted) {
 1406
 1407
 1408
-1409</pre>
+1409
+1410
+1411
+1412
+1413
+1414
+1415
+1416
+1417
+1418</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1386</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 1391</span>
 
-static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
+static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
     VALUE rewrite) {
-  UNUSED(self);
+  /* Ensure rewrite is a string. */
+  StringValue(rewrite);
+
   re2_pattern *p;
 
   /* Take a copy of str so it can be modified in-place by
@@ -616,13 +632,15 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     Data_Get_Struct(pattern, re2_pattern, p);
-    RE2::Replace(&amp;str_as_string, *p-&gt;pattern, StringValuePtr(rewrite));
+    RE2::Replace(&amp;str_as_string, *p-&gt;pattern, RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p-&gt;pattern-&gt;options().encoding());
   } else {
-    RE2::Replace(&amp;str_as_string, StringValuePtr(pattern),
-        StringValuePtr(rewrite));
+    /* Ensure pattern is a string. */
+    StringValue(pattern);
+
+    RE2::Replace(&amp;str_as_string, RSTRING_PTR(pattern), RSTRING_PTR(rewrite));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(), RE2::Options::EncodingUTF8);
   }
@@ -637,7 +655,7 @@ static VALUE re2_Replace(VALUE self, VALUE str, VALUE pattern,
 </div>
 
       <div id="footer">
-  Generated on Wed Sep 20 08:42:46 2023 by
+  Generated on Sat Sep 23 19:11:27 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

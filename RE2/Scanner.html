@@ -368,15 +368,15 @@
       <pre class="lines">
 
 
+208
 209
 210
 211
 212
-213
-214</pre>
+213</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 209</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 208</span>
 
 static VALUE re2_scanner_eof(const VALUE self) {
   re2_scanner *c;
@@ -502,6 +502,7 @@ static VALUE re2_scanner_regexp(const VALUE self) {
       <pre class="lines">
 
 
+226
 227
 228
 229
@@ -513,13 +514,14 @@ static VALUE re2_scanner_regexp(const VALUE self) {
 235</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 227</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 226</span>
 
 static VALUE re2_scanner_rewind(VALUE self) {
   re2_scanner *c;
   Data_Get_Struct(self, re2_scanner, c);
 
-  c-&gt;input = new(std::nothrow) re2::StringPiece(StringValuePtr(c-&gt;text));
+  delete c-&gt;input;
+  c-&gt;input = new(std::nothrow) re2::StringPiece(RSTRING_PTR(c-&gt;text));
   c-&gt;eof = false;
 
   return self;
@@ -751,15 +753,15 @@ static VALUE re2_scanner_scan(VALUE self) {
       <pre class="lines">
 
 
+193
 194
 195
 196
 197
-198
-199</pre>
+198</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 194</span>
+      <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 193</span>
 
 static VALUE re2_scanner_string(const VALUE self) {
   re2_scanner *c;
@@ -777,7 +779,7 @@ static VALUE re2_scanner_string(const VALUE self) {
 </div>
 
       <div id="footer">
-  Generated on Wed Sep 20 08:42:46 2023 by
+  Generated on Sat Sep 23 19:11:27 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

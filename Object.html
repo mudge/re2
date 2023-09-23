@@ -174,16 +174,12 @@
 
 745
 746
-747
-748
-749</pre>
+747</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'ext/re2/re2.cc', line 745</span>
 
-static VALUE re2_re2(int argc, VALUE *argv, VALUE self) {
-  UNUSED(self);
-
+static VALUE re2_re2(int argc, VALUE *argv, VALUE) {
   return rb_class_new_instance(argc, argv, re2_cRegexp);
 }</pre>
     </td>
@@ -196,7 +192,7 @@ static VALUE re2_re2(int argc, VALUE *argv, VALUE self) {
 </div>
 
       <div id="footer">
-  Generated on Wed Sep 20 08:42:46 2023 by
+  Generated on Sat Sep 23 19:11:27 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
