@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+require "net/http"
+require "digest/sha2"
+require "yaml"
+
+re2_response = Net::HTTP.get_response(URI("https://github.com/google/re2/releases/latest"))
+exit 1 unless re2_response.is_a?(Net::HTTPRedirection)
+
+re2_release = File.basename(URI(re2_response["Location"]).path)
+re2_redirect = Net::HTTP.get_response(URI("https://github.com/google/re2/releases/download/#{re2_release}/re2-#{re2_release}.tar.gz"))
+exit 1 unless re2_redirect.is_a?(Net::HTTPRedirection)
+
+re2_archive = Net::HTTP.get_response(URI(re2_redirect["Location"]))
+exit 1 unless re2_archive.is_a?(Net::HTTPSuccess)
+re2_sha256sum = Digest::SHA2.hexdigest(re2_archive.body)
+
+abseil_response = Net::HTTP.get_response(URI("https://github.com/abseil/abseil-cpp/releases/latest"))
+exit 1 unless abseil_response.is_a?(Net::HTTPRedirection)
+
+abseil_tag = File.basename(URI(abseil_response["Location"]).path)
+abseil_redirect = Net::HTTP.get_response(URI("https://github.com/abseil/abseil-cpp/archive/refs/tags/#{abseil_tag}.tar.gz"))
+exit 1 unless abseil_redirect.is_a?(Net::HTTPRedirection)
+
+abseil_archive = Net::HTTP.get_response(URI(abseil_redirect["Location"]))
+exit 1 unless abseil_archive.is_a?(Net::HTTPSuccess)
+abseil_sha256sum = Digest::SHA2.hexdigest(abseil_archive.body)
+
+File.write(
+  File.expand_path("../dependencies.yml", __dir__),
+  {
+    "libre2" => { "version" => re2_release, "sha256" => re2_sha256sum },
+    "abseil" => { "version" => abseil_tag, "sha256" => abseil_sha256sum }
+  }.to_yaml
+)
