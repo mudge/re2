@@ -18,9 +18,15 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('???', :log_errors => false)
       expect(re).to be_a(RE2::Regexp)
     end
+
+    it "supports passing something that can be coerced to a String as input" do
+      re = RE2::Regexp.new(StringLike.new('w(o)(o)'))
+
+      expect(re).to be_a(RE2::Regexp)
+    end
   end
 
-  describe "#compile" do
+  describe ".compile" do
     it "returns an instance given only a pattern" do
       re = RE2::Regexp.compile('woo')
       expect(re).to be_a(RE2::Regexp)
@@ -31,8 +37,18 @@ RSpec.describe RE2::Regexp do
       expect(re).to be_a(RE2::Regexp)
     end
 
+    it "raises an error if given an inappropriate type" do
+      expect { RE2::Regexp.compile(nil) }.to raise_error(TypeError)
+    end
+
     it "allows invalid patterns to be created" do
       re = RE2::Regexp.compile('???', :log_errors => false)
+      expect(re).to be_a(RE2::Regexp)
+    end
+
+    it "supports passing something that can be coerced to a String as input" do
+      re = RE2::Regexp.compile(StringLike.new('w(o)(o)'))
+
       expect(re).to be_a(RE2::Regexp)
     end
   end
@@ -59,7 +75,7 @@ RSpec.describe RE2::Regexp do
 
     it "is populated with overridden options when specified" do
       options = RE2::Regexp.new('woo', :case_sensitive => false).options
-      expect(options[:case_sensitive]).to eq(false)
+      expect(options).to include(:case_sensitive => false)
     end
   end
 
@@ -82,7 +98,7 @@ RSpec.describe RE2::Regexp do
       expect(error_arg).to be_nil
     end
 
-    it "returns the offending portin of the regexp if there is an error" do
+    it "returns the offending portion of the regexp if there is an error" do
       error_arg = RE2::Regexp.new('wo(o', :log_errors => false).error_arg
       expect(error_arg).to eq("wo(o")
     end

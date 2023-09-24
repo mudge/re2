@@ -9,5 +9,21 @@ RSpec.describe Kernel do
 
       expect(re).not_to be_case_sensitive
     end
+
+    it "raises an error if given an inappropriate type" do
+      expect { RE2(nil) }.to raise_error(TypeError)
+    end
+
+    it "allows invalid patterns to be created" do
+      re = RE2('???', :log_errors => false)
+
+      expect(re).to be_a(RE2::Regexp)
+    end
+
+    it "supports passing something that can be coerced to a String as input" do
+      re = RE2(StringLike.new('w(o)(o)'))
+
+      expect(re).to be_a(RE2::Regexp)
+    end
   end
 end

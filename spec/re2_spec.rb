@@ -12,11 +12,12 @@ RSpec.describe RE2 do
       expect(RE2.Replace("Good morning", "(?i)gOOD MORNING", "hi")).to eq("hi")
     end
 
-    it "does not perform replacements in-place" do
+    it "does not perform replacements in-place", :aggregate_failures do
       name = "Robert"
       replacement = RE2.Replace(name, "R", "Cr")
 
-      expect(name).not_to equal(replacement)
+      expect(name).to eq("Robert")
+      expect(replacement).to eq("Crobert")
     end
 
     it "supports passing an RE2::Regexp as the pattern" do
@@ -89,11 +90,12 @@ RSpec.describe RE2 do
       expect(RE2.GlobalReplace("Robert", "(?i)r", "w")).to eq("wobewt")
     end
 
-    it "does not perform replacement in-place" do
+    it "does not perform replacement in-place", :aggregate_failures do
       name = "Robert"
       replacement = RE2.GlobalReplace(name, "(?i)R", "w")
 
-      expect(name).not_to equal(replacement)
+      expect(name).to eq("Robert")
+      expect(replacement).to eq("wobewt")
     end
 
     it "supports passing an RE2::Regexp as the pattern" do
