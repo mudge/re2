@@ -1,0 +1,26 @@
+name: Upgrade vendored dependencies
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 3 1 * *'
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+      - name: Upgrade all vendored dependencies to their latest versions
+        run: ./scripts/update-dependencies
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          branch: 'upgrade-vendored-dependencies'
+          title: 'Upgrade vendored dependencies'
+          commit-message: 'Upgrade vendored dependencies to latest versions'
+          labels: dependencies
+          body: |
+            - Upgrade RE2
+            - Upgrade Abseil
