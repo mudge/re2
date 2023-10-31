@@ -5,6 +5,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.3.0] - 2023-10-31
+### Changed
+- Upgrade the bundled version of RE2 to 2023-11-01.
+
 ## [2.2.0] - 2023-10-23
 ### Changed
 - Upgrade the bundled version of Abseil to 20230802.1.
@@ -176,6 +180,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.3.0]: https://github.com/mudge/re2/releases/tag/v2.3.0
 [2.2.0]: https://github.com/mudge/re2/releases/tag/v2.2.0
 [2.1.3]: https://github.com/mudge/re2/releases/tag/v2.1.3
 [2.1.2]: https://github.com/mudge/re2/releases/tag/v2.1.2
