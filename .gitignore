@@ -9,3 +9,4 @@ tmp
 .yardoc
 doc
 Gemfile.lock
+ports/
