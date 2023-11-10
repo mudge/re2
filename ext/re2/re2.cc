@@ -122,10 +122,25 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
   }
 }
 
+/* For compatibility with ruby < 2.7 */
+#ifdef HAVE_RB_GC_MARK_MOVABLE
+#define re2_compact_callback(x) .dcompact = (x),
+#else
+#define rb_gc_mark_movable(x) rb_gc_mark(x)
+#define re2_compact_callback(x)
+#define rb_gc_location(x)
+#endif
+
 static void re2_matchdata_mark(void * data) {
   re2_matchdata* self = (re2_matchdata*)data;
-  rb_gc_mark(self->regexp);
-  rb_gc_mark(self->text);
+  rb_gc_mark_movable(self->regexp);
+  rb_gc_mark_movable(self->text);
+}
+
+static void re2_matchdata_update_references(void * data) {
+  re2_matchdata* self = (re2_matchdata*)data;
+  self->regexp = rb_gc_location(self->regexp);
+  self->text = rb_gc_location(self->text);
 }
 
 static void re2_matchdata_free(void * data) {
@@ -146,6 +161,7 @@ static const rb_data_type_t re2_matchdata_data_type = {
     .dmark = re2_matchdata_mark,
     .dfree = re2_matchdata_free,
     .dsize = re2_matchdata_memsize,
+    re2_compact_callback(re2_matchdata_update_references)
   },
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
@@ -154,8 +170,14 @@ static const rb_data_type_t re2_matchdata_data_type = {
 
 static void re2_scanner_mark(void *data) {
   re2_scanner* self = (re2_scanner *)data;
-  rb_gc_mark(self->regexp);
-  rb_gc_mark(self->text);
+  rb_gc_mark_movable(self->regexp);
+  rb_gc_mark_movable(self->text);
+}
+
+static void re2_scanner_update_references(void * data) {
+  re2_matchdata* self = (re2_scanner*)data;
+  self->regexp = rb_gc_location(self->regexp);
+  self->text = rb_gc_location(self->text);
 }
 
 static void re2_scanner_free(void *data) {
@@ -181,6 +203,7 @@ static const rb_data_type_t re2_scanner_data_type = {
     .dmark = re2_scanner_mark,
     .dfree = re2_scanner_free,
     .dsize = re2_scanner_memsize,
+    re2_compact_callback(re2_scanner_update_references)
   },
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.

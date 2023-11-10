@@ -128,6 +128,7 @@ def build_extension(static_p = false)
 
   have_library("stdc++")
   have_header("stdint.h")
+  have_func("rb_gc_mark_movable") # introduced in Ruby 2.7
 
   if !static_p and !have_library("re2")
     abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
