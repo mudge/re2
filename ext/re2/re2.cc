@@ -150,17 +150,38 @@ static const rb_data_type_t re2_matchdata_data_type = {
   .flags = RUBY_TYPED_FREE_IMMEDIATELY
 };
 
-static void re2_scanner_mark(re2_scanner* self) {
+static void re2_scanner_mark(void *data) {
+  re2_scanner* self = (re2_scanner *)data;
   rb_gc_mark(self->regexp);
   rb_gc_mark(self->text);
 }
 
-static void re2_scanner_free(re2_scanner* self) {
+static void re2_scanner_free(void *data) {
+  re2_scanner* self = (re2_scanner *)data;
   if (self->input) {
     delete self->input;
   }
   free(self);
 }
+
+static size_t re2_scanner_memsize(const void *data) {
+  const re2_scanner* self = (const re2_scanner*)data;
+  size_t size = sizeof(re2_scanner);
+  if (self->input) {
+    size += sizeof(self->input);
+  }
+  return size;
+}
+
+static const rb_data_type_t re2_scanner_data_type = {
+  .wrap_struct_name = "RE2::Scanner",
+  .function = {
+    .dmark = re2_scanner_mark,
+    .dfree = re2_scanner_free,
+    .dsize = re2_scanner_memsize,
+  },
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY
+};
 
 static void re2_regexp_free(re2_pattern* self) {
   if (self->pattern) {
@@ -179,8 +200,7 @@ static VALUE re2_matchdata_allocate(VALUE klass) {
 static VALUE re2_scanner_allocate(VALUE klass) {
   re2_scanner *c;
 
-  return Data_Make_Struct(klass, re2_scanner, re2_scanner_mark,
-      re2_scanner_free, c);
+  return TypedData_Make_Struct(klass, re2_scanner, &re2_scanner_data_type, c);
 }
 
 /*
@@ -208,7 +228,7 @@ static VALUE re2_matchdata_string(const VALUE self) {
  */
 static VALUE re2_scanner_string(const VALUE self) {
   re2_scanner *c;
-  Data_Get_Struct(self, re2_scanner, c);
+  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
 
   return c->text;
 }
@@ -223,7 +243,7 @@ static VALUE re2_scanner_string(const VALUE self) {
  */
 static VALUE re2_scanner_eof(const VALUE self) {
   re2_scanner *c;
-  Data_Get_Struct(self, re2_scanner, c);
+  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
 
   return BOOL2RUBY(c->eof);
 }
@@ -241,7 +261,7 @@ static VALUE re2_scanner_eof(const VALUE self) {
  */
 static VALUE re2_scanner_rewind(VALUE self) {
   re2_scanner *c;
-  Data_Get_Struct(self, re2_scanner, c);
+  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
 
   delete c->input;
   c->input = new(std::nothrow) re2::StringPiece(RSTRING_PTR(c->text));
@@ -268,7 +288,7 @@ static VALUE re2_scanner_scan(VALUE self) {
   re2_pattern *p;
   re2_scanner *c;
 
-  Data_Get_Struct(self, re2_scanner, c);
+  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
   Data_Get_Struct(c->regexp, re2_pattern, p);
 
   std::vector<RE2::Arg> argv(c->number_of_capturing_groups);
@@ -445,7 +465,7 @@ static VALUE re2_matchdata_regexp(const VALUE self) {
  */
 static VALUE re2_scanner_regexp(const VALUE self) {
   re2_scanner *c;
-  Data_Get_Struct(self, re2_scanner, c);
+  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
 
   return c->regexp;
 }
@@ -1370,7 +1390,7 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
 
   Data_Get_Struct(self, re2_pattern, p);
   VALUE scanner = rb_class_new_instance(0, 0, re2_cScanner);
-  Data_Get_Struct(scanner, re2_scanner, c);
+  TypedData_Get_Struct(scanner, re2_scanner, &re2_scanner_data_type, c);
 
   c->input = new(std::nothrow) re2::StringPiece(RSTRING_PTR(text));
   c->regexp = self;
