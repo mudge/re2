@@ -147,7 +147,9 @@ static const rb_data_type_t re2_matchdata_data_type = {
     .dfree = re2_matchdata_free,
     .dsize = re2_matchdata_memsize,
   },
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY
+  // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
+  // macro to update VALUE references, as to trigger write barriers.
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static void re2_scanner_mark(void *data) {
@@ -180,7 +182,9 @@ static const rb_data_type_t re2_scanner_data_type = {
     .dfree = re2_scanner_free,
     .dsize = re2_scanner_memsize,
   },
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY
+  // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
+  // macro to update VALUE references, as to trigger write barriers.
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static void re2_regexp_free(void *data) {
@@ -208,7 +212,9 @@ static const rb_data_type_t re2_regexp_data_type = {
     .dfree = re2_regexp_free,
     .dsize = re2_regexp_memsize,
   },
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY
+  // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
+  // macro to update VALUE references, as to trigger write barriers.
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static VALUE re2_matchdata_allocate(VALUE klass) {
@@ -1358,9 +1364,11 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
     TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
     m->matches = new(std::nothrow) re2::StringPiece[n];
-    m->regexp = self;
-    m->text = rb_str_dup(text);
-    rb_str_freeze(m->text);
+    RB_OBJ_WRITE(matchdata, &m->regexp, self);
+    if (!RTEST(rb_obj_frozen_p(text))) {
+      text = rb_str_freeze(rb_str_dup(text));
+    }
+    RB_OBJ_WRITE(matchdata, &m->text, text);
 
     if (m->matches == 0) {
       rb_raise(rb_eNoMemError,
@@ -1414,8 +1422,8 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   TypedData_Get_Struct(scanner, re2_scanner, &re2_scanner_data_type, c);
 
   c->input = new(std::nothrow) re2::StringPiece(RSTRING_PTR(text));
-  c->regexp = self;
-  c->text = text;
+  RB_OBJ_WRITE(scanner, &c->regexp, self);
+  RB_OBJ_WRITE(scanner, &c->text, text);
 
   if (p->pattern->ok()) {
     c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
@@ -1561,7 +1569,9 @@ static const rb_data_type_t re2_set_data_type = {
     .dfree = re2_set_free,
     .dsize = re2_set_memsize,
   },
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY
+  // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
+  // macro to update VALUE references, as to trigger write barriers.
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static VALUE re2_set_allocate(VALUE klass) {
