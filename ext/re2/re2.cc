@@ -122,17 +122,33 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
   }
 }
 
-static void re2_matchdata_mark(re2_matchdata* self) {
+static void re2_matchdata_mark(void * data) {
+  re2_matchdata* self = (re2_matchdata*)data;
   rb_gc_mark(self->regexp);
   rb_gc_mark(self->text);
 }
 
-static void re2_matchdata_free(re2_matchdata* self) {
+static void re2_matchdata_free(void * data) {
+  re2_matchdata* self = (re2_matchdata*)data;
   if (self->matches) {
     delete[] self->matches;
   }
   free(self);
 }
+
+static size_t re2_matchdata_memsize(const void * data) {
+  return sizeof(re2_matchdata);
+}
+
+static const rb_data_type_t re2_matchdata_data_type = {
+  .wrap_struct_name = "RE2::MatchData",
+  .function = {
+    .dmark = re2_matchdata_mark,
+    .dfree = re2_matchdata_free,
+    .dsize = re2_matchdata_memsize,
+  },
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY
+};
 
 static void re2_scanner_mark(re2_scanner* self) {
   rb_gc_mark(self->regexp);
@@ -156,8 +172,8 @@ static void re2_regexp_free(re2_pattern* self) {
 static VALUE re2_matchdata_allocate(VALUE klass) {
   re2_matchdata *m;
 
-  return Data_Make_Struct(klass, re2_matchdata, re2_matchdata_mark,
-      re2_matchdata_free, m);
+  return TypedData_Make_Struct(klass, re2_matchdata, &re2_matchdata_data_type,
+      m);
 }
 
 static VALUE re2_scanner_allocate(VALUE klass) {
@@ -177,7 +193,7 @@ static VALUE re2_scanner_allocate(VALUE klass) {
  */
 static VALUE re2_matchdata_string(const VALUE self) {
   re2_matchdata *m;
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
 
   return m->text;
 }
@@ -308,7 +324,7 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   int id;
@@ -349,7 +365,7 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
  */
 static VALUE re2_matchdata_size(const VALUE self) {
   re2_matchdata *m;
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
 
   return INT2FIX(m->number_of_matches);
 }
@@ -367,7 +383,7 @@ static VALUE re2_matchdata_size(const VALUE self) {
 static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
   re2_matchdata *m;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
   if (match == NULL) {
@@ -392,7 +408,7 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
 static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
   re2_matchdata *m;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
   if (match == NULL) {
@@ -414,7 +430,7 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
  */
 static VALUE re2_matchdata_regexp(const VALUE self) {
   re2_matchdata *m;
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
 
   return m->regexp;
 }
@@ -456,7 +472,7 @@ static VALUE re2_matchdata_to_a(const VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   VALUE array = rb_ary_new2(m->number_of_matches);
@@ -478,7 +494,7 @@ static VALUE re2_matchdata_nth_match(int nth, const VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   if (nth < 0 || nth >= m->number_of_matches) {
@@ -499,7 +515,7 @@ static VALUE re2_matchdata_named_match(const char* name, const VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
@@ -599,7 +615,7 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   std::ostringstream output;
@@ -651,7 +667,7 @@ static VALUE re2_matchdata_deconstruct(const VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   VALUE array = rb_ary_new2(m->number_of_matches - 1);
@@ -701,7 +717,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
   re2_matchdata *m;
   re2_pattern *p;
 
-  Data_Get_Struct(self, re2_matchdata, m);
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
   Data_Get_Struct(m->regexp, re2_pattern, p);
 
   const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
@@ -1299,7 +1315,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     n += 1;
 
     VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
-    Data_Get_Struct(matchdata, re2_matchdata, m);
+    TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
     m->matches = new(std::nothrow) re2::StringPiece[n];
     m->regexp = self;
     m->text = rb_str_dup(text);
