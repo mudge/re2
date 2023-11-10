@@ -1537,16 +1537,36 @@ static VALUE re2_QuoteMeta(VALUE, VALUE unquoted) {
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }
 
-static void re2_set_free(re2_set *self) {
+static void re2_set_free(void *data) {
+  re2_set *self = (re2_set *)data;
   if (self->set) {
     delete self->set;
   }
   free(self);
 }
 
+static size_t re2_set_memsize(const void *data) {
+  const re2_set *self = (const re2_set *)data;
+  size_t size = sizeof(re2_set);
+  if (self->set) {
+    size += sizeof(self->set);
+  }
+  return size;
+}
+
+static const rb_data_type_t re2_set_data_type = {
+  .wrap_struct_name = "RE2::Set",
+  .function = {
+    .dmark = NULL,
+    .dfree = re2_set_free,
+    .dsize = re2_set_memsize,
+  },
+  .flags = RUBY_TYPED_FREE_IMMEDIATELY
+};
+
 static VALUE re2_set_allocate(VALUE klass) {
   re2_set *s;
-  VALUE result = Data_Make_Struct(klass, re2_set, 0, re2_set_free, s);
+  VALUE result = TypedData_Make_Struct(klass, re2_set, &re2_set_data_type, s);
 
   return result;
 }
@@ -1597,7 +1617,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
   re2_set *s;
 
   rb_scan_args(argc, argv, "02", &anchor, &options);
-  Data_Get_Struct(self, re2_set, s);
+  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
 
   RE2::Anchor re2_anchor = RE2::UNANCHORED;
 
@@ -1645,7 +1665,7 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
   StringValue(pattern);
 
   re2_set *s;
-  Data_Get_Struct(self, re2_set, s);
+  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
 
   /* To prevent the memory of the err string leaking when we call rb_raise,
    * take a copy of it and let it go out of scope.
@@ -1678,7 +1698,7 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
  */
 static VALUE re2_set_compile(VALUE self) {
   re2_set *s;
-  Data_Get_Struct(self, re2_set, s);
+  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
 
   return BOOL2RUBY(s->set->Compile());
 }
@@ -1745,7 +1765,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
 
   StringValue(str);
   re2_set *s;
-  Data_Get_Struct(self, re2_set, s);
+  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
 
   if (RTEST(options)) {
     Check_Type(options, T_HASH);
