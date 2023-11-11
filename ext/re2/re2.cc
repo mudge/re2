@@ -181,7 +181,7 @@ static void re2_scanner_mark(void *data) {
 }
 
 static void re2_scanner_update_references(void * data) {
-  re2_matchdata* self = (re2_scanner*)data;
+  re2_scanner *self = (re2_scanner *)data;
   self->regexp = rb_gc_location(self->regexp);
   self->text = rb_gc_location(self->text);
 }
