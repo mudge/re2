@@ -5,6 +5,15 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.4.0] - 2023-11-11
+### Added
+- Improve garbage collection and support compaction in newer versions of Ruby.
+  Thanks to @byroot for contributing this by switching to Ruby's TypedData API.
+
+### Changed
+- No longer needlessly return copies of frozen strings passed to
+  `RE2::Regexp#match` and return the original instead.
+
 ## [2.3.0] - 2023-10-31
 ### Changed
 - Upgrade the bundled version of RE2 to 2023-11-01.
@@ -180,6 +189,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.4.0]: https://github.com/mudge/re2/releases/tag/v2.4.0
 [2.3.0]: https://github.com/mudge/re2/releases/tag/v2.3.0
 [2.2.0]: https://github.com/mudge/re2/releases/tag/v2.2.0
 [2.1.3]: https://github.com/mudge/re2/releases/tag/v2.1.3
