@@ -128,7 +128,6 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 #else
 #define rb_gc_mark_movable(x) rb_gc_mark(x)
 #define re2_compact_callback(x)
-#define rb_gc_location(x) x
 #endif
 
 static void re2_matchdata_mark(void *data) {
@@ -137,11 +136,13 @@ static void re2_matchdata_mark(void *data) {
   rb_gc_mark_movable(self->text);
 }
 
+#ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_matchdata_update_references(void *data) {
   re2_matchdata *self = (re2_matchdata *)data;
   self->regexp = rb_gc_location(self->regexp);
   self->text = rb_gc_location(self->text);
 }
+#endif
 
 static void re2_matchdata_free(void *data) {
   re2_matchdata *self = (re2_matchdata *)data;
@@ -180,11 +181,13 @@ static void re2_scanner_mark(void *data) {
   rb_gc_mark_movable(self->text);
 }
 
+#ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_scanner_update_references(void *data) {
   re2_scanner *self = (re2_scanner *)data;
   self->regexp = rb_gc_location(self->regexp);
   self->text = rb_gc_location(self->text);
 }
+#endif
 
 static void re2_scanner_free(void *data) {
   re2_scanner *self = (re2_scanner *)data;
