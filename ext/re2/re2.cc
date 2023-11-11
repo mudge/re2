@@ -151,7 +151,7 @@ static void re2_matchdata_free(void *data) {
   xfree(self);
 }
 
-static size_t re2_matchdata_memsize(const void * data) {
+static size_t re2_matchdata_memsize(const void *data) {
   const re2_matchdata *self = (const re2_matchdata *)data;
   size_t size = sizeof(re2_matchdata);
   if (self->matches) {
