@@ -131,20 +131,20 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 #define rb_gc_location(x)
 #endif
 
-static void re2_matchdata_mark(void * data) {
-  re2_matchdata* self = (re2_matchdata*)data;
+static void re2_matchdata_mark(void *data) {
+  re2_matchdata *self = (re2_matchdata *)data;
   rb_gc_mark_movable(self->regexp);
   rb_gc_mark_movable(self->text);
 }
 
-static void re2_matchdata_update_references(void * data) {
-  re2_matchdata* self = (re2_matchdata*)data;
+static void re2_matchdata_update_references(void *data) {
+  re2_matchdata *self = (re2_matchdata *)data;
   self->regexp = rb_gc_location(self->regexp);
   self->text = rb_gc_location(self->text);
 }
 
-static void re2_matchdata_free(void * data) {
-  re2_matchdata* self = (re2_matchdata*)data;
+static void re2_matchdata_free(void *data) {
+  re2_matchdata *self = (re2_matchdata *)data;
   if (self->matches) {
     delete[] self->matches;
   }
@@ -175,19 +175,19 @@ static const rb_data_type_t re2_matchdata_data_type = {
 };
 
 static void re2_scanner_mark(void *data) {
-  re2_scanner* self = (re2_scanner *)data;
+  re2_scanner *self = (re2_scanner *)data;
   rb_gc_mark_movable(self->regexp);
   rb_gc_mark_movable(self->text);
 }
 
-static void re2_scanner_update_references(void * data) {
+static void re2_scanner_update_references(void *data) {
   re2_scanner *self = (re2_scanner *)data;
   self->regexp = rb_gc_location(self->regexp);
   self->text = rb_gc_location(self->text);
 }
 
 static void re2_scanner_free(void *data) {
-  re2_scanner* self = (re2_scanner *)data;
+  re2_scanner *self = (re2_scanner *)data;
   if (self->input) {
     delete self->input;
   }
@@ -195,11 +195,12 @@ static void re2_scanner_free(void *data) {
 }
 
 static size_t re2_scanner_memsize(const void *data) {
-  const re2_scanner* self = (const re2_scanner*)data;
+  const re2_scanner *self = (const re2_scanner *)data;
   size_t size = sizeof(re2_scanner);
   if (self->input) {
     size += sizeof(self->input);
   }
+
   return size;
 }
 
@@ -217,7 +218,7 @@ static const rb_data_type_t re2_scanner_data_type = {
 };
 
 static void re2_regexp_free(void *data) {
-  re2_pattern* self = (re2_pattern*)data;
+  re2_pattern *self = (re2_pattern *)data;
   if (self->pattern) {
     delete self->pattern;
   }
@@ -225,12 +226,12 @@ static void re2_regexp_free(void *data) {
 }
 
 static size_t re2_regexp_memsize(const void *data) {
-  const re2_pattern* self = (const re2_pattern*)data;
-
+  const re2_pattern *self = (const re2_pattern *)data;
   size_t size = sizeof(re2_pattern);
   if (self->pattern) {
     size += sizeof(self->pattern);
   }
+
   return size;
 }
 
@@ -441,6 +442,7 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
  */
 static VALUE re2_matchdata_size(const VALUE self) {
   re2_matchdata *m;
+
   TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
 
   return INT2FIX(m->number_of_matches);
@@ -1588,6 +1590,7 @@ static size_t re2_set_memsize(const void *data) {
   if (self->set) {
     size += sizeof(self->set);
   }
+
   return size;
 }
 
