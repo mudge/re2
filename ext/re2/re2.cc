@@ -152,7 +152,13 @@ static void re2_matchdata_free(void * data) {
 }
 
 static size_t re2_matchdata_memsize(const void * data) {
-  return sizeof(re2_matchdata);
+  const re2_matchdata *self = (const re2_matchdata *)data;
+  size_t size = sizeof(re2_matchdata);
+  if (self->matches) {
+    size += sizeof(self->matches);
+  }
+
+  return size;
 }
 
 static const rb_data_type_t re2_matchdata_data_type = {
