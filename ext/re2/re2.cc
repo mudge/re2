@@ -128,7 +128,7 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 #else
 #define rb_gc_mark_movable(x) rb_gc_mark(x)
 #define re2_compact_callback(x)
-#define rb_gc_location(x)
+#define rb_gc_location(x) x
 #endif
 
 static void re2_matchdata_mark(void *data) {
