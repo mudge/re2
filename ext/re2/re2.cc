@@ -148,7 +148,7 @@ static void re2_matchdata_free(void * data) {
   if (self->matches) {
     delete[] self->matches;
   }
-  free(self);
+  xfree(self);
 }
 
 static size_t re2_matchdata_memsize(const void * data) {
@@ -185,7 +185,7 @@ static void re2_scanner_free(void *data) {
   if (self->input) {
     delete self->input;
   }
-  free(self);
+  xfree(self);
 }
 
 static size_t re2_scanner_memsize(const void *data) {
@@ -215,7 +215,7 @@ static void re2_regexp_free(void *data) {
   if (self->pattern) {
     delete self->pattern;
   }
-  free(self);
+  xfree(self);
 }
 
 static size_t re2_regexp_memsize(const void *data) {
@@ -1573,7 +1573,7 @@ static void re2_set_free(void *data) {
   if (self->set) {
     delete self->set;
   }
-  free(self);
+  xfree(self);
 }
 
 static size_t re2_set_memsize(const void *data) {
