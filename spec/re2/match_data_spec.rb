@@ -129,6 +129,12 @@ RSpec.describe RE2::MatchData do
       re = RE2::Regexp.new('(\D+)').match("bob")
       expect(re.string).to be_frozen
     end
+
+    it "does not copy the string if it was already frozen" do
+      string = "bob".freeze
+      re = RE2::Regexp.new('(\D+)').match(string)
+      expect(re.string).to equal(string)
+    end
   end
 
   describe "#size" do
