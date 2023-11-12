@@ -1,5 +1,14 @@
 # encoding: utf-8
+require 'objspace'
+
 RSpec.describe RE2::MatchData do
+  it "reports a larger consuming memory size when it has more matches" do
+    matches1 = RE2::Regexp.new('w(o)').match('woo')
+    matches2 = RE2::Regexp.new('w(o)(o)').match('woo')
+
+    expect(ObjectSpace.memsize_of(matches1)).to be < ObjectSpace.memsize_of(matches2)
+  end
+
   describe "#to_a" do
     it "is populated with the match and capturing groups" do
       a = RE2::Regexp.new('w(o)(o)').match('woo').to_a

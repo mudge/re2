@@ -156,7 +156,7 @@ static size_t re2_matchdata_memsize(const void *data) {
   const re2_matchdata *self = (const re2_matchdata *)data;
   size_t size = sizeof(re2_matchdata);
   if (self->matches) {
-    size += sizeof(self->matches) * self->number_of_matches;
+    size += sizeof(re2::StringPiece) * self->number_of_matches;
   }
 
   return size;
