@@ -131,21 +131,21 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 #endif
 
 static void re2_matchdata_mark(void *data) {
-  re2_matchdata *self = (re2_matchdata *)data;
+  re2_matchdata *self = reinterpret_cast<re2_matchdata *>(data);
   rb_gc_mark_movable(self->regexp);
   rb_gc_mark_movable(self->text);
 }
 
 #ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_matchdata_update_references(void *data) {
-  re2_matchdata *self = (re2_matchdata *)data;
+  re2_matchdata *self = reinterpret_cast<re2_matchdata *>(data);
   self->regexp = rb_gc_location(self->regexp);
   self->text = rb_gc_location(self->text);
 }
 #endif
 
 static void re2_matchdata_free(void *data) {
-  re2_matchdata *self = (re2_matchdata *)data;
+  re2_matchdata *self = reinterpret_cast<re2_matchdata *>(data);
   if (self->matches) {
     delete[] self->matches;
   }
@@ -153,7 +153,7 @@ static void re2_matchdata_free(void *data) {
 }
 
 static size_t re2_matchdata_memsize(const void *data) {
-  const re2_matchdata *self = (const re2_matchdata *)data;
+  const re2_matchdata *self = reinterpret_cast<const re2_matchdata *>(data);
   size_t size = sizeof(re2_matchdata);
   if (self->matches) {
     size += sizeof(re2::StringPiece) * self->number_of_matches;
@@ -176,21 +176,21 @@ static const rb_data_type_t re2_matchdata_data_type = {
 };
 
 static void re2_scanner_mark(void *data) {
-  re2_scanner *self = (re2_scanner *)data;
+  re2_scanner *self = reinterpret_cast<re2_scanner *>(data);
   rb_gc_mark_movable(self->regexp);
   rb_gc_mark_movable(self->text);
 }
 
 #ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_scanner_update_references(void *data) {
-  re2_scanner *self = (re2_scanner *)data;
+  re2_scanner *self = reinterpret_cast<re2_scanner *>(data);
   self->regexp = rb_gc_location(self->regexp);
   self->text = rb_gc_location(self->text);
 }
 #endif
 
 static void re2_scanner_free(void *data) {
-  re2_scanner *self = (re2_scanner *)data;
+  re2_scanner *self = reinterpret_cast<re2_scanner *>(data);
   if (self->input) {
     delete self->input;
   }
@@ -198,7 +198,7 @@ static void re2_scanner_free(void *data) {
 }
 
 static size_t re2_scanner_memsize(const void *data) {
-  const re2_scanner *self = (const re2_scanner *)data;
+  const re2_scanner *self = reinterpret_cast<const re2_scanner *>(data);
   size_t size = sizeof(re2_scanner);
   if (self->input) {
     size += sizeof(self->input);
@@ -221,7 +221,7 @@ static const rb_data_type_t re2_scanner_data_type = {
 };
 
 static void re2_regexp_free(void *data) {
-  re2_pattern *self = (re2_pattern *)data;
+  re2_pattern *self = reinterpret_cast<re2_pattern *>(data);
   if (self->pattern) {
     delete self->pattern;
   }
@@ -229,7 +229,7 @@ static void re2_regexp_free(void *data) {
 }
 
 static size_t re2_regexp_memsize(const void *data) {
-  const re2_pattern *self = (const re2_pattern *)data;
+  const re2_pattern *self = reinterpret_cast<const re2_pattern *>(data);
   size_t size = sizeof(re2_pattern);
   if (self->pattern) {
     size += sizeof(self->pattern);
@@ -1580,7 +1580,7 @@ static VALUE re2_QuoteMeta(VALUE, VALUE unquoted) {
 }
 
 static void re2_set_free(void *data) {
-  re2_set *self = (re2_set *)data;
+  re2_set *self = reinterpret_cast<re2_set *>(data);
   if (self->set) {
     delete self->set;
   }
@@ -1588,7 +1588,7 @@ static void re2_set_free(void *data) {
 }
 
 static size_t re2_set_memsize(const void *data) {
-  const re2_set *self = (const re2_set *)data;
+  const re2_set *self = reinterpret_cast<const re2_set *>(data);
   size_t size = sizeof(re2_set);
   if (self->set) {
     size += sizeof(self->set);
@@ -1877,12 +1877,14 @@ extern "C" void Init_re2(void) {
   re2_eSetUnsupportedError = rb_define_class_under(re2_cSet, "UnsupportedError",
       rb_const_get(rb_cObject, rb_intern("StandardError")));
 
-  rb_define_alloc_func(re2_cRegexp, (VALUE (*)(VALUE))re2_regexp_allocate);
+  rb_define_alloc_func(re2_cRegexp,
+      reinterpret_cast<VALUE (*)(VALUE)>(re2_regexp_allocate));
   rb_define_alloc_func(re2_cMatchData,
-      (VALUE (*)(VALUE))re2_matchdata_allocate);
+      reinterpret_cast<VALUE (*)(VALUE)>(re2_matchdata_allocate));
   rb_define_alloc_func(re2_cScanner,
-      (VALUE (*)(VALUE))re2_scanner_allocate);
-  rb_define_alloc_func(re2_cSet, (VALUE (*)(VALUE))re2_set_allocate);
+      reinterpret_cast<VALUE (*)(VALUE)>(re2_scanner_allocate));
+  rb_define_alloc_func(re2_cSet,
+      reinterpret_cast<VALUE (*)(VALUE)>(re2_set_allocate));
 
   rb_define_method(re2_cMatchData, "string",
       RUBY_METHOD_FUNC(re2_matchdata_string), 0);
