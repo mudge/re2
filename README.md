@@ -256,13 +256,17 @@ Contributions
 -------------
 
 * Thanks to [Jason Woods](https://github.com/driskell) who contributed the
-  original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`;
-* Thanks to [Stefano Rivera](https://github.com/stefanor) who first contributed C++11 support;
-* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty patterns and `RE2::Regexp#scan`, contributing support for libre2.11 (2023-07-01) and for vendoring RE2 and abseil and compiling native gems in 2.0;
+  original implementations of `RE2::MatchData#begin` and `RE2::MatchData#end`.
+* Thanks to [Stefano Rivera](https://github.com/stefanor) who first contributed
+  C++11 support.
+* Thanks to [Stan Hu](https://github.com/stanhu) for reporting a bug with empty
+  patterns and `RE2::Regexp#scan`, contributing support for libre2.11
+  (2023-07-01) and for vendoring RE2 and abseil and compiling native gems in
+  2.0.
 * Thanks to [Sebastian Reitenbach](https://github.com/buzzdeee) for reporting
-  the deprecation and removal of the `utf8` encoding option in RE2;
+  the deprecation and removal of the `utf8` encoding option in RE2.
 * Thanks to [Sergio Medina](https://github.com/serch) for reporting a bug when
-  using `RE2::Scanner#scan` with an invalid regular expression;
+  using `RE2::Scanner#scan` with an invalid regular expression.
 * Thanks to [Pritam Baral](https://github.com/pritambaral) for contributing the
   initial support for `RE2::Set`.
 * Thanks to [Mike Dalessio](https://github.com/flavorjones) for reviewing the
