@@ -130,33 +130,33 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 #define re2_compact_callback(x)
 #endif
 
-static void re2_matchdata_mark(void *data) {
-  re2_matchdata *self = reinterpret_cast<re2_matchdata *>(data);
-  rb_gc_mark_movable(self->regexp);
-  rb_gc_mark_movable(self->text);
+static void re2_matchdata_mark(void *ptr) {
+  re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
+  rb_gc_mark_movable(m->regexp);
+  rb_gc_mark_movable(m->text);
 }
 
 #ifdef HAVE_RB_GC_MARK_MOVABLE
-static void re2_matchdata_update_references(void *data) {
-  re2_matchdata *self = reinterpret_cast<re2_matchdata *>(data);
-  self->regexp = rb_gc_location(self->regexp);
-  self->text = rb_gc_location(self->text);
+static void re2_matchdata_compact(void *ptr) {
+  re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
+  m->regexp = rb_gc_location(m->regexp);
+  m->text = rb_gc_location(m->text);
 }
 #endif
 
-static void re2_matchdata_free(void *data) {
-  re2_matchdata *self = reinterpret_cast<re2_matchdata *>(data);
-  if (self->matches) {
-    delete[] self->matches;
+static void re2_matchdata_free(void *ptr) {
+  re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
+  if (m->matches) {
+    delete[] m->matches;
   }
-  xfree(self);
+  xfree(m);
 }
 
-static size_t re2_matchdata_memsize(const void *data) {
-  const re2_matchdata *self = reinterpret_cast<const re2_matchdata *>(data);
-  size_t size = sizeof(re2_matchdata);
-  if (self->matches) {
-    size += sizeof(re2::StringPiece) * self->number_of_matches;
+static size_t re2_matchdata_memsize(const void *ptr) {
+  const re2_matchdata *m = reinterpret_cast<const re2_matchdata *>(ptr);
+  size_t size = sizeof(*m);
+  if (m->matches) {
+    size += sizeof(*m->matches) * m->number_of_matches;
   }
 
   return size;
@@ -168,40 +168,40 @@ static const rb_data_type_t re2_matchdata_data_type = {
     .dmark = re2_matchdata_mark,
     .dfree = re2_matchdata_free,
     .dsize = re2_matchdata_memsize,
-    re2_compact_callback(re2_matchdata_update_references)
+    re2_compact_callback(re2_matchdata_compact)
   },
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
   .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
-static void re2_scanner_mark(void *data) {
-  re2_scanner *self = reinterpret_cast<re2_scanner *>(data);
-  rb_gc_mark_movable(self->regexp);
-  rb_gc_mark_movable(self->text);
+static void re2_scanner_mark(void *ptr) {
+  re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
+  rb_gc_mark_movable(s->regexp);
+  rb_gc_mark_movable(s->text);
 }
 
 #ifdef HAVE_RB_GC_MARK_MOVABLE
-static void re2_scanner_update_references(void *data) {
-  re2_scanner *self = reinterpret_cast<re2_scanner *>(data);
-  self->regexp = rb_gc_location(self->regexp);
-  self->text = rb_gc_location(self->text);
+static void re2_scanner_compact(void *ptr) {
+  re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
+  s->regexp = rb_gc_location(s->regexp);
+  s->text = rb_gc_location(s->text);
 }
 #endif
 
-static void re2_scanner_free(void *data) {
-  re2_scanner *self = reinterpret_cast<re2_scanner *>(data);
-  if (self->input) {
-    delete self->input;
+static void re2_scanner_free(void *ptr) {
+  re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
+  if (s->input) {
+    delete s->input;
   }
-  xfree(self);
+  xfree(s);
 }
 
-static size_t re2_scanner_memsize(const void *data) {
-  const re2_scanner *self = reinterpret_cast<const re2_scanner *>(data);
-  size_t size = sizeof(re2_scanner);
-  if (self->input) {
-    size += sizeof(self->input);
+static size_t re2_scanner_memsize(const void *ptr) {
+  const re2_scanner *s = reinterpret_cast<const re2_scanner *>(ptr);
+  size_t size = sizeof(*s);
+  if (s->input) {
+    size += sizeof(s->input);
   }
 
   return size;
@@ -213,26 +213,26 @@ static const rb_data_type_t re2_scanner_data_type = {
     .dmark = re2_scanner_mark,
     .dfree = re2_scanner_free,
     .dsize = re2_scanner_memsize,
-    re2_compact_callback(re2_scanner_update_references)
+    re2_compact_callback(re2_scanner_compact)
   },
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
   .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
-static void re2_regexp_free(void *data) {
-  re2_pattern *self = reinterpret_cast<re2_pattern *>(data);
-  if (self->pattern) {
-    delete self->pattern;
+static void re2_regexp_free(void *ptr) {
+  re2_pattern *p = reinterpret_cast<re2_pattern *>(ptr);
+  if (p->pattern) {
+    delete p->pattern;
   }
-  xfree(self);
+  xfree(p);
 }
 
-static size_t re2_regexp_memsize(const void *data) {
-  const re2_pattern *self = reinterpret_cast<const re2_pattern *>(data);
-  size_t size = sizeof(re2_pattern);
-  if (self->pattern) {
-    size += sizeof(self->pattern);
+static size_t re2_regexp_memsize(const void *ptr) {
+  const re2_pattern *p = reinterpret_cast<const re2_pattern *>(ptr);
+  size_t size = sizeof(*p);
+  if (p->pattern) {
+    size += sizeof(p->pattern);
   }
 
   return size;
@@ -1579,19 +1579,19 @@ static VALUE re2_QuoteMeta(VALUE, VALUE unquoted) {
   return rb_str_new(quoted_string.data(), quoted_string.size());
 }
 
-static void re2_set_free(void *data) {
-  re2_set *self = reinterpret_cast<re2_set *>(data);
-  if (self->set) {
-    delete self->set;
+static void re2_set_free(void *ptr) {
+  re2_set *s = reinterpret_cast<re2_set *>(ptr);
+  if (s->set) {
+    delete s->set;
   }
-  xfree(self);
+  xfree(s);
 }
 
-static size_t re2_set_memsize(const void *data) {
-  const re2_set *self = reinterpret_cast<const re2_set *>(data);
-  size_t size = sizeof(re2_set);
-  if (self->set) {
-    size += sizeof(self->set);
+static size_t re2_set_memsize(const void *ptr) {
+  const re2_set *s = reinterpret_cast<const re2_set *>(ptr);
+  size_t size = sizeof(*s);
+  if (s->set) {
+    size += sizeof(s->set);
   }
 
   return size;
