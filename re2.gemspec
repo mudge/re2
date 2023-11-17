@@ -11,7 +11,6 @@ Gem::Specification.new do |s|
   s.license = "BSD-3-Clause"
   s.required_ruby_version = ">= 2.6.0"
   s.files = [
-    ".rspec",
     "dependencies.yml",
     "ext/re2/extconf.rb",
     "ext/re2/re2.cc",
@@ -28,6 +27,7 @@ Gem::Specification.new do |s|
     "re2.gemspec"
   ]
   s.test_files = [
+    ".rspec",
     "spec/spec_helper.rb",
     "spec/re2_spec.rb",
     "spec/kernel_spec.rb",
