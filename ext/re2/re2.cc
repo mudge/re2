@@ -201,7 +201,7 @@ static size_t re2_scanner_memsize(const void *ptr) {
   const re2_scanner *s = reinterpret_cast<const re2_scanner *>(ptr);
   size_t size = sizeof(*s);
   if (s->input) {
-    size += sizeof(s->input);
+    size += sizeof(*s->input);
   }
 
   return size;
@@ -232,7 +232,7 @@ static size_t re2_regexp_memsize(const void *ptr) {
   const re2_pattern *p = reinterpret_cast<const re2_pattern *>(ptr);
   size_t size = sizeof(*p);
   if (p->pattern) {
-    size += sizeof(p->pattern);
+    size += sizeof(*p->pattern);
   }
 
   return size;
@@ -1591,7 +1591,7 @@ static size_t re2_set_memsize(const void *ptr) {
   const re2_set *s = reinterpret_cast<const re2_set *>(ptr);
   size_t size = sizeof(*s);
   if (s->set) {
-    size += sizeof(s->set);
+    size += sizeof(*s->set);
   }
 
   return size;
