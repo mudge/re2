@@ -5,6 +5,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.4.2] - 2023-11-17
+### Changed
+- Improve the reported consuming memory size of RE2::Regexp, RE2::Set and
+  RE2::Scanner objects.
+
 ## [2.4.1] - 2023-11-12
 ### Changed
 - Improve the reported consuming memory size of RE2::MatchData objects. Thanks
@@ -194,6 +199,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.4.2]: https://github.com/mudge/re2/releases/tag/v2.4.2
 [2.4.1]: https://github.com/mudge/re2/releases/tag/v2.4.1
 [2.4.0]: https://github.com/mudge/re2/releases/tag/v2.4.0
 [2.3.0]: https://github.com/mudge/re2/releases/tag/v2.3.0
