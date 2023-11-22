@@ -8,7 +8,8 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ## [2.4.3] - 2023-11-22
 ### Fixed
 - Restore support for compiling the gem with gcc 7.3 (as used on Amazon Linux
-  2). Thanks to @stanhu for reporting this bug.
+  2), fixing the "non-trivial designated initializers not supported" error
+  introduced in version 2.4.0. Thanks to @stanhu for reporting this bug.
 
 ## [2.4.2] - 2023-11-17
 ### Changed
