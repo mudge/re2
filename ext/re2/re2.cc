@@ -170,6 +170,8 @@ static const rb_data_type_t re2_matchdata_data_type = {
     .dsize = re2_matchdata_memsize,
     re2_compact_callback(re2_matchdata_compact)
   },
+  .parent = NULL,
+  .data = NULL,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
   .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
@@ -215,6 +217,8 @@ static const rb_data_type_t re2_scanner_data_type = {
     .dsize = re2_scanner_memsize,
     re2_compact_callback(re2_scanner_compact)
   },
+  .parent = NULL,
+  .data = NULL,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
   .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
@@ -245,6 +249,8 @@ static const rb_data_type_t re2_regexp_data_type = {
     .dfree = re2_regexp_free,
     .dsize = re2_regexp_memsize,
   },
+  .parent = NULL,
+  .data = NULL,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
   .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
@@ -1604,6 +1610,8 @@ static const rb_data_type_t re2_set_data_type = {
     .dfree = re2_set_free,
     .dsize = re2_set_memsize,
   },
+  .parent = NULL,
+  .data = NULL,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
   .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
