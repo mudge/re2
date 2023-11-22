@@ -124,7 +124,7 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 
 /* For compatibility with ruby < 2.7 */
 #ifdef HAVE_RB_GC_MARK_MOVABLE
-#define re2_compact_callback(x) .dcompact = (x),
+#define re2_compact_callback(x) (x),
 #else
 #define rb_gc_mark_movable(x) rb_gc_mark(x)
 #define re2_compact_callback(x)
@@ -163,18 +163,18 @@ static size_t re2_matchdata_memsize(const void *ptr) {
 }
 
 static const rb_data_type_t re2_matchdata_data_type = {
-  .wrap_struct_name = "RE2::MatchData",
-  .function = {
-    .dmark = re2_matchdata_mark,
-    .dfree = re2_matchdata_free,
-    .dsize = re2_matchdata_memsize,
+  "RE2::MatchData",
+  {
+    re2_matchdata_mark,
+    re2_matchdata_free,
+    re2_matchdata_memsize,
     re2_compact_callback(re2_matchdata_compact)
   },
-  .parent = NULL,
-  .data = NULL,
+  0,
+  0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static void re2_scanner_mark(void *ptr) {
@@ -210,18 +210,18 @@ static size_t re2_scanner_memsize(const void *ptr) {
 }
 
 static const rb_data_type_t re2_scanner_data_type = {
-  .wrap_struct_name = "RE2::Scanner",
-  .function = {
-    .dmark = re2_scanner_mark,
-    .dfree = re2_scanner_free,
-    .dsize = re2_scanner_memsize,
+  "RE2::Scanner",
+  {
+    re2_scanner_mark,
+    re2_scanner_free,
+    re2_scanner_memsize,
     re2_compact_callback(re2_scanner_compact)
   },
-  .parent = NULL,
-  .data = NULL,
+  0,
+  0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static void re2_regexp_free(void *ptr) {
@@ -243,17 +243,17 @@ static size_t re2_regexp_memsize(const void *ptr) {
 }
 
 static const rb_data_type_t re2_regexp_data_type = {
-  .wrap_struct_name = "RE2::Regexp",
-  .function = {
-    .dmark = NULL,
-    .dfree = re2_regexp_free,
-    .dsize = re2_regexp_memsize,
+  "RE2::Regexp",
+  {
+    0,
+    re2_regexp_free,
+    re2_regexp_memsize,
   },
-  .parent = NULL,
-  .data = NULL,
+  0,
+  0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static VALUE re2_matchdata_allocate(VALUE klass) {
@@ -1604,17 +1604,17 @@ static size_t re2_set_memsize(const void *ptr) {
 }
 
 static const rb_data_type_t re2_set_data_type = {
-  .wrap_struct_name = "RE2::Set",
-  .function = {
-    .dmark = NULL,
-    .dfree = re2_set_free,
-    .dsize = re2_set_memsize,
+  "RE2::Set",
+  {
+    0,
+    re2_set_free,
+    re2_set_memsize,
   },
-  .parent = NULL,
-  .data = NULL,
+  0,
+  0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
 static VALUE re2_set_allocate(VALUE klass) {
