@@ -11,7 +11,6 @@ set -e -u
 
 OUTPUT_DIR=$1
 BUILD_NATIVE_GEM=$2
-REF_TYPE=$3
 
 test -e /etc/os-release && cat /etc/os-release
 
