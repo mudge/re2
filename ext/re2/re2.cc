@@ -359,7 +359,7 @@ static VALUE re2_scanner_scan(VALUE self) {
 
   std::vector<RE2::Arg> argv(c->number_of_capturing_groups);
   std::vector<RE2::Arg*> args(c->number_of_capturing_groups);
-  std::vector<std::string> matches(c->number_of_capturing_groups);
+  std::vector<re2::StringPiece> matches(c->number_of_capturing_groups);
 
   if (c->eof) {
     return Qnil;
