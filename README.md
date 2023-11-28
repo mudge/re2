@@ -6,8 +6,8 @@ backtracking regular expression engines like those used in PCRE, Perl, and
 Python".
 
 **Current version:** 2.4.3  
-**Supported Ruby versions:** 2.6, 2.7, 3.0, 3.1, 3.2  
 **Bundled RE2 version:** libre2.11 (2023-11-01)  
+**Supported Ruby versions:** 2.6, 2.7, 3.0, 3.1, 3.2  
 **Supported RE2 versions:** libre2.0 (< 2020-03-02), libre2.1 (2020-03-02), libre2.6 (2020-03-03), libre2.7 (2020-05-01), libre2.8 (2020-07-06), libre2.9 (2020-11-01), libre2.10 (2022-12-01), libre2.11 (2023-07-01)
 
 Installation
@@ -68,9 +68,10 @@ Documentation
 Full documentation automatically generated from the latest version is
 available at <http://mudge.name/re2/>.
 
-Note that RE2's regular expression syntax differs from PCRE and Ruby's
-built-in [`Regexp`][Regexp] library, see the [official syntax page][] for more
-details.
+> [!IMPORTANT]
+> Note that RE2's regular expression syntax differs from PCRE and Ruby's
+> built-in [`Regexp`][Regexp] library, see the [official syntax page][] for
+> more details.
 
 Usage
 -----
@@ -80,27 +81,19 @@ library (with [`Regexp`](http://mudge.name/re2/RE2/Regexp.html) and
 [`MatchData`](http://mudge.name/re2/RE2/MatchData.html)), its API is slightly
 different:
 
-```console
-$ irb -rubygems
-> require 're2'
-> r = RE2::Regexp.new('w(\d)(\d+)')
-=> #<RE2::Regexp /w(\d)(\d+)/>
-> m = r.match("w1234")
-=> #<RE2::MatchData "w1234" 1:"1" 2:"234">
-> m[1]
-=> "1"
-> m.string
-=> "w1234"
-> m.begin(1)
-=> 1
-> m.end(1)
-=> 2
-> r =~ "w1234"
-=> true
-> r !~ "bob"
-=> true
-> r.match("bob")
-=> nil
+```ruby
+require "re2"
+
+r = RE2::Regexp.new('w(\d)(\d+)') # => #<RE2::Regexp /w(\d)(\d+)/>
+m = r.match("w1234")              # => #<RE2::MatchData "w1234" 1:"1" 2:"234">
+m[1]                              # => "1"
+
+# Improve performance by requesting fewer submatches
+m = r.match("w1234", 1)           # => #<RE2::MatchData "w1234" 1:"1">
+
+# Or no submatches at all
+r.match("w1234", 0)               # => true
+r =~ "w1234"                      # => true
 ```
 
 As
@@ -109,30 +102,25 @@ As
 defined against `Kernel` so you can use a shorter version to create regular
 expressions:
 
-```console
-> RE2('(\d+)')
-=> #<RE2::Regexp /(\d+)/>
+```ruby
+RE2('(\d+)') # => #<RE2::Regexp /(\d+)/>
 ```
 
 Note the use of *single quotes* as double quotes will interpret `\d` as `d` as
 in the following example:
 
-```console
-> RE2("(\d+)")
-=> #<RE2::Regexp /(d+)/>
+```ruby
+RE2("(\d+)") # => #<RE2::Regexp /(d+)/>
 ```
 
 As of 0.3.0, you can use named groups:
 
-```console
-> r = RE2::Regexp.new('(?P<name>\w+) (?P<age>\d+)')
-=> #<RE2::Regexp /(?P<name>\w+) (?P<age>\d+)/>
-> m = r.match("Bob 40")
-=> #<RE2::MatchData "Bob 40" 1:"Bob" 2:"40">
-> m[:name]
-=> "Bob"
-> m["age"]
-=> "40"
+```ruby
+r = RE2::Regexp.new('(?P<name>\w+) (?P<age>\d+)')
+# => #<RE2::Regexp /(?P<name>\w+) (?P<age>\d+)/>
+m = r.match("Bob 40") # => #<RE2::MatchData "Bob 40" 1:"Bob" 2:"40">
+m[:name]              # => "Bob"
+m["age"]              # => "40"
 ```
 
 As of 0.6.0, you can use `RE2::Regexp#scan` to incrementally scan text for
@@ -197,9 +185,10 @@ end
 Encoding
 --------
 
-Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
-returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
-`RE2::Regexp` is set to false (any other encoding's behaviour is undefined).
+> [!IMPORTANT]
+> Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+> returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+> `RE2::Regexp` is set to false (any other encoding's behaviour is undefined).
 
 For backward compatibility: re2 won't automatically convert string inputs to
 the right encoding so this is the responsibility of the caller, e.g.
@@ -220,8 +209,8 @@ Features
   `RE2::Regexp.compile(re)` or `RE2(re)` (including specifying options, e.g.
   `RE2::Regexp.new("pattern", :case_sensitive => false)`
 
-* Extracting matches with `re2.match(text)` (and an exact number of matches
-  with `re2.match(text, number_of_matches)` such as `re2.match("123-234", 2)`)
+* Extracting matches with `re2.match(text)` (and an exact number of submatches
+  with `re2.match(text, number_of_submatches)` such as `re2.match("123-234", 2)`)
 
 * Extracting matches by name (both with strings and symbols)
 

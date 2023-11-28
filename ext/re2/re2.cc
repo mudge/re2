@@ -1309,15 +1309,20 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
 }
 
 /*
- * Match the pattern against the given +text+ and return either
- * a boolean (if no submatches are required) or a {RE2::MatchData}
- * instance.
+ * Match the pattern against the given +text+ and return either a boolean (if
+ * no submatches are required) or a {RE2::MatchData} instance with the
+ * specified number of submatches (defaults to the total number of capturing
+ * groups).
+ *
+ * The number of submatches has a significant impact on performance: requesting
+ * one submatch is much faster than requesting more than one and requesting
+ * zero submatches is faster still.
  *
  * @return [Boolean, RE2::MatchData]
  *
  * @overload match(text)
  *   Returns an {RE2::MatchData} containing the matching pattern and all
- *   subpatterns resulting from looking for the regexp in +text+ if the pattern
+ *   submatches resulting from looking for the regexp in +text+ if the pattern
  *   contains capturing groups.
  *
  *   Returns either true or false indicating whether a successful match was
@@ -1326,7 +1331,7 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *   @param [String] text the text to search
  *   @return [RE2::MatchData] if the pattern contains capturing groups
  *   @return [Boolean] if the pattern does not contain capturing groups
- *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
+ *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
  *   @example Matching with capturing groups
  *     r = RE2::Regexp.new('w(o)(o)')
  *     r.match('woo')    #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
@@ -1340,20 +1345,20 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *
  *   @param [String] text the text to search
  *   @return [Boolean] whether the match was successful
- *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
+ *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
  *   @example
  *     r = RE2::Regexp.new('w(o)(o)')
  *     r.match('woo', 0) #=> true
  *     r.match('bob', 0) #=> false
  *
- * @overload match(text, number_of_matches)
+ * @overload match(text, number_of_submatches)
  *   See +match(text)+ but with a specific number of
- *   matches returned (padded with nils if necessary).
+ *   submatches returned (padded with nils if necessary).
  *
  *   @param [String] text the text to search
- *   @param [Integer] number_of_matches the number of matches to return
- *   @return [RE2::MatchData] the matches
- *   @raise [ArgumentError] if given a negative number of matches
+ *   @param [Integer] number_of_submatches the number of submatches to return
+ *   @return [RE2::MatchData] the submatches
+ *   @raise [ArgumentError] if given a negative number of submatches
  *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
  *   @example
  *     r = RE2::Regexp.new('w(o)(o)')
@@ -1363,9 +1368,9 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
 static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   re2_pattern *p;
   re2_matchdata *m;
-  VALUE text, number_of_matches;
+  VALUE text, number_of_submatches;
 
-  rb_scan_args(argc, argv, "11", &text, &number_of_matches);
+  rb_scan_args(argc, argv, "11", &text, &number_of_submatches);
 
   /* Ensure text is a string. */
   StringValue(text);
@@ -1374,8 +1379,8 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
   int n;
 
-  if (RTEST(number_of_matches)) {
-    n = NUM2INT(number_of_matches);
+  if (RTEST(number_of_submatches)) {
+    n = NUM2INT(number_of_submatches);
 
     if (n < 0) {
       rb_raise(rb_eArgError, "number of matches should be >= 0");
