@@ -47,8 +47,9 @@ VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
 /* Symbols used in RE2 options. */
 static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
           id_max_mem, id_literal, id_never_nl, id_case_sensitive,
-          id_perl_classes, id_word_boundary, id_one_line,
-          id_unanchored, id_anchor_start, id_anchor_both, id_exception;
+          id_perl_classes, id_word_boundary, id_one_line, id_unanchored,
+          id_anchor, id_anchor_start, id_anchor_both, id_exception,
+          id_submatches, id_startpos;
 
 inline VALUE encoded_str_new(const char *str, long length, RE2::Options::Encoding encoding) {
   if (encoding == RE2::Options::EncodingUTF8) {
@@ -1339,38 +1340,37 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *     r = RE2::Regexp.new('woo')
  *     r.match('woo')    #=> true
  *
- * @overload match(text, 0)
- *   Returns either true or false indicating whether a
- *   successful match was made.
- *
- *   @param [String] text the text to search
- *   @return [Boolean] whether the match was successful
- *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
- *   @example
- *     r = RE2::Regexp.new('w(o)(o)')
- *     r.match('woo', 0) #=> true
- *     r.match('bob', 0) #=> false
- *
- * @overload match(text, number_of_submatches)
+ * @overload match(text, options)
  *   See +match(text)+ but with a specific number of
  *   submatches returned (padded with nils if necessary).
  *
  *   @param [String] text the text to search
- *   @param [Integer] number_of_submatches the number of submatches to return
- *   @return [RE2::MatchData] the submatches
- *   @raise [ArgumentError] if given a negative number of submatches
+ *   @param [Hash] options the options with which to perform the match
+ *   @option options [Integer] :startpos (0) offset at which to start matching
+ *   @option options [Symbol] :anchor (:unanchored) one of :unanchored, :anchor_start, :anchor_both to anchor the match
+ *   @option options [Integer] :submatches how many submatches to extract (0 is
+ *     fastest), defaults to the number of capturing groups
+ *   @return [RE2::MatchData] if extracting any submatches
+ *   @return [Boolean] if not extracting any submatches
+ *   @raise [ArgumentError] if given a negative number of submatches or invalid anchor
  *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
+ *   @raise [TypeError] if given non-String text, non-numeric number of
+ *     submatches, non-symbol anchor or non-hash options
  *   @example
  *     r = RE2::Regexp.new('w(o)(o)')
- *     r.match('woo', 1) #=> #<RE2::MatchData "woo" 1:"o">
- *     r.match('woo', 3) #=> #<RE2::MatchData "woo" 1:"o" 2:"o" 3:nil>
+ *     r.match('woo', submatches: 1) # => #<RE2::MatchData "woo" 1:"o">
+ *     r.match('woo', submatches: 3) # => #<RE2::MatchData "woo" 1:"o" 2:"o" 3:nil>
+ *     r.match('woot', anchor: :anchor_both, submatches: 0)
+ *     # => false
+ *     r.match('woot', anchor: :anchor_start, submatches: 0)
+ *     # => true
  */
 static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   re2_pattern *p;
   re2_matchdata *m;
-  VALUE text, number_of_submatches;
+  VALUE text, options;
 
-  rb_scan_args(argc, argv, "11", &text, &number_of_submatches);
+  rb_scan_args(argc, argv, "11", &text, &options);
 
   /* Ensure text is a string. */
   StringValue(text);
@@ -1378,12 +1378,64 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
 
   int n;
+  int startpos = 0;
+  RE2::Anchor anchor = RE2::UNANCHORED;
 
-  if (RTEST(number_of_submatches)) {
-    n = NUM2INT(number_of_submatches);
+  if (RTEST(options)) {
+    if (FIXNUM_P(options)) {
+      n = NUM2INT(options);
 
-    if (n < 0) {
-      rb_raise(rb_eArgError, "number of matches should be >= 0");
+      if (n < 0) {
+        rb_raise(rb_eArgError, "number of matches should be >= 0");
+      }
+    } else {
+      if (TYPE(options) != T_HASH) {
+        options = rb_Hash(options);
+      }
+
+      VALUE anchor_option = rb_hash_aref(options, ID2SYM(id_anchor));
+      if (!NIL_P(anchor_option)) {
+        Check_Type(anchor_option, T_SYMBOL);
+
+        ID id_anchor_option = SYM2ID(anchor_option);
+        if (id_anchor_option == id_unanchored) {
+          anchor = RE2::UNANCHORED;
+        } else if (id_anchor_option == id_anchor_start) {
+          anchor = RE2::ANCHOR_START;
+        } else if (id_anchor_option == id_anchor_both) {
+          anchor = RE2::ANCHOR_BOTH;
+        } else {
+          rb_raise(rb_eArgError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both");
+        }
+      }
+
+      VALUE submatches_option = rb_hash_aref(options, ID2SYM(id_submatches));
+      if (!NIL_P(submatches_option)) {
+        Check_Type(submatches_option, T_FIXNUM);
+
+        n = NUM2INT(submatches_option);
+
+        if (n < 0) {
+          rb_raise(rb_eArgError, "number of matches should be >= 0");
+        }
+      } else {
+        if (!p->pattern->ok()) {
+          return Qnil;
+        }
+
+        n = p->pattern->NumberOfCapturingGroups();
+      }
+
+      VALUE startpos_option = rb_hash_aref(options, ID2SYM(id_startpos));
+      if (!NIL_P(startpos_option)) {
+        Check_Type(startpos_option, T_FIXNUM);
+
+        startpos = NUM2INT(startpos_option);
+
+        if (startpos < 0) {
+          rb_raise(rb_eArgError, "startpos should be >= 0");
+        }
+      }
     }
   } else {
     if (!p->pattern->ok()) {
@@ -1395,10 +1447,10 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
   if (n == 0) {
 #ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(RSTRING_PTR(text), 0,
-        RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
+    bool matched = p->pattern->Match(RSTRING_PTR(text), startpos,
+        RSTRING_LEN(text), anchor, 0, 0);
 #else
-    bool matched = p->pattern->Match(RSTRING_PTR(text), 0, RE2::UNANCHORED,
+    bool matched = p->pattern->Match(RSTRING_PTR(text), startpos, anchor,
         0, 0);
 #endif
     return BOOL2RUBY(matched);
@@ -1423,11 +1475,11 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     m->number_of_matches = n;
 
 #ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(RSTRING_PTR(m->text), 0,
-        RSTRING_LEN(m->text), RE2::UNANCHORED, m->matches, n);
+    bool matched = p->pattern->Match(RSTRING_PTR(m->text), startpos,
+        RSTRING_LEN(m->text), anchor, m->matches, n);
 #else
-    bool matched = p->pattern->Match(RSTRING_PTR(m->text), 0,
-        RE2::UNANCHORED, m->matches, n);
+    bool matched = p->pattern->Match(RSTRING_PTR(m->text), startpos,
+        anchor, m->matches, n);
 #endif
     if (matched) {
       return matchdata;
@@ -2032,7 +2084,10 @@ extern "C" void Init_re2(void) {
   id_word_boundary = rb_intern("word_boundary");
   id_one_line = rb_intern("one_line");
   id_unanchored = rb_intern("unanchored");
+  id_anchor = rb_intern("anchor");
   id_anchor_start = rb_intern("anchor_start");
   id_anchor_both = rb_intern("anchor_both");
   id_exception = rb_intern("exception");
+  id_submatches = rb_intern("submatches");
+  id_startpos = rb_intern("startpos");
 }

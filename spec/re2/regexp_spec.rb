@@ -313,21 +313,100 @@ RSpec.describe RE2::Regexp do
       expect { re.match(nil) }.to raise_error(TypeError)
     end
 
-    it "raises an exception when given an inappropriate number of matches" do
-      expect { re.match("My name is Robert Paulson", {}) }.to raise_error(TypeError)
+    it "raises an exception when given invalid options" do
+      expect { re.match("My name is Robert Paulson", "foo") }.to raise_error(TypeError)
     end
 
-    it "raises an exception when given a negative number of matches" do
-      expect { re.match("My name is Robert Paulson", -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
+    it "accepts anything that can be coerced to a hash as options", :aggregate_failures do
+      m = re.match("My name is Robert Paulson", nil)
+      expect(m[1]).to eq("Robert")
+
+      m = re.match("My name is Robert Paulson", [])
+      expect(m[1]).to eq("Robert")
     end
 
     it "returns nil with an invalid pattern" do
       re = RE2::Regexp.new('???', :log_errors => false)
+
       expect(re.match('My name is Robert Paulson')).to be_nil
     end
 
+    it "returns nil with an invalid pattern and options" do
+      re = RE2::Regexp.new('???', :log_errors => false)
+
+      expect(re.match('My name is Robert Paulson', submatches: 1)).to be_nil
+    end
+
+    it "is unanchored by default", :aggregate_failures do
+      expect(re.match("My name is Robert Paulson", submatches: 0)).to eq(true)
+      expect(re.match("My name is Robert Paulson, he said", submatches: 0)).to eq(true)
+      expect(re.match("He said, My name is Robert Paulson", submatches: 0)).to eq(true)
+    end
+
+    it "is unanchored if given a nil anchor", :aggregate_failures do
+      expect(re.match("My name is Robert Paulson", anchor: nil, submatches: 0)).to eq(true)
+      expect(re.match("My name is Robert Paulson, he said", anchor: nil, submatches: 0)).to eq(true)
+      expect(re.match("He said, My name is Robert Paulson", anchor: nil, submatches: 0)).to eq(true)
+    end
+
+    it "can be explicitly unanchored", :aggregate_failures do
+      expect(re.match("My name is Robert Paulson", anchor: :unanchored, submatches: 0)).to eq(true)
+      expect(re.match("My name is Robert Paulson, he said", anchor: :unanchored, submatches: 0)).to eq(true)
+      expect(re.match("He said, My name is Robert Paulson", anchor: :unanchored, submatches: 0)).to eq(true)
+    end
+
+    it "can anchor the match at both ends", :aggregate_failures do
+      expect(re.match("My name is Robert Paulson", anchor: :anchor_both, submatches: 0)).to eq(true)
+      expect(re.match("My name is Robert Paulson, he said", anchor: :anchor_both, submatches: 0)).to eq(false)
+      expect(re.match("He said, My name is Robert Paulson", anchor: :anchor_both, submatches: 0)).to eq(false)
+    end
+
+    it "can anchor the match at the start", :aggregate_failures do
+      expect(re.match("My name is Robert Paulson", anchor: :anchor_start, submatches: 0)).to eq(true)
+      expect(re.match("My name is Robert Paulson, he said", anchor: :anchor_start, submatches: 0)).to eq(true)
+      expect(re.match("He said, My name is Robert Paulson", anchor: :anchor_start, submatches: 0)).to eq(false)
+    end
+
+    it "raises an exception when given an invalid anchor" do
+      expect { re.match("My name is Robert Paulson", anchor: :invalid) }.to raise_error(ArgumentError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both")
+    end
+
+    it "raises an exception when given a non-symbol anchor" do
+      expect { re.match("My name is Robert Paulson", anchor: 0) }.to raise_error(TypeError)
+    end
+
+    it "can be given an offset at which to start matching", :aggregate_failures do
+      m = re.match("My name is Alice Bloggs My name is Robert Paulson", startpos: 24)
+
+      expect(m[1]).to eq("Robert")
+      expect(m[2]).to eq("Paulson")
+    end
+
+    it "does not match if given an offset past the end of the text", :aggregate_failures do
+      expect(re.match("My name is Alice Bloggs", startpos: 99)).to be_nil
+    end
+
+    it "raises an exception when given a negative start position" do
+      expect { re.match("My name is Robert Paulson", startpos: -1) }.to raise_error(ArgumentError, "startpos should be >= 0")
+    end
+
+    it "raises an exception when given a negative number of matches" do
+      expect { re.match("My name is Robert Paulson", submatches: -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
+    end
+
+    it "raises an exception when given a non-numeric number of matches" do
+      expect { re.match("My name is Robert Paulson", submatches: "foo") }.to raise_error(TypeError)
+    end
+
+    it "defaults to extracting all submatches when given nil", :aggregate_failures do
+      m = re.match("My name is Robert Paulson", submatches: nil)
+
+      expect(m[1]).to eq("Robert")
+      expect(m[2]).to eq("Paulson")
+    end
+
     describe "with a specific number of matches under the total in the pattern" do
-      subject { re.match("My name is Robert Paulson", 1) }
+      subject { re.match("My name is Robert Paulson", submatches: 1) }
 
       it "returns a match data object" do
         expect(subject).to be_a(RE2::MatchData)
@@ -347,7 +426,7 @@ RSpec.describe RE2::Regexp do
     end
 
     describe "with a number of matches over the total in the pattern" do
-      subject { re.match("My name is Robert Paulson", 5) }
+      subject { re.match("My name is Robert Paulson", submatches: 5) }
 
       it "returns a match data object" do
         expect(subject).to be_a(RE2::MatchData)
@@ -368,6 +447,20 @@ RSpec.describe RE2::Regexp do
         expect(subject[5]).to be_nil
         expect(subject[6]).to be_nil
       end
+    end
+
+    it "accepts the number of submatches as a second argument for compatibility", :aggregate_failures do
+      expect(re.match("My name is Robert Paulson", 0)).to eq(true)
+
+      m = re.match("My name is Robert Paulson", 1)
+      expect(m[1]).to eq("Robert")
+      expect(m[2]).to be_nil
+
+      m = re.match("My name is Robert Paulson", 2)
+      expect(m[1]).to eq("Robert")
+      expect(m[2]).to eq("Paulson")
+
+      expect { re.match("My name is Robert Paulson", -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
     end
   end
 
@@ -473,6 +566,93 @@ RSpec.describe RE2::Regexp do
       scanner = r.scan("It is a truth universally acknowledged")
 
       expect(scanner).to be_a(RE2::Scanner)
+    end
+  end
+
+  describe "#partial_match" do
+    it "matches the pattern anywhere within the given text" do
+      r = RE2::Regexp.new('f(o+)')
+
+      expect(r.partial_match('foo bar', submatches: 0)).to eq(true)
+    end
+
+    it "can set the number of submatches to extract", :aggregate_failures do
+      r = RE2::Regexp.new('f(o+)(a+)')
+      m = r.partial_match('fooaa bar', submatches: 1)
+
+      expect(m[1]).to eq('oo')
+      expect(m[2]).to be_nil
+
+      m = r.partial_match('fooaa bar', submatches: 2)
+
+      expect(m[1]).to eq('oo')
+      expect(m[2]).to eq('aa')
+    end
+
+    it "raises an error if given non-hash options" do
+      r = RE2::Regexp.new('f(o+)(a+)')
+
+      expect { r.partial_match('fooaa bar', 'not a hash') }.to raise_error(TypeError)
+    end
+
+    it "accepts options that can be coerced to a hash", :aggregate_failures do
+      r = RE2::Regexp.new('f(o+)(a+)')
+
+      m = r.partial_match('fooaa bar', nil)
+      expect(m[1]).to eq('oo')
+
+      m = r.partial_match('fooaa bar', [])
+      expect(m[1]).to eq('oo')
+    end
+
+    it "accepts anything that can be coerced to a string" do
+      r = RE2::Regexp.new('f(o+)(a+)')
+
+      expect(r.partial_match(StringLike.new('fooaa bar'), submatches: 0)).to eq(true)
+    end
+  end
+
+  describe "#full_match" do
+    it "only matches the pattern if all of the given text matches", :aggregate_failures do
+      r = RE2::Regexp.new('f(o+)')
+
+      expect(r.full_match('foo', submatches: 0)).to eq(true)
+      expect(r.full_match('foo bar', submatches: 0)).to eq(false)
+    end
+
+    it "can set the number of submatches to extract", :aggregate_failures do
+      r = RE2::Regexp.new('f(o+)(a+)')
+      m = r.full_match('fooaa', submatches: 1)
+
+      expect(m[1]).to eq('oo')
+      expect(m[2]).to be_nil
+
+      m = r.full_match('fooaa', submatches: 2)
+
+      expect(m[1]).to eq('oo')
+      expect(m[2]).to eq('aa')
+    end
+
+    it "raises an error if given non-hash options" do
+      r = RE2::Regexp.new('f(o+)(a+)')
+
+      expect { r.full_match('fooaa', 'not a hash') }.to raise_error(TypeError)
+    end
+
+    it "accepts options that can be coerced to a hash", :aggregate_failures do
+      r = RE2::Regexp.new('f(o+)(a+)')
+
+      m = r.full_match('fooaa', nil)
+      expect(m[1]).to eq('oo')
+
+      m = r.full_match('fooaa', [])
+      expect(m[1]).to eq('oo')
+    end
+
+    it "accepts anything that can be coerced to a string" do
+      r = RE2::Regexp.new('f(o+)(a+)')
+
+      expect(r.full_match(StringLike.new('fooaa'), submatches: 0)).to eq(true)
     end
   end
 end
