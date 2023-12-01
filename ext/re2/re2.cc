@@ -1335,14 +1335,15 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
  *   @example Matching with capturing groups
  *     r = RE2::Regexp.new('w(o)(o)')
- *     r.match('woo')    #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
+ *     r.match('woo') # => #<RE2::MatchData "woo" 1:"o" 2:"o">
  *   @example Matching without capturing groups
  *     r = RE2::Regexp.new('woo')
- *     r.match('woo')    #=> true
+ *     r.match('woo') # => true
  *
  * @overload match(text, options)
- *   See +match(text)+ but with a specific number of
- *   submatches returned (padded with nils if necessary).
+ *   See +match(text)+ but with customisable offsets for starting and ending
+ *   matches, optional anchoring to the start or both ends of the text and a
+ *   specific number of submatches to extract (padded with nils if necessary).
  *
  *   @param [String] text the text to search
  *   @param [Hash] options the options with which to perform the match
@@ -1368,6 +1369,23 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *     # => false
  *     r.match('woot', anchor: :anchor_start, submatches: 0)
  *     # => true
+ *
+ * @overload match(text, submatches)
+ *   @deprecated Legacy syntax for matching against +text+ with
+ *     a specific number of submatches to extract. See
+ *     +match(text, options)+ for the preferred API.
+ *
+ *   @param [String] text the text to search
+ *   @param [Integer] submatches the number of submatches to extract
+ *   @return [RE2::MatchData] if extracting any submatches
+ *   @return [Boolean] if not extracting any submatches
+ *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
+ *   @raise [TypeError] if given non-numeric number of submatches
+ *   @example
+ *     r = RE2::Regexp.new('w(o)(o)')
+ *     r.match('woo', 0) # => true
+ *     r.match('woo', 1) # => #<RE2::MatchData "woo" 1:"o">
+ *     r.match('woo', 2) # => #<RE2::MatchData "woo" 1:"o" 2:"o">
  */
 static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   re2_pattern *p;
