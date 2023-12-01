@@ -42,14 +42,14 @@ typedef struct {
 } re2_set;
 
 VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
-      re2_eSetMatchError, re2_eSetUnsupportedError;
+      re2_eSetMatchError, re2_eSetUnsupportedError, re2_eRegexpUnsupportedError;
 
 /* Symbols used in RE2 options. */
 static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
           id_max_mem, id_literal, id_never_nl, id_case_sensitive,
           id_perl_classes, id_word_boundary, id_one_line, id_unanchored,
           id_anchor, id_anchor_start, id_anchor_both, id_exception,
-          id_submatches, id_startpos;
+          id_submatches, id_startpos, id_endpos;
 
 inline VALUE encoded_str_new(const char *str, long length, RE2::Options::Encoding encoding) {
   if (encoding == RE2::Options::EncodingUTF8) {
@@ -1347,15 +1347,19 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *   @param [String] text the text to search
  *   @param [Hash] options the options with which to perform the match
  *   @option options [Integer] :startpos (0) offset at which to start matching
+ *   @option options [Integer] :endpos offset at which to stop matching, defaults to the text length
  *   @option options [Symbol] :anchor (:unanchored) one of :unanchored, :anchor_start, :anchor_both to anchor the match
  *   @option options [Integer] :submatches how many submatches to extract (0 is
  *     fastest), defaults to the number of capturing groups
  *   @return [RE2::MatchData] if extracting any submatches
  *   @return [Boolean] if not extracting any submatches
- *   @raise [ArgumentError] if given a negative number of submatches or invalid anchor
+ *   @raise [ArgumentError] if given a negative number of submatches, invalid
+ *     anchor or invalid startpos, endpos pair
  *   @raise [NoMemoryError] if there was not enough memory to allocate the matches
  *   @raise [TypeError] if given non-String text, non-numeric number of
  *     submatches, non-symbol anchor or non-hash options
+ *   @raise [RE2::Regexp::UnsupportedError] if given an endpos argument on a
+ *     version of RE2 that does not support it
  *   @example
  *     r = RE2::Regexp.new('w(o)(o)')
  *     r.match('woo', submatches: 1) # => #<RE2::MatchData "woo" 1:"o">
@@ -1379,6 +1383,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
   int n;
   int startpos = 0;
+  int endpos = RSTRING_LEN(text);
   RE2::Anchor anchor = RE2::UNANCHORED;
 
   if (RTEST(options)) {
@@ -1391,6 +1396,21 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     } else {
       if (TYPE(options) != T_HASH) {
         options = rb_Hash(options);
+      }
+
+      VALUE endpos_option = rb_hash_aref(options, ID2SYM(id_endpos));
+      if (!NIL_P(endpos_option)) {
+#ifdef HAVE_ENDPOS_ARGUMENT
+        Check_Type(endpos_option, T_FIXNUM);
+
+        endpos = NUM2INT(endpos_option);
+
+        if (endpos < 0) {
+          rb_raise(rb_eArgError, "endpos should be >= 0");
+        }
+#else
+        rb_raise(re2_eRegexpUnsupportedError, "current version of RE2::Match() does not support endpos argument");
+#endif
       }
 
       VALUE anchor_option = rb_hash_aref(options, ID2SYM(id_anchor));
@@ -1445,10 +1465,14 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     n = p->pattern->NumberOfCapturingGroups();
   }
 
+  if (startpos > endpos) {
+    rb_raise(rb_eArgError, "startpos should be <= endpos");
+  }
+
   if (n == 0) {
 #ifdef HAVE_ENDPOS_ARGUMENT
     bool matched = p->pattern->Match(RSTRING_PTR(text), startpos,
-        RSTRING_LEN(text), anchor, 0, 0);
+        endpos, anchor, 0, 0);
 #else
     bool matched = p->pattern->Match(RSTRING_PTR(text), startpos, anchor,
         0, 0);
@@ -1476,7 +1500,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
 #ifdef HAVE_ENDPOS_ARGUMENT
     bool matched = p->pattern->Match(RSTRING_PTR(m->text), startpos,
-        RSTRING_LEN(m->text), anchor, m->matches, n);
+        endpos, anchor, m->matches, n);
 #else
     bool matched = p->pattern->Match(RSTRING_PTR(m->text), startpos,
         anchor, m->matches, n);
@@ -1531,6 +1555,21 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   c->eof = false;
 
   return scanner;
+}
+
+/*
+ * Returns whether the underlying RE2 version supports passing an endpos
+ * argument to RE2::Match. If not, #match will raise an error if attempting to
+ * pass an endpos.
+ *
+ * @return [Bool] whether the underlying RE2::Match has an endpos argument
+ */
+static VALUE re2_regexp_match_has_endpos_argument_p(VALUE) {
+#ifdef HAVE_ENDPOS_ARGUMENT
+  return Qtrue;
+#else
+  return Qfalse;
+#endif
 }
 
 /*
@@ -1814,11 +1853,11 @@ static VALUE re2_set_compile(VALUE self) {
 }
 
 /*
- * Returns whether the underlying re2 version outputs error information from
+ * Returns whether the underlying RE2 version outputs error information from
  * RE2::Set::Match. If not, #match will raise an error if attempting to set its
  * :exception option to true.
  *
- * @return [Bool] whether the underlying re2 outputs error information from Set matches
+ * @return [Bool] whether the underlying RE2 outputs error information from Set matches
  */
 static VALUE re2_set_match_raises_errors_p(VALUE) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
@@ -1934,6 +1973,8 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
 extern "C" void Init_re2(void) {
   re2_mRE2 = rb_define_module("RE2");
   re2_cRegexp = rb_define_class_under(re2_mRE2, "Regexp", rb_cObject);
+  re2_eRegexpUnsupportedError = rb_define_class_under(re2_cRegexp,
+      "UnsupportedError", rb_const_get(rb_cObject, rb_intern("StandardError")));
   re2_cMatchData = rb_define_class_under(re2_mRE2, "MatchData", rb_cObject);
   re2_cScanner = rb_define_class_under(re2_mRE2, "Scanner", rb_cObject);
   re2_cSet = rb_define_class_under(re2_mRE2, "Set", rb_cObject);
@@ -1987,6 +2028,8 @@ extern "C" void Init_re2(void) {
   rb_define_method(re2_cScanner, "rewind",
       RUBY_METHOD_FUNC(re2_scanner_rewind), 0);
 
+  rb_define_singleton_method(re2_cRegexp, "match_has_endpos_argument?",
+      RUBY_METHOD_FUNC(re2_regexp_match_has_endpos_argument_p), 0);
   rb_define_method(re2_cRegexp, "initialize",
       RUBY_METHOD_FUNC(re2_regexp_initialize), -1);
   rb_define_method(re2_cRegexp, "ok?", RUBY_METHOD_FUNC(re2_regexp_ok), 0);
@@ -2090,4 +2133,5 @@ extern "C" void Init_re2(void) {
   id_exception = rb_intern("exception");
   id_submatches = rb_intern("submatches");
   id_startpos = rb_intern("startpos");
+  id_endpos = rb_intern("endpos");
 }

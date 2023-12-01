@@ -161,7 +161,7 @@ RSpec.describe RE2::Set do
       end
     end
 
-    it "raises an error if :exception is true and re2 does not support it" do
+    it "raises an error if :exception is true and RE2 does not support it" do
       skip "Underlying RE2::Set::Match outputs error information" if RE2::Set.match_raises_errors?
 
       set = RE2::Set.new(:unanchored, :log_errors => false)

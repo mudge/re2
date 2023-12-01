@@ -382,12 +382,41 @@ RSpec.describe RE2::Regexp do
       expect(m[2]).to eq("Paulson")
     end
 
-    it "does not match if given an offset past the end of the text", :aggregate_failures do
-      expect(re.match("My name is Alice Bloggs", startpos: 99)).to be_nil
+    it "does not match if given a starting offset past the end of the text" do
+      re = RE2::Regexp.new('(\w+)', log_errors: false)
+
+      expect(re.match("My name is Alice Bloggs", startpos: 99, endpos: 100)).to be_nil
     end
 
-    it "raises an exception when given a negative start position" do
+    it "raises an exception when given a negative start offset" do
       expect { re.match("My name is Robert Paulson", startpos: -1) }.to raise_error(ArgumentError, "startpos should be >= 0")
+    end
+
+    it "can be given an offset at which to stop matching" do
+      skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
+
+      re = RE2::Regexp.new('(\w+)')
+      m = re.match("foobar", endpos: 3)
+
+      expect(m[1]).to eq("foo")
+    end
+
+    it "raises an error if given an ending offset and RE2 does not support it" do
+      skip "Underlying RE2::Match has endpos argument" if RE2::Regexp.match_has_endpos_argument?
+
+      expect { re.match("My name is Robert Paulson", endpos: 3) }.to raise_error(RE2::Regexp::UnsupportedError)
+    end
+
+    it "does not match if given an ending offset at the start of the text" do
+      expect(re.match("My name is Alice Bloggs", endpos: 0)).to be_nil
+    end
+
+    it "raises an exception if given an ending offset before the starting offset" do
+      expect { re.match("My name is Alice Bloggs", startpos: 5, endpos: 2) }.to raise_error(ArgumentError, "startpos should be <= endpos")
+    end
+
+    it "raises an exception when given a negative end offset" do
+      expect { re.match("My name is Robert Paulson", endpos: -1) }.to raise_error(ArgumentError, "endpos should be >= 0")
     end
 
     it "raises an exception when given a negative number of matches" do
