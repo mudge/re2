@@ -1,8 +1,10 @@
 /*
- * re2 (http://github.com/mudge/re2)
- * Ruby bindings to re2, an "efficient, principled regular expression library"
+ * re2 (https://github.com/mudge/re2)
+ * Ruby bindings to RE2, a "fast, safe, thread-friendly alternative to
+ * backtracking regular expression engines like those used in PCRE, Perl, and
+ * Python".
  *
- * Copyright (c) 2010-2014, Paul Mucur (http://mudge.name)
+ * Copyright (c) 2010, Paul Mucur (https://mudge.name)
  * Released under the BSD Licence, please see LICENSE.txt
  */
 
@@ -123,7 +125,7 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
   }
 }
 
-/* For compatibility with ruby < 2.7 */
+/* For compatibility with Ruby < 2.7 */
 #ifdef HAVE_RB_GC_MARK_MOVABLE
 #define re2_compact_callback(x) (x),
 #else
@@ -271,11 +273,13 @@ static VALUE re2_scanner_allocate(VALUE klass) {
 }
 
 /*
- * Returns a frozen copy of the string passed into +match+.
+ * Returns a frozen copy of the text supplied when matching.
  *
- * @return [String] a frozen copy of the passed string.
+ * If the text was already a frozen string, returns the original.
+ *
+ * @return [String] a frozen string with the text supplied when matching
  * @example
- *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *   m.string #=> "bob 123"
  */
 static VALUE re2_matchdata_string(const VALUE self) {
@@ -286,9 +290,10 @@ static VALUE re2_matchdata_string(const VALUE self) {
 }
 
 /*
- * Returns the string passed into the scanner.
+ * Returns the text supplied when incrementally matching with
+ * {RE2::Regexp#scan}.
  *
- * @return [String] the original string.
+ * @return [String] the original string passed to {RE2::Regexp#scan}
  * @example
  *   c = RE2::Regexp.new('(\d+)').scan("foo")
  *   c.string #=> "foo"
@@ -301,9 +306,9 @@ static VALUE re2_scanner_string(const VALUE self) {
 }
 
 /*
- * Returns whether the scanner has consumed all input or not.
+ * Returns whether the {RE2::Scanner} has consumed all input or not.
  *
- * @return [Boolean] whether the scanner has consumed all input or not
+ * @return [Boolean] whether the {RE2::Scanner} has consumed all input or not
  * @example
  *   c = RE2::Regexp.new('(\d+)').scan("foo")
  *   c.eof? #=> true
@@ -316,7 +321,7 @@ static VALUE re2_scanner_eof(const VALUE self) {
 }
 
 /*
- * Rewind the scanner to the start of the string.
+ * Rewind the {RE2::Scanner} to the start of the string.
  *
  * @example
  *   s = RE2::Regexp.new('(\d+)').scan("1 2 3")
@@ -338,14 +343,19 @@ static VALUE re2_scanner_rewind(VALUE self) {
 }
 
 /*
- * Scan the given text incrementally for matches, returning an array of
- * matches on each subsequent call. Returns nil if no matches are found.
+ * Scan the given text incrementally for matches using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L447-L463
+ * `FindAndConsume`}, returning an array of submatches on each subsequent
+ * call. Returns `nil` if no matches are found or an empty array for every
+ * match if the pattern has no capturing groups.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
- * @return [Array<String>] the matches.
+ * @return [Array<String>] if the pattern has capturing groups
+ * @return [[]] if the pattern does not have capturing groups
+ * @return [nil] if no matches are found
  * @example
  *   s = RE2::Regexp.new('(\w+)').scan("Foo bar baz")
  *   s.scan #=> ["Foo"]
@@ -404,9 +414,6 @@ static VALUE re2_scanner_scan(VALUE self) {
   }
 }
 
-/*
- * Retrieve a matchdata by index or name.
- */
 static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
   re2_matchdata *m;
   re2_pattern *p;
@@ -442,7 +449,8 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
 }
 
 /*
- * Returns the number of elements in the match array (including nils).
+ * Returns the number of elements in the {RE2::MatchData} (including the
+ * overall match, submatches and any `nils`).
  *
  * @return [Integer] the number of elements
  * @example
@@ -459,10 +467,11 @@ static VALUE re2_matchdata_size(const VALUE self) {
 }
 
 /*
- * Returns the offset of the start of the nth element of the matchdata.
+ * Returns the offset of the start of the nth element of the {RE2::MatchData}.
  *
- * @param [Integer, String, Symbol] n the name or number of the match
- * @return [Integer] the offset of the start of the match
+ * @param [Integer, String, Symbol] n the name or number of the submatch
+ * @return [Integer, nil] the offset of the start of the match or `nil` if
+ *   there is no such submatch
  * @example
  *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
  *   m.begin(0) #=> 1
@@ -484,10 +493,12 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
 }
 
 /*
- * Returns the offset of the character following the end of the nth element of the matchdata.
+ * Returns the offset of the character following the end of the nth element of
+ * the {RE2::MatchData}.
  *
  * @param [Integer, String, Symbol] n the name or number of the match
- * @return [Integer] the offset of the character following the end of the match
+ * @return [Integer, nil] the offset of the character following the end of the
+ *   match or `nil` if there is no such match
  * @example
  *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
  *   m.end(0) #=> 9
@@ -511,7 +522,7 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
 /*
  * Returns the {RE2::Regexp} used in the match.
  *
- * @return [RE2::Regexp] the regexp used in the match
+ * @return [RE2::Regexp] the regular expression used in the match
  * @example
  *   m = RE2::Regexp.new('(\d+)').match("bob 123")
  *   m.regexp #=> #<RE2::Regexp /(\d+)/>
@@ -524,9 +535,9 @@ static VALUE re2_matchdata_regexp(const VALUE self) {
 }
 
 /*
- * Returns the {RE2::Regexp} used in the scanner.
+ * Returns the {RE2::Regexp} used in the {RE2::Scanner}.
  *
- * @return [RE2::Regexp] the regexp used in the scanner
+ * @return [RE2::Regexp] the regular expression used in the {RE2::Scanner}
  * @example
  *   c = RE2::Regexp.new('(\d+)').scan("bob 123")
  *   c.regexp #=> #<RE2::Regexp /(\d+)/>
@@ -545,11 +556,12 @@ static VALUE re2_regexp_allocate(VALUE klass) {
 }
 
 /*
- * Returns the array of matches.
+ * Returns the array of matches including the overall match, submatches and any
+ * `nil`s.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @return [Array<String, nil>] the array of matches
  * @example
@@ -620,16 +632,14 @@ static VALUE re2_matchdata_named_match(const char* name, const VALUE self) {
  * Retrieve zero, one or more matches by index or name.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
- *
- * @return [Array<String, nil>, String, Boolean]
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @overload [](index)
  *   Access a particular match by index.
  *
  *   @param [Integer] index the index of the match to fetch
- *   @return [String, nil] the specified match
+ *   @return [String, nil] the specified match or `nil` if it isn't present
  *   @example
  *     m = RE2::Regexp.new('(\d+)').match("bob 123")
  *     m[0] #=> "123"
@@ -657,7 +667,7 @@ static VALUE re2_matchdata_named_match(const char* name, const VALUE self) {
  *   Access a particular match by name.
  *
  *   @param [String, Symbol] name the name of the match to fetch
- *   @return [String, nil] the specific match
+ *   @return [String, nil] the specific match or `nil` if it isn't present
  *   @example
  *     m = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
  *     m["number"] #=> "123"
@@ -691,8 +701,8 @@ static VALUE re2_matchdata_to_s(const VALUE self) {
  * Returns a printable version of the match.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @return [String] a printable version of the match
  * @example
@@ -735,8 +745,9 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
  * Returns the array of submatches for pattern matching.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is
+ * undefined).
  *
  * @return [Array<String, nil>] the array of submatches
  * @example
@@ -781,17 +792,18 @@ static VALUE re2_matchdata_deconstruct(const VALUE self) {
  * order but an invalid name will cause the hash to be immediately returned.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @return [Hash] a hash of capturing group names to submatches
- * @param [Array<Symbol>, nil] keys an array of Symbol capturing group names or nil to return all names
+ * @param [Array<Symbol>, nil] keys an array of `Symbol` capturing group names
+ *   or `nil` to return all names
  * @example
  *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
- *   m.deconstruct_keys(nil)                #=> {:numbers => "123", :letters => "abc"}
- *   m.deconstruct_keys([:numbers])         #=> {:numbers => "123"}
+ *   m.deconstruct_keys(nil)                #=> {numbers: "123", letters: "abc"}
+ *   m.deconstruct_keys([:numbers])         #=> {numbers: "123"}
  *   m.deconstruct_keys([:fruit])           #=> {}
- *   m.deconstruct_keys([:letters, :fruit]) #=> {:letters => "abc"}
+ *   m.deconstruct_keys([:letters, :fruit]) #=> {letters: "abc"}
  *
  * @example pattern matching
  *   case RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
@@ -840,11 +852,9 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
 }
 
 /*
- * Returns a new RE2 object with a compiled version of
- * +pattern+ stored inside. Equivalent to +RE2::Regexp.new+.
+ * Shorthand to compile a new {RE2::Regexp}.
  *
  * @see RE2::Regexp#initialize
- *
  */
 static VALUE re2_re2(int argc, VALUE *argv, VALUE) {
   return rb_class_new_instance(argc, argv, re2_cRegexp);
@@ -852,22 +862,21 @@ static VALUE re2_re2(int argc, VALUE *argv, VALUE) {
 
 /*
  * Returns a new {RE2::Regexp} object with a compiled version of
- * +pattern+ stored inside.
- *
- * @return [RE2::Regexp]
+ * `pattern` stored inside.
  *
  * @overload initialize(pattern)
  *   Returns a new {RE2::Regexp} object with a compiled version of
- *   +pattern+ stored inside with the default options.
+ *   `pattern` stored inside with the default options.
  *
  *   @param [String] pattern the pattern to compile
- *   @return [RE2::Regexp] an RE2::Regexp with the specified pattern
+ *   @return [RE2::Regexp] a {RE2::Regexp} with the specified pattern
+ *   @raise [TypeError] if the given pattern can't be coerced to a `String`
  *   @raise [NoMemoryError] if memory could not be allocated for the compiled
- *                          pattern
+ *     pattern
  *
  * @overload initialize(pattern, options)
  *   Returns a new {RE2::Regexp} object with a compiled version of
- *   +pattern+ stored inside with the specified options.
+ *   `pattern` stored inside with the specified options.
  *
  *   @param [String] pattern the pattern to compile
  *   @param [Hash] options the options with which to compile the pattern
@@ -877,12 +886,13 @@ static VALUE re2_re2(int argc, VALUE *argv, VALUE) {
  *   @option options [Boolean] :log_errors (true) log syntax and execution errors to ERROR
  *   @option options [Integer] :max_mem approx. max memory footprint of RE2
  *   @option options [Boolean] :literal (false) interpret string as literal, not regexp
- *   @option options [Boolean] :never_nl (false) never match \n, even if it is in regexp
- *   @option options [Boolean] :case_sensitive (true) match is case-sensitive (regexp can override with (?i) unless in posix_syntax mode)
- *   @option options [Boolean] :perl_classes (false) allow Perl's \d \s \w \D \S \W when in posix_syntax mode
- *   @option options [Boolean] :word_boundary (false) allow \b \B (word boundary and not) when in posix_syntax mode
- *   @option options [Boolean] :one_line (false) ^ and $ only match beginning and end of text when in posix_syntax mode
- *   @return [RE2::Regexp] an RE2::Regexp with the specified pattern and options
+ *   @option options [Boolean] :never_nl (false) never match `\n`, even if it is in regexp
+ *   @option options [Boolean] :case_sensitive (true) match is case-sensitive (regexp can override with `(?i)` unless in `posix_syntax` mode)
+ *   @option options [Boolean] :perl_classes (false) allow Perl's `\d` `\s` `\w` `\D` `\S` `\W` when in `posix_syntax` mode
+ *   @option options [Boolean] :word_boundary (false) allow `\b` `\B` (word boundary and not) when in `posix_syntax` mode
+ *   @option options [Boolean] :one_line (false) `^` and `$` only match beginning and end of text when in `posix_syntax` mode
+ *   @return [RE2::Regexp] a {RE2::Regexp} with the specified pattern and options
+ *   @raise [TypeError] if the given pattern can't be coerced to a `String`
  *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
  */
 static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
@@ -913,11 +923,12 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 }
 
 /*
- * Returns a printable version of the regular expression +re2+.
+ * Returns a printable version of the regular expression.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is
+ * undefined).
  *
  * @return [String] a printable version of the regular expression
  * @example
@@ -938,11 +949,11 @@ static VALUE re2_regexp_inspect(const VALUE self) {
 }
 
 /*
- * Returns a string version of the regular expression +re2+.
+ * Returns a string version of the regular expression.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @return [String] a string version of the regular expression
  * @example
@@ -959,8 +970,7 @@ static VALUE re2_regexp_to_s(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled successfully or not.
+ * Returns whether or not the regular expression was compiled successfully.
  *
  * @return [Boolean] whether or not compilation was successful
  * @example
@@ -975,12 +985,12 @@ static VALUE re2_regexp_ok(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the utf8 option set to true.
+ * Returns whether or not the regular expression was compiled with the `utf8`
+ * option set to `true`.
  *
- * @return [Boolean] the utf8 option
+ * @return [Boolean] the `utf8` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :utf8 => true)
+ *   re2 = RE2::Regexp.new("woo?", utf8: true)
  *   re2.utf8? #=> true
  */
 static VALUE re2_regexp_utf8(const VALUE self) {
@@ -991,12 +1001,12 @@ static VALUE re2_regexp_utf8(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the posix_syntax option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `posix_syntax` option set to `true`.
  *
- * @return [Boolean] the posix_syntax option
+ * @return [Boolean] the `posix_syntax` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :posix_syntax => true)
+ *   re2 = RE2::Regexp.new("woo?", posix_syntax: true)
  *   re2.posix_syntax? #=> true
  */
 static VALUE re2_regexp_posix_syntax(const VALUE self) {
@@ -1007,12 +1017,12 @@ static VALUE re2_regexp_posix_syntax(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the longest_match option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `longest_match` option set to `true`.
  *
- * @return [Boolean] the longest_match option
+ * @return [Boolean] the `longest_match` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :longest_match => true)
+ *   re2 = RE2::Regexp.new("woo?", longest_match: true)
  *   re2.longest_match? #=> true
  */
 static VALUE re2_regexp_longest_match(const VALUE self) {
@@ -1023,12 +1033,12 @@ static VALUE re2_regexp_longest_match(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the log_errors option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `log_errors` option set to `true`.
  *
- * @return [Boolean] the log_errors option
+ * @return [Boolean] the `log_errors` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :log_errors => true)
+ *   re2 = RE2::Regexp.new("woo?", log_errors: true)
  *   re2.log_errors? #=> true
  */
 static VALUE re2_regexp_log_errors(const VALUE self) {
@@ -1039,12 +1049,11 @@ static VALUE re2_regexp_log_errors(const VALUE self) {
 }
 
 /*
- * Returns the max_mem setting for the regular expression
- * +re2+.
+ * Returns the `max_mem` setting for the regular expression.
  *
- * @return [Integer] the max_mem option
+ * @return [Integer] the `max_mem` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :max_mem => 1024)
+ *   re2 = RE2::Regexp.new("woo?", max_mem: 1024)
  *   re2.max_mem #=> 1024
  */
 static VALUE re2_regexp_max_mem(const VALUE self) {
@@ -1055,12 +1064,12 @@ static VALUE re2_regexp_max_mem(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the literal option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `literal` option set to `true`.
  *
- * @return [Boolean] the literal option
+ * @return [Boolean] the `literal` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :literal => true)
+ *   re2 = RE2::Regexp.new("woo?", literal: true)
  *   re2.literal? #=> true
  */
 static VALUE re2_regexp_literal(const VALUE self) {
@@ -1071,12 +1080,12 @@ static VALUE re2_regexp_literal(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the never_nl option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `never_nl` option set to `true`.
  *
- * @return [Boolean] the never_nl option
+ * @return [Boolean] the `never_nl` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :never_nl => true)
+ *   re2 = RE2::Regexp.new("woo?", never_nl: true)
  *   re2.never_nl? #=> true
  */
 static VALUE re2_regexp_never_nl(const VALUE self) {
@@ -1087,12 +1096,12 @@ static VALUE re2_regexp_never_nl(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the case_sensitive option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `case_sensitive` option set to `true`.
  *
- * @return [Boolean] the case_sensitive option
+ * @return [Boolean] the `case_sensitive` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :case_sensitive => true)
+ *   re2 = RE2::Regexp.new("woo?", case_sensitive: true)
  *   re2.case_sensitive? #=> true
  */
 static VALUE re2_regexp_case_sensitive(const VALUE self) {
@@ -1103,12 +1112,12 @@ static VALUE re2_regexp_case_sensitive(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the case_sensitive option set to false.
+ * Returns whether or not the regular expression was compiled with the
+ * `case_sensitive` option set to `false`.
  *
- * @return [Boolean] the inverse of the case_sensitive option
+ * @return [Boolean] the inverse of the `case_sensitive` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :case_sensitive => true)
+ *   re2 = RE2::Regexp.new("woo?", case_sensitive: true)
  *   re2.case_insensitive? #=> false
  *   re2.casefold?         #=> false
  */
@@ -1117,12 +1126,12 @@ static VALUE re2_regexp_case_insensitive(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the perl_classes option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * perl_classes option set to `true`.
  *
- * @return [Boolean] the perl_classes option
+ * @return [Boolean] the `perl_classes` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :perl_classes => true)
+ *   re2 = RE2::Regexp.new("woo?", perl_classes: true)
  *   re2.perl_classes? #=> true
  */
 static VALUE re2_regexp_perl_classes(const VALUE self) {
@@ -1133,12 +1142,12 @@ static VALUE re2_regexp_perl_classes(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the word_boundary option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `word_boundary` option set to `true`.
  *
- * @return [Boolean] the word_boundary option
+ * @return [Boolean] the `word_boundary` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :word_boundary => true)
+ *   re2 = RE2::Regexp.new("woo?", word_boundary: true)
  *   re2.word_boundary? #=> true
  */
 static VALUE re2_regexp_word_boundary(const VALUE self) {
@@ -1149,12 +1158,12 @@ static VALUE re2_regexp_word_boundary(const VALUE self) {
 }
 
 /*
- * Returns whether or not the regular expression +re2+
- * was compiled with the one_line option set to true.
+ * Returns whether or not the regular expression was compiled with the
+ * `one_line` option set to `true`.
  *
- * @return [Boolean] the one_line option
+ * @return [Boolean] the `one_line` option
  * @example
- *   re2 = RE2::Regexp.new("woo?", :one_line => true)
+ *   re2 = RE2::Regexp.new("woo?", one_line: true)
  *   re2.one_line? #=> true
  */
 static VALUE re2_regexp_one_line(const VALUE self) {
@@ -1165,10 +1174,10 @@ static VALUE re2_regexp_one_line(const VALUE self) {
 }
 
 /*
- * If the RE2 could not be created properly, returns an
- * error string otherwise returns nil.
+ * If the {RE2::Regexp} could not be created properly, returns an error string
+ * otherwise returns `nil`.
  *
- * @return [String, nil] the error string or nil
+ * @return [String, nil] the error string or `nil`
  */
 static VALUE re2_regexp_error(const VALUE self) {
   re2_pattern *p;
@@ -1182,14 +1191,14 @@ static VALUE re2_regexp_error(const VALUE self) {
 }
 
 /*
- * If the RE2 could not be created properly, returns
- * the offending portion of the regexp otherwise returns nil.
+ * If the {RE2::Regexp} could not be created properly, returns
+ * the offending portion of the regexp otherwise returns `nil`.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
- * @return [String, nil] the offending portion of the regexp or nil
+ * @return [String, nil] the offending portion of the regexp or `nil`
  */
 static VALUE re2_regexp_error_arg(const VALUE self) {
   re2_pattern *p;
@@ -1219,8 +1228,7 @@ static VALUE re2_regexp_program_size(const VALUE self) {
 }
 
 /*
- * Returns a hash of the options currently set for
- * +re2+.
+ * Returns a hash of the options currently set for the {RE2::Regexp}.
  *
  * @return [Hash] the options
  */
@@ -1271,8 +1279,8 @@ static VALUE re2_regexp_options(const VALUE self) {
 
 /*
  * Returns the number of capturing subpatterns, or -1 if the regexp
- * wasn't valid on construction. The overall match ($0) does not
- * count: if the regexp is "(a)(b)", returns 2.
+ * wasn't valid on construction. The overall match (`$0`) does not
+ * count: if the regexp is `"(a)(b)"`, returns 2.
  *
  * @return [Integer] the number of capturing subpatterns
  */
@@ -1287,8 +1295,8 @@ static VALUE re2_regexp_number_of_capturing_groups(const VALUE self) {
  * Returns a hash of names to capturing indices of groups.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @return [Hash] a hash of names to capturing indices
  */
@@ -1310,29 +1318,29 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
 }
 
 /*
- * Match the pattern against the given +text+ and return either a boolean (if
- * no submatches are required) or a {RE2::MatchData} instance with the
- * specified number of submatches (defaults to the total number of capturing
- * groups).
+ * General matching: match the pattern against the given `text` using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L562-L588
+ * `Match`} and return a {RE2::MatchData} instance with the specified number of
+ * submatches (defaults to the total number of capturing groups) or a boolean
+ * (if no submatches are required).
  *
  * The number of submatches has a significant impact on performance: requesting
  * one submatch is much faster than requesting more than one and requesting
  * zero submatches is faster still.
  *
- * @return [Boolean, RE2::MatchData]
- *
  * @overload match(text)
- *   Returns an {RE2::MatchData} containing the matching pattern and all
- *   submatches resulting from looking for the regexp in +text+ if the pattern
+ *   Returns a {RE2::MatchData} containing the matching pattern and all
+ *   submatches resulting from looking for the regexp in `text` if the pattern
  *   contains capturing groups.
  *
- *   Returns either true or false indicating whether a successful match was
+ *   Returns either `true` or `false` indicating whether a successful match was
  *   made if the pattern contains no capturing groups.
  *
  *   @param [String] text the text to search
- *   @return [RE2::MatchData] if the pattern contains capturing groups
+ *   @return [RE2::MatchData, nil] if the pattern contains capturing groups
  *   @return [Boolean] if the pattern does not contain capturing groups
  *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
+ *   @raise [TypeError] if given text that cannot be coerced to a `String`
  *   @example Matching with capturing groups
  *     r = RE2::Regexp.new('w(o)(o)')
  *     r.match('woo') #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
@@ -1341,9 +1349,10 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *     r.match('woo') #=> true
  *
  * @overload match(text, options)
- *   See +match(text)+ but with customisable offsets for starting and ending
+ *   See `match(text)` but with customisable offsets for starting and ending
  *   matches, optional anchoring to the start or both ends of the text and a
- *   specific number of submatches to extract (padded with nils if necessary).
+ *   specific number of submatches to extract (padded with `nil`s if
+ *   necessary).
  *
  *   @param [String] text the text to search
  *   @param [Hash] options the options with which to perform the match
@@ -1352,7 +1361,7 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *   @option options [Symbol] :anchor (:unanchored) one of :unanchored, :anchor_start, :anchor_both to anchor the match
  *   @option options [Integer] :submatches how many submatches to extract (0 is
  *     fastest), defaults to the number of capturing groups
- *   @return [RE2::MatchData] if extracting any submatches
+ *   @return [RE2::MatchData, nil] if extracting any submatches
  *   @return [Boolean] if not extracting any submatches
  *   @raise [ArgumentError] if given a negative number of submatches, invalid
  *     anchor or invalid startpos, endpos pair
@@ -1361,7 +1370,7 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *     submatches, non-symbol anchor or non-hash options
  *   @raise [RE2::Regexp::UnsupportedError] if given an endpos argument on a
  *     version of RE2 that does not support it
- *   @example
+ *   @example Matching with capturing groups
  *     r = RE2::Regexp.new('w(o)(o)')
  *     r.match('woo', submatches: 1) #=> #<RE2::MatchData "woo" 1:"o">
  *     r.match('woo', submatches: 3) #=> #<RE2::MatchData "woo" 1:"o" 2:"o" 3:nil>
@@ -1369,15 +1378,18 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *     #=> false
  *     r.match('woot', anchor: :anchor_start, submatches: 0)
  *     #=> true
+ *   @example Matching without capturing groups
+ *     r = RE2::Regexp.new('wo+')
+ *     r.match('woot', anchor: :anchor_both)  #=> false
+ *     r.match('woot', anchor: :anchor_start) #=> true
  *
  * @overload match(text, submatches)
- *   @deprecated Legacy syntax for matching against +text+ with
- *     a specific number of submatches to extract. See
- *     +match(text, options)+ for the preferred API.
+ *   @deprecated Legacy syntax for matching against `text` with a specific
+ *     number of submatches to extract. Use `match(text, submatches: n)` instead.
  *
  *   @param [String] text the text to search
  *   @param [Integer] submatches the number of submatches to extract
- *   @return [RE2::MatchData] if extracting any submatches
+ *   @return [RE2::MatchData, nil] if extracting any submatches
  *   @return [Boolean] if not extracting any submatches
  *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
  *   @raise [TypeError] if given non-numeric number of submatches
@@ -1532,9 +1544,12 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 }
 
 /*
- * Returns true if the pattern matches any substring of the given text.
+ * Returns true if the pattern matches any substring of the given text using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L413-L427
+ * `PartialMatch`}.
  *
  * @return [Boolean] whether the match was successful
+ * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
   re2_pattern *p;
@@ -1548,9 +1563,12 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
 }
 
 /*
- * Returns true if the pattern matches the given text.
+ * Returns true if the pattern matches the given text using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L376-L411
+ * `FullMatch`}.
  *
  * @return [Boolean] whether the match was successful
+ * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
   re2_pattern *p;
@@ -1564,10 +1582,16 @@ static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
 }
 
 /*
- * Returns a {RE2::Scanner} for scanning the given text incrementally.
+ * Returns a {RE2::Scanner} for scanning the given text incrementally with
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L447-L463
+ * `FindAndConsume`}.
  *
+ * @param [text] text the text to scan incrementally
+ * @return [RE2::Scanner] an `Enumerable` {RE2::Scanner} object
+ * @raises [TypeError] if `text` cannot be coerced to a `String`
  * @example
  *   c = RE2::Regexp.new('(\w+)').scan("Foo bar baz")
+ *   #=> #<RE2::Scanner:0x0000000000000001>
  */
 static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   /* Ensure text is a string. */
@@ -1596,11 +1620,15 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
 }
 
 /*
- * Returns whether the underlying RE2 version supports passing an endpos
- * argument to RE2::Match. If not, #match will raise an error if attempting to
- * pass an endpos.
+ * Returns whether the underlying RE2 version supports passing an `endpos`
+ * argument to
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L562-L588
+ * Match}. If not, {RE2::Regexp#match} will raise an error if attempting to
+ * pass an `endpos`.
  *
- * @return [Bool] whether the underlying RE2::Match has an endpos argument
+ * @return [Boolean] whether the underlying
+ *   {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L562-L588
+ *   Match} has an endpos argument
  */
 static VALUE re2_regexp_match_has_endpos_argument_p(VALUE) {
 #ifdef HAVE_ENDPOS_ARGUMENT
@@ -1611,17 +1639,21 @@ static VALUE re2_regexp_match_has_endpos_argument_p(VALUE) {
 }
 
 /*
- * Returns a copy of +str+ with the first occurrence +pattern+
- * replaced with +rewrite+.
+ * Returns a copy of `str` with the first occurrence `pattern` replaced with
+ * `rewrite` using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L465-L480
+ * `Replace`}.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @param [String] str the string to modify
  * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
  * @param [String] rewrite the string to replace with
  * @return [String] the resulting string
+ * @raises [TypeError] if the given rewrite or pattern (if not provided as a
+ *   {RE2::Regexp}) cannot be coerced to `String`s
  * @example
  *   RE2.Replace("hello there", "hello", "howdy") #=> "howdy there"
  *   re2 = RE2::Regexp.new("hel+o")
@@ -1657,15 +1689,19 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
 }
 
 /*
- * Return a copy of +str+ with +pattern+ replaced by +rewrite+.
+ * Return a copy of `str` with `pattern` replaced by `rewrite` using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L482-L497
+ * `GlobalReplace`}.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the :utf8 option for the
- * RE2::Regexp is set to false (any other encoding's behaviour is undefined).
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
  * @param [String] str the string to modify
  * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
  * @param [String] rewrite the string to replace with
+ * @raises [TypeError] if the given rewrite or pattern (if not provided as a
+ *   {RE2::Regexp}) cannot be coerced to `String`s
  * @return [String] the resulting string
  * @example
  *   re2 = RE2::Regexp.new("oo?")
@@ -1702,11 +1738,14 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
 }
 
 /*
- * Returns a version of str with all potentially meaningful regexp
- * characters escaped. The returned string, used as a regular
- * expression, will exactly match the original string.
+ * Returns a version of `str` with all potentially meaningful regexp characters
+ * escaped using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L512-L518
+ * `QuoteMeta`}. The returned string, used as a regular expression, will
+ * exactly match the original string.
  *
  * @param [String] unquoted the unquoted string
+ * @raises [TypeError] if the given unquoted string cannot be coerced to a `String`
  * @return [String] the escaped string
  * @example
  *   RE2::Regexp.escape("1.5-2.0?") #=> "1\.5\-2\.0\?"
@@ -1775,14 +1814,14 @@ static VALUE re2_set_allocate(VALUE klass) {
  *   Returns a new {RE2::Set} object for the specified anchor with the default
  *   options.
  *
- *   @param [Symbol] anchor One of :unanchored, :anchor_start, :anchor_both
- *   @raise [ArgumentError] if anchor is not :unanchored, :anchor_start or :anchor_both
+ *   @param [Symbol] anchor one of `:unanchored`, `:anchor_start`, `:anchor_both`
+ *   @raise [ArgumentError] if anchor is not `:unanchored`, `:anchor_start` or `:anchor_both`
  *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
  *
  * @overload initialize(anchor, options)
  *   Returns a new {RE2::Set} object with the specified options.
  *
- *   @param [Symbol] anchor One of :unanchored, :anchor_start, :anchor_both
+ *   @param [Symbol] anchor one of `:unanchored`, `:anchor_start`, `:anchor_both`
  *   @param [Hash] options the options with which to compile the pattern
  *   @option options [Boolean] :utf8 (true) text and pattern are UTF-8; otherwise Latin-1
  *   @option options [Boolean] :posix_syntax (false) restrict regexps to POSIX egrep syntax
@@ -1790,13 +1829,13 @@ static VALUE re2_set_allocate(VALUE klass) {
  *   @option options [Boolean] :log_errors (true) log syntax and execution errors to ERROR
  *   @option options [Integer] :max_mem approx. max memory footprint of RE2
  *   @option options [Boolean] :literal (false) interpret string as literal, not regexp
- *   @option options [Boolean] :never_nl (false) never match \n, even if it is in regexp
- *   @option options [Boolean] :case_sensitive (true) match is case-sensitive (regexp can override with (?i) unless in posix_syntax mode)
- *   @option options [Boolean] :perl_classes (false) allow Perl's \d \s \w \D \S \W when in posix_syntax mode
- *   @option options [Boolean] :word_boundary (false) allow \b \B (word boundary and not) when in posix_syntax mode
- *   @option options [Boolean] :one_line (false) ^ and $ only match beginning and end of text when in posix_syntax mode
- *   @return [RE2::Set] an RE2::Set with the specified anchor and options
- *   @raise [ArgumentError] if anchor is not one of the accepted choices
+ *   @option options [Boolean] :never_nl (false) never match `\n`, even if it is in regexp
+ *   @option options [Boolean] :case_sensitive (true) match is case-sensitive (regexp can override with `(?i)` unless in `posix_syntax` mode)
+ *   @option options [Boolean] :perl_classes (false) allow Perl's `\d` `\s` `\w` `\D` `\S` `\W` when in `posix_syntax` mode
+ *   @option options [Boolean] :word_boundary (false) allow `\b` `\B` (word boundary and not) when in `posix_syntax` mode
+ *   @option options [Boolean] :one_line (false) `^` and `$` only match beginning and end of text when in `posix_syntax` mode
+ *   @return [RE2::Set] a {RE2::Set} with the specified anchor and options
+ *   @raise [ArgumentError] if `anchor` is not one of the accepted choices
  *   @raise [NoMemoryError] if memory could not be allocated for the compiled pattern
  */
 static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
@@ -1838,7 +1877,8 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
 
 /*
  * Adds a pattern to the set. Returns the index that will identify the pattern
- * in the output of #match. Cannot be called after #compile has been called.
+ * in the output of {RE2::Set#match}. Cannot be called after {RE2::Set#compile}
+ * has been called.
  *
  * @param [String] pattern the regex pattern
  * @return [Integer] the index of the pattern in the set
@@ -1874,10 +1914,10 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
 }
 
 /*
- * Compiles a Set so it can be used to match against. Must be called after #add
- * and before #match.
+ * Compiles a {RE2::Set} so it can be used to match against. Must be called
+ * after {RE2::Set#add} and before {RE2::Set#match}.
  *
- * @return [Bool] whether compilation was a success
+ * @return [Boolean] whether compilation was a success
  * @example
  *   set = RE2::Set.new
  *   set.add("abc")
@@ -1892,10 +1932,11 @@ static VALUE re2_set_compile(VALUE self) {
 
 /*
  * Returns whether the underlying RE2 version outputs error information from
- * RE2::Set::Match. If not, #match will raise an error if attempting to set its
- * :exception option to true.
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/set.h#L62-L65
+ * `RE2::Set::Match`}. If not, {RE2::Set#match} will raise an error if attempting to set
+ * its `:exception` option to `true`.
  *
- * @return [Bool] whether the underlying RE2 outputs error information from Set matches
+ * @return [Boolean] whether the underlying RE2 outputs error information from {RE2::Set} matches
  */
 static VALUE re2_set_match_raises_errors_p(VALUE) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
@@ -1919,7 +1960,7 @@ static VALUE re2_set_match_raises_errors_p(VALUE) {
  *   @param [String] str the text to match against
  *   @return [Array<Integer>] the indices of matching regexps
  *   @raise [MatchError] if an error occurs while matching
- *   @raise [UnsupportedError] if the underlying version of re2 does not output error information
+ *   @raise [UnsupportedError] if the underlying version of RE2 does not output error information
  *   @example
  *     set = RE2::Set.new
  *     set.add("abc")
@@ -1930,20 +1971,20 @@ static VALUE re2_set_match_raises_errors_p(VALUE) {
  * @overload match(str, options)
  *   Returns an array of integer indices of patterns matching the given string
  *   (if any). Raises exceptions if there are any errors while matching and the
- *   :exception option is set to true.
+ *   `:exception` option is set to true.
  *
  *   @param [String] str the text to match against
  *   @param [Hash] options the options with which to match
- *   @option options [Boolean] :exception (true) whether to raise exceptions with re2's error information (not supported on ABI version 0 of re2)
+ *   @option options [Boolean] :exception (true) whether to raise exceptions with RE2's error information (not supported on ABI version 0 of RE2)
  *   @return [Array<Integer>] the indices of matching regexps
  *   @raise [MatchError] if an error occurs while matching
- *   @raise [UnsupportedError] if the underlying version of re2 does not output error information
+ *   @raise [UnsupportedError] if the underlying version of RE2 does not output error information
  *   @example
  *     set = RE2::Set.new
  *     set.add("abc")
  *     set.add("def")
  *     set.compile
- *     set.match("abcdef", :exception => true) #=> [0, 1]
+ *     set.match("abcdef", exception: true) #=> [0, 1]
  */
 static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   VALUE str, options;
@@ -2087,6 +2128,10 @@ extern "C" void Init_re2(void) {
       -1);
   rb_define_method(re2_cRegexp, "match?", RUBY_METHOD_FUNC(re2_regexp_match_p),
       1);
+  rb_define_method(re2_cRegexp, "partial_match?",
+      RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
+  rb_define_method(re2_cRegexp, "=~", RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
+  rb_define_method(re2_cRegexp, "===", RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
   rb_define_method(re2_cRegexp, "full_match?",
       RUBY_METHOD_FUNC(re2_regexp_full_match_p), 1);
   rb_define_method(re2_cRegexp, "scan",
@@ -2145,6 +2190,8 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
   rb_define_singleton_method(re2_cRegexp, "quote",
       RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
+
+  // (see RE2::Regexp#initialize)
   rb_define_singleton_method(re2_cRegexp, "compile",
       RUBY_METHOD_FUNC(rb_class_new_instance), -1);
 

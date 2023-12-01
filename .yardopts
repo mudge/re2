@@ -1,3 +1,4 @@
+--markup markdown
 --title "RE2: Ruby bindings to RE2"
 ext/**/*.cc
 lib/**/*.rb
