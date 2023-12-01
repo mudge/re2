@@ -25,7 +25,7 @@ RSpec.describe RE2::Set do
     end
 
     it "returns an instance given an anchor and options" do
-      set = RE2::Set.new(:unanchored, :case_sensitive => false)
+      set = RE2::Set.new(:unanchored, case_sensitive: false)
 
       expect(set).to be_a(RE2::Set)
     end
@@ -42,7 +42,7 @@ RSpec.describe RE2::Set do
     end
 
     it "raises an error if given an invalid anchor and options" do
-      expect { RE2::Set.new(:not_a_valid_anchor, :case_sensitive => false) }.to raise_error(
+      expect { RE2::Set.new(:not_a_valid_anchor, case_sensitive: false) }.to raise_error(
         ArgumentError,
         "anchor should be one of: :unanchored, :anchor_start, :anchor_both"
       )
@@ -59,19 +59,19 @@ RSpec.describe RE2::Set do
     end
 
     it "rejects invalid patterns when added" do
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
 
       expect { set.add("???") }.to raise_error(ArgumentError, /str rejected by RE2::Set->Add\(\)/)
     end
 
     it "truncates error messages to 100 characters" do
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
 
       expect { set.add("(?P<#{'o' * 200}") }.to raise_error(ArgumentError, "str rejected by RE2::Set->Add(): invalid named capture group: (?P<oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
     end
 
     it "raises an error if called after #compile" do
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
       set.add("abc")
       set.compile
 
@@ -81,7 +81,7 @@ RSpec.describe RE2::Set do
     end
 
     it "raises an error if given a pattern that can't be coerced to a String" do
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
 
       expect { set.add(0) }.to raise_error(TypeError)
     end
@@ -112,7 +112,7 @@ RSpec.describe RE2::Set do
       set.add("ghi")
       set.compile
 
-      expect(set.match("abcdefghi", :exception => false)).to eq([0, 1, 2])
+      expect(set.match("abcdefghi", exception: false)).to eq([0, 1, 2])
     end
 
     it "returns an empty array if there is no match" do
@@ -120,7 +120,7 @@ RSpec.describe RE2::Set do
       set.add("abc")
       set.compile
 
-      expect(set.match("def", :exception => false)).to be_empty
+      expect(set.match("def", exception: false)).to be_empty
     end
 
     it "returns an empty array if there is no match when :exception is true" do
@@ -136,7 +136,7 @@ RSpec.describe RE2::Set do
     it "raises an error if called before #compile by default" do
       skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
 
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
 
       silence_stderr do
         expect { set.match("") }.to raise_error(RE2::Set::MatchError)
@@ -146,28 +146,28 @@ RSpec.describe RE2::Set do
     it "raises an error if called before #compile when :exception is true" do
       skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
 
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
 
       silence_stderr do
-        expect { set.match("", :exception => true) }.to raise_error(RE2::Set::MatchError)
+        expect { set.match("", exception: true) }.to raise_error(RE2::Set::MatchError)
       end
     end
 
     it "returns an empty array if called before #compile when :exception is false" do
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
 
       silence_stderr do
-        expect(set.match("", :exception => false)).to be_empty
+        expect(set.match("", exception: false)).to be_empty
       end
     end
 
     it "raises an error if :exception is true and RE2 does not support it" do
       skip "Underlying RE2::Set::Match outputs error information" if RE2::Set.match_raises_errors?
 
-      set = RE2::Set.new(:unanchored, :log_errors => false)
+      set = RE2::Set.new(:unanchored, log_errors: false)
 
       silence_stderr do
-        expect { set.match("", :exception => true) }.to raise_error(RE2::Set::UnsupportedError)
+        expect { set.match("", exception: true) }.to raise_error(RE2::Set::UnsupportedError)
       end
     end
 
@@ -182,7 +182,7 @@ RSpec.describe RE2::Set do
       set.add("abc")
       set.compile
 
-      expect { set.match(0, :exception => false) }.to raise_error(TypeError)
+      expect { set.match(0, exception: false) }.to raise_error(TypeError)
     end
 
     it "accepts input if it can be coerced to a String" do
@@ -190,7 +190,7 @@ RSpec.describe RE2::Set do
       set.add("abc")
       set.compile
 
-      expect(set.match(StringLike.new("abcdef"), :exception => false)).to contain_exactly(0)
+      expect(set.match(StringLike.new("abcdef"), exception: false)).to contain_exactly(0)
     end
   end
 

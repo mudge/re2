@@ -2,11 +2,13 @@ RSpec.describe RE2::Regexp do
   describe "#initialize" do
     it "returns an instance given only a pattern" do
       re = RE2::Regexp.new('woo')
+
       expect(re).to be_a(RE2::Regexp)
     end
 
     it "returns an instance given a pattern and options" do
-      re = RE2::Regexp.new('woo', :case_sensitive => false)
+      re = RE2::Regexp.new('woo', case_sensitive: false)
+
       expect(re).to be_a(RE2::Regexp)
     end
 
@@ -15,7 +17,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "allows invalid patterns to be created" do
-      re = RE2::Regexp.new('???', :log_errors => false)
+      re = RE2::Regexp.new('???', log_errors: false)
+
       expect(re).to be_a(RE2::Regexp)
     end
 
@@ -29,11 +32,12 @@ RSpec.describe RE2::Regexp do
   describe ".compile" do
     it "returns an instance given only a pattern" do
       re = RE2::Regexp.compile('woo')
+
       expect(re).to be_a(RE2::Regexp)
     end
 
     it "returns an instance given a pattern and options" do
-      re = RE2::Regexp.compile('woo', :case_sensitive => false)
+      re = RE2::Regexp.compile('woo', case_sensitive: false)
       expect(re).to be_a(RE2::Regexp)
     end
 
@@ -42,7 +46,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "allows invalid patterns to be created" do
-      re = RE2::Regexp.compile('???', :log_errors => false)
+      re = RE2::Regexp.compile('???', log_errors: false)
+
       expect(re).to be_a(RE2::Regexp)
     end
 
@@ -60,34 +65,38 @@ RSpec.describe RE2::Regexp do
     end
 
     it "is populated with default options when nothing has been set" do
-      options = RE2::Regexp.new('woo').options
-      expect(options).to include(:utf8 => true,
-                                 :posix_syntax => false,
-                                 :longest_match => false,
-                                 :log_errors => true,
-                                 :literal => false,
-                                 :never_nl => false,
-                                 :case_sensitive => true,
-                                 :perl_classes => false,
-                                 :word_boundary => false,
-                                 :one_line => false)
+      expect(RE2::Regexp.new('woo').options).to include(
+        utf8: true,
+        posix_syntax: false,
+        longest_match: false,
+        log_errors: true,
+        literal: false,
+        never_nl: false,
+        case_sensitive: true,
+        perl_classes: false,
+        word_boundary: false,
+        one_line: false
+      )
     end
 
     it "is populated with overridden options when specified" do
-      options = RE2::Regexp.new('woo', :case_sensitive => false).options
-      expect(options).to include(:case_sensitive => false)
+      options = RE2::Regexp.new('woo', case_sensitive: false).options
+
+      expect(options).to include(case_sensitive: false)
     end
   end
 
   describe "#error" do
     it "returns nil if there is no error" do
       error = RE2::Regexp.new('woo').error
+
       expect(error).to be_nil
     end
 
-    # Use log_errors => false to suppress RE2's logging to STDERR.
+    # Use log_errors: false to suppress RE2's logging to STDERR.
     it "contains the error string if there is an error" do
-      error = RE2::Regexp.new('wo(o', :log_errors => false).error
+      error = RE2::Regexp.new('wo(o', log_errors: false).error
+
       expect(error).to eq("missing ): wo(o")
     end
   end
@@ -95,11 +104,13 @@ RSpec.describe RE2::Regexp do
   describe "#error_arg" do
     it "returns nil if there is no error" do
       error_arg = RE2::Regexp.new('woo').error_arg
+
       expect(error_arg).to be_nil
     end
 
-    it "returns the offending portion of the regexp if there is an error" do
-      error_arg = RE2::Regexp.new('wo(o', :log_errors => false).error_arg
+    it "returns the offending portion of the pattern if there is an error" do
+      error_arg = RE2::Regexp.new('wo(o', log_errors: false).error_arg
+
       expect(error_arg).to eq("wo(o")
     end
   end
@@ -112,7 +123,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "returns -1 for an invalid pattern" do
-      program_size = RE2::Regexp.new('???', :log_errors => false).program_size
+      program_size = RE2::Regexp.new('???', log_errors: false).program_size
+
       expect(program_size).to eq(-1)
     end
   end
@@ -120,18 +132,27 @@ RSpec.describe RE2::Regexp do
   describe "#to_str" do
     it "returns the original pattern" do
       string = RE2::Regexp.new('w(o)(o)').to_str
+
       expect(string).to eq("w(o)(o)")
+    end
+
+    it "returns the pattern even if invalid" do
+      string = RE2::Regexp.new('???', log_errors: false).to_str
+
+      expect(string).to eq("???")
     end
   end
 
   describe "#pattern" do
     it "returns the original pattern" do
       pattern = RE2::Regexp.new('w(o)(o)').pattern
+
       expect(pattern).to eq("w(o)(o)")
     end
 
     it "returns the pattern even if invalid" do
-      pattern = RE2::Regexp.new('???', :log_errors => false).pattern
+      pattern = RE2::Regexp.new('???', log_errors: false).pattern
+
       expect(pattern).to eq("???")
     end
   end
@@ -139,7 +160,14 @@ RSpec.describe RE2::Regexp do
   describe "#inspect" do
     it "shows the class name and original pattern" do
       string = RE2::Regexp.new('w(o)(o)').inspect
+
       expect(string).to eq("#<RE2::Regexp /w(o)(o)/>")
+    end
+
+    it "respects the pattern's original encoding" do
+      string = RE2::Regexp.new('w(o)(o)', utf8: false).inspect
+
+      expect(string.encoding).to eq(Encoding::ISO_8859_1)
     end
   end
 
@@ -149,7 +177,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :utf8 => false)
+      re = RE2::Regexp.new('woo', utf8: false)
+
       expect(re).to_not be_utf8
     end
   end
@@ -160,7 +189,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :posix_syntax => true)
+      re = RE2::Regexp.new('woo', posix_syntax: true)
+
       expect(re).to be_posix_syntax
     end
   end
@@ -171,7 +201,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :literal => true)
+      re = RE2::Regexp.new('woo', literal: true)
+
       expect(re).to be_literal
     end
   end
@@ -182,7 +213,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :never_nl => true)
+      re = RE2::Regexp.new('woo', never_nl: true)
+
       expect(re).to be_never_nl
     end
   end
@@ -193,7 +225,7 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :case_sensitive => false)
+      re = RE2::Regexp.new('woo', case_sensitive: false)
       expect(re).to_not be_case_sensitive
     end
   end
@@ -204,7 +236,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :case_sensitive => false)
+      re = RE2::Regexp.new('woo', case_sensitive: false)
+
       expect(re).to be_case_insensitive
     end
   end
@@ -215,7 +248,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :case_sensitive => false)
+      re = RE2::Regexp.new('woo', case_sensitive: false)
+
       expect(re).to be_casefold
     end
   end
@@ -226,7 +260,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :longest_match => true)
+      re = RE2::Regexp.new('woo', longest_match: true)
+
       expect(re).to be_longest_match
     end
   end
@@ -237,7 +272,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :log_errors => false)
+      re = RE2::Regexp.new('woo', log_errors: false)
+
       expect(re).to_not be_log_errors
     end
   end
@@ -248,7 +284,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :perl_classes => true)
+      re = RE2::Regexp.new('woo', perl_classes: true)
+
       expect(re).to be_perl_classes
     end
   end
@@ -259,7 +296,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :word_boundary => true)
+      re = RE2::Regexp.new('woo', word_boundary: true)
+
       expect(re).to be_word_boundary
     end
   end
@@ -270,7 +308,8 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :one_line => true)
+      re = RE2::Regexp.new('woo', one_line: true)
+
       expect(re).to be_one_line
     end
   end
@@ -281,266 +320,330 @@ RSpec.describe RE2::Regexp do
     end
 
     it "can be overridden on initialization" do
-      re = RE2::Regexp.new('woo', :max_mem => 1024)
+      re = RE2::Regexp.new('woo', max_mem: 1024)
+
       expect(re.max_mem).to eq(1024)
     end
   end
 
   describe "#match" do
-    let(:re) { RE2::Regexp.new('My name is (\S+) (\S+)') }
+    it "returns match data given only text if the pattern has capturing groups" do
+      re = RE2::Regexp.new('My name is (\w+) (\w+)')
 
-    it "returns match data given only text" do
-      md = re.match("My name is Robert Paulson")
-      expect(md).to be_a(RE2::MatchData)
+      expect(re.match("My name is Alice Bloggs")).to be_a(RE2::MatchData)
     end
 
-    it "returns nil if there is no match for the given text" do
+    it "returns only true or false given only text if the pattern has no capturing groups" do
+      re = RE2::Regexp.new('My name is \w+ \w+')
+
+      expect(re.match("My name is Alice Bloggs")).to eq(true)
+    end
+
+    it "returns nil if the text does not match the pattern" do
+      re = RE2::Regexp.new('My name is (\w+) (\w+)')
+
       expect(re.match("My age is 99")).to be_nil
     end
 
-    it "returns only true or false if no matches are requested" do
-      expect(re.match("My name is Robert Paulson", 0)).to eq(true)
-      expect(re.match("My age is 99", 0)).to eq(false)
+    it "accepts text that can be coerced to a string" do
+      re = RE2::Regexp.new('My name is (\w+) (\w+)')
+
+      expect(re.match(StringLike.new("My name is Alice Bloggs"))).to be_a(RE2::MatchData)
     end
 
-    it "returns only true or false if the pattern has no capturing groups" do
-      re = RE2::Regexp.new('My name is')
+    it "raises an exception when given text that cannot be coerced to a string" do
+      re = RE2::Regexp.new('My name is (\w+) (\w+)')
 
-      expect(re.match('My name is Robert Paulson')).to eq(true)
-    end
-
-    it "raises an exception when given nil" do
       expect { re.match(nil) }.to raise_error(TypeError)
     end
 
-    it "raises an exception when given invalid options" do
-      expect { re.match("My name is Robert Paulson", "foo") }.to raise_error(TypeError)
-    end
-
-    it "accepts anything that can be coerced to a hash as options", :aggregate_failures do
-      m = re.match("My name is Robert Paulson", nil)
-      expect(m[1]).to eq("Robert")
-
-      m = re.match("My name is Robert Paulson", [])
-      expect(m[1]).to eq("Robert")
-    end
-
     it "returns nil with an invalid pattern" do
-      re = RE2::Regexp.new('???', :log_errors => false)
+      re = RE2::Regexp.new('???', log_errors: false)
 
-      expect(re.match('My name is Robert Paulson')).to be_nil
+      expect(re.match("My name is Alice Bloggs")).to be_nil
     end
 
     it "returns nil with an invalid pattern and options" do
-      re = RE2::Regexp.new('???', :log_errors => false)
+      re = RE2::Regexp.new('???', log_errors: false)
 
-      expect(re.match('My name is Robert Paulson', submatches: 1)).to be_nil
+      expect(re.match('foo bar', startpos: 1)).to be_nil
     end
 
-    it "is unanchored by default", :aggregate_failures do
-      expect(re.match("My name is Robert Paulson", submatches: 0)).to eq(true)
-      expect(re.match("My name is Robert Paulson, he said", submatches: 0)).to eq(true)
-      expect(re.match("He said, My name is Robert Paulson", submatches: 0)).to eq(true)
+    it "accepts an offset at which to start matching", :aggregate_failures do
+      re = RE2::Regexp.new('(\w+) (\w+)')
+      md = re.match("one two three", startpos: 4)
+
+      expect(md[1]).to eq("two")
+      expect(md[2]).to eq("three")
     end
 
-    it "is unanchored if given a nil anchor", :aggregate_failures do
-      expect(re.match("My name is Robert Paulson", anchor: nil, submatches: 0)).to eq(true)
-      expect(re.match("My name is Robert Paulson, he said", anchor: nil, submatches: 0)).to eq(true)
-      expect(re.match("He said, My name is Robert Paulson", anchor: nil, submatches: 0)).to eq(true)
-    end
-
-    it "can be explicitly unanchored", :aggregate_failures do
-      expect(re.match("My name is Robert Paulson", anchor: :unanchored, submatches: 0)).to eq(true)
-      expect(re.match("My name is Robert Paulson, he said", anchor: :unanchored, submatches: 0)).to eq(true)
-      expect(re.match("He said, My name is Robert Paulson", anchor: :unanchored, submatches: 0)).to eq(true)
-    end
-
-    it "can anchor the match at both ends", :aggregate_failures do
-      expect(re.match("My name is Robert Paulson", anchor: :anchor_both, submatches: 0)).to eq(true)
-      expect(re.match("My name is Robert Paulson, he said", anchor: :anchor_both, submatches: 0)).to eq(false)
-      expect(re.match("He said, My name is Robert Paulson", anchor: :anchor_both, submatches: 0)).to eq(false)
-    end
-
-    it "can anchor the match at the start", :aggregate_failures do
-      expect(re.match("My name is Robert Paulson", anchor: :anchor_start, submatches: 0)).to eq(true)
-      expect(re.match("My name is Robert Paulson, he said", anchor: :anchor_start, submatches: 0)).to eq(true)
-      expect(re.match("He said, My name is Robert Paulson", anchor: :anchor_start, submatches: 0)).to eq(false)
-    end
-
-    it "raises an exception when given an invalid anchor" do
-      expect { re.match("My name is Robert Paulson", anchor: :invalid) }.to raise_error(ArgumentError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both")
-    end
-
-    it "raises an exception when given a non-symbol anchor" do
-      expect { re.match("My name is Robert Paulson", anchor: 0) }.to raise_error(TypeError)
-    end
-
-    it "can be given an offset at which to start matching", :aggregate_failures do
-      m = re.match("My name is Alice Bloggs My name is Robert Paulson", startpos: 24)
-
-      expect(m[1]).to eq("Robert")
-      expect(m[2]).to eq("Paulson")
-    end
-
-    it "does not match if given a starting offset past the end of the text" do
-      re = RE2::Regexp.new('(\w+)', log_errors: false)
-
-      expect(re.match("My name is Alice Bloggs", startpos: 99, endpos: 100)).to be_nil
-    end
-
-    it "raises an exception when given a negative start offset" do
-      expect { re.match("My name is Robert Paulson", startpos: -1) }.to raise_error(ArgumentError, "startpos should be >= 0")
-    end
-
-    it "can be given an offset at which to stop matching" do
+    it "returns nil if using a starting offset past the end of the text" do
       skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
 
-      re = RE2::Regexp.new('(\w+)')
-      m = re.match("foobar", endpos: 3)
+      re = RE2::Regexp.new('(\w+) (\w+)', log_errors: false)
 
-      expect(m[1]).to eq("foo")
+      expect(re.match("one two three", startpos: 20, endpos: 21)).to be_nil
+    end
+
+    it "raises an exception when given a negative starting offset" do
+      re = RE2::Regexp.new('(\w+) (\w+)')
+
+      expect { re.match("one two three", startpos: -1) }.to raise_error(ArgumentError, "startpos should be >= 0")
+    end
+
+    it "raises an exception when given a starting offset past the default ending offset" do
+      re = RE2::Regexp.new('(\w+) (\w+)')
+
+      expect { re.match("one two three", startpos: 30) }.to raise_error(ArgumentError, "startpos should be <= endpos")
+    end
+
+    it "accepts an offset at which to end matching", :aggregate_failures do
+      skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
+
+      re = RE2::Regexp.new('(\w+) (\w+)')
+      md = re.match("one two three", endpos: 6)
+
+      expect(md[1]).to eq("one")
+      expect(md[2]).to eq("tw")
+    end
+
+    it "returns nil if using a ending offset at the start of the text" do
+      skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
+
+      re = RE2::Regexp.new('(\w+) (\w+)')
+
+      expect(re.match("one two three", endpos: 0)).to be_nil
+    end
+
+    it "raises an exception when given a negative ending offset" do
+      skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
+
+      re = RE2::Regexp.new('(\w+) (\w+)')
+
+      expect { re.match("one two three", endpos: -1) }.to raise_error(ArgumentError, "endpos should be >= 0")
+    end
+
+    it "raises an exception when given an ending offset before the starting offset" do
+      skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
+
+      re = RE2::Regexp.new('(\w+) (\w+)')
+
+      expect { re.match("one two three", startpos: 3, endpos: 0) }.to raise_error(ArgumentError, "startpos should be <= endpos")
     end
 
     it "raises an error if given an ending offset and RE2 does not support it" do
       skip "Underlying RE2::Match has endpos argument" if RE2::Regexp.match_has_endpos_argument?
 
-      expect { re.match("My name is Robert Paulson", endpos: 3) }.to raise_error(RE2::Regexp::UnsupportedError)
+      re = RE2::Regexp.new('(\w+) (\w+)')
+
+      expect { re.match("one two three", endpos: 3) }.to raise_error(RE2::Regexp::UnsupportedError)
     end
 
-    it "does not match if given an ending offset at the start of the text" do
-      expect(re.match("My name is Alice Bloggs", endpos: 0)).to be_nil
+    it "does not anchor matches by default when extracting submatches" do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("one two three")).to be_a(RE2::MatchData)
     end
 
-    it "raises an exception if given an ending offset before the starting offset" do
-      expect { re.match("My name is Alice Bloggs", startpos: 5, endpos: 2) }.to raise_error(ArgumentError, "startpos should be <= endpos")
+    it "does not anchor matches by default without extracting submatches" do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("one two three", submatches: 0)).to eq(true)
     end
 
-    it "raises an exception when given a negative end offset" do
-      expect { re.match("My name is Robert Paulson", endpos: -1) }.to raise_error(ArgumentError, "endpos should be >= 0")
+    it "can explicitly match without anchoring when extracting submatches" do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("one two three", anchor: :unanchored)).to be_a(RE2::MatchData)
     end
 
-    it "raises an exception when given a negative number of matches" do
-      expect { re.match("My name is Robert Paulson", submatches: -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
+    it "can explicitly match with neither anchoring nor extracting submatches" do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("one two three", anchor: :unanchored, submatches: 0)).to eq(true)
     end
 
-    it "raises an exception when given a non-numeric number of matches" do
-      expect { re.match("My name is Robert Paulson", submatches: "foo") }.to raise_error(TypeError)
+    it "can anchor matches at the start when extracting submatches", :aggregate_failures do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("two three", anchor: :anchor_start)).to be_a(RE2::MatchData)
+      expect(re.match("one two three", anchor: :anchor_start)).to be_nil
+    end
+
+    it "can anchor matches at the start without extracting submatches", :aggregate_failures do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("two three", anchor: :anchor_start, submatches: 0)).to eq(true)
+      expect(re.match("one two three", anchor: :anchor_start, submatches: 0)).to eq(false)
+    end
+
+    it "can anchor matches at both ends when extracting submatches", :aggregate_failures do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("two three", anchor: :anchor_both)).to be_nil
+      expect(re.match("two", anchor: :anchor_both)).to be_a(RE2::MatchData)
+    end
+
+    it "does not anchor matches when given a nil anchor" do
+      re = RE2::Regexp.new('(two)')
+
+      expect(re.match("one two three", anchor: nil)).to be_a(RE2::MatchData)
+    end
+
+    it "raises an exception when given an invalid anchor" do
+      re = RE2::Regexp.new('(two)')
+
+      expect { re.match("one two three", anchor: :invalid) }.to raise_error(ArgumentError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both")
+    end
+
+    it "raises an exception when given a non-symbol anchor" do
+      re = RE2::Regexp.new('(two)')
+
+      expect { re.match("one two three", anchor: 0) }.to raise_error(TypeError)
+    end
+
+    it "extracts all submatches by default", :aggregate_failures do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+      md = re.match("one two three")
+
+      expect(md[1]).to eq("one")
+      expect(md[2]).to eq("two")
+      expect(md[3]).to eq("three")
+    end
+
+    it "extracts a specific number of submatches", :aggregate_failures do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+      md = re.match("one two three", submatches: 2)
+
+      expect(md[1]).to eq("one")
+      expect(md[2]).to eq("two")
+      expect(md[3]).to be_nil
+    end
+
+    it "pads submatches with nil when requesting more than the number of capturing groups" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+      md = re.match("one two three", submatches: 5)
+
+      expect(md.to_a).to eq(["one two three", "one", "two", "three", nil, nil])
+    end
+
+    it "raises an exception when given a negative number of submatches" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+
+      expect { re.match("one two three", submatches: -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
+    end
+
+    it "raises an exception when given a non-numeric number of submatches" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+
+      expect { re.match("one two three", submatches: :invalid) }.to raise_error(TypeError)
     end
 
     it "defaults to extracting all submatches when given nil", :aggregate_failures do
-      m = re.match("My name is Robert Paulson", submatches: nil)
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+      md = re.match("one two three", submatches: nil)
 
-      expect(m[1]).to eq("Robert")
-      expect(m[2]).to eq("Paulson")
+      expect(md[1]).to eq("one")
+      expect(md[2]).to eq("two")
+      expect(md[3]).to eq("three")
     end
 
-    describe "with a specific number of matches under the total in the pattern" do
-      subject { re.match("My name is Robert Paulson", submatches: 1) }
+    it "accepts passing the number of submatches instead of options for backward compatibility", :aggregate_failures do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+      md = re.match("one two three", 2)
 
-      it "returns a match data object" do
-        expect(subject).to be_a(RE2::MatchData)
-      end
-
-      it "has the whole match and only the specified number of matches" do
-        expect(subject.size).to eq(2)
-      end
-
-      it "populates any specified matches" do
-        expect(subject[1]).to eq("Robert")
-      end
-
-      it "does not populate any matches that weren't included" do
-        expect(subject[2]).to be_nil
-      end
+      expect(md[1]).to eq("one")
+      expect(md[2]).to eq("two")
+      expect(md[3]).to be_nil
     end
 
-    describe "with a number of matches over the total in the pattern" do
-      subject { re.match("My name is Robert Paulson", submatches: 5) }
+    it "raises an exception when given invalid options" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
 
-      it "returns a match data object" do
-        expect(subject).to be_a(RE2::MatchData)
-      end
-
-      it "has the whole match the specified number of matches" do
-        expect(subject.size).to eq(6)
-      end
-
-      it "populates any specified matches" do
-        expect(subject[1]).to eq("Robert")
-        expect(subject[2]).to eq("Paulson")
-      end
-
-      it "pads the remaining matches with nil" do
-        expect(subject[3]).to be_nil
-        expect(subject[4]).to be_nil
-        expect(subject[5]).to be_nil
-        expect(subject[6]).to be_nil
-      end
+      expect { re.match("one two three", :invalid) }.to raise_error(TypeError)
     end
 
-    it "accepts the number of submatches as a second argument for compatibility", :aggregate_failures do
-      expect(re.match("My name is Robert Paulson", 0)).to eq(true)
+    it "accepts anything that can be coerced to a hash as options", :aggregate_failures do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
 
-      m = re.match("My name is Robert Paulson", 1)
-      expect(m[1]).to eq("Robert")
-      expect(m[2]).to be_nil
-
-      m = re.match("My name is Robert Paulson", 2)
-      expect(m[1]).to eq("Robert")
-      expect(m[2]).to eq("Paulson")
-
-      expect { re.match("My name is Robert Paulson", -1) }.to raise_error(ArgumentError, "number of matches should be >= 0")
+      expect(re.match("one two three", nil)).to be_a(RE2::MatchData)
     end
   end
 
   describe "#match?" do
-    it "returns only true or false if no matches are requested" do
+    it "returns only true or false even if there are capturing groups", :aggregate_failures do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
-      expect(re.match?("My name is Robert Paulson")).to eq(true)
-      expect(re.match?("My age is 99")).to eq(false)
+
+      expect(re).to match("My name is Alice Bloggs")
+      expect(re).not_to match("My age is 99")
     end
 
     it "returns false if the pattern is invalid" do
-      re = RE2::Regexp.new('???', :log_errors => false)
-      expect(re.match?("My name is Robert Paulson")).to eq(false)
+      re = RE2::Regexp.new('???', log_errors: false)
+
+      expect(re).not_to match("My name is Alice Bloggs")
+    end
+
+    it "raises an exception if text cannot be coerced to a string" do
+      re = RE2::Regexp.new('My name is (\S+) (\S+)')
+
+      expect { re.match?(0) }.to raise_error(TypeError)
     end
   end
 
   describe "#=~" do
-    it "returns only true or false if no matches are requested" do
+    it "returns only true or false even if there are capturing groups", :aggregate_failures do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
-      expect(re =~ "My name is Robert Paulson").to eq(true)
+
+      expect(re =~ "My name is Alice Bloggs").to eq(true)
       expect(re =~ "My age is 99").to eq(false)
     end
-  end
 
-  describe "#!~" do
-    it "returns only true or false if no matches are requested" do
+    it "returns false if the pattern is invalid" do
+      re = RE2::Regexp.new('???', log_errors: false)
+
+      expect(re =~ "My name is Alice Bloggs").to eq(false)
+    end
+
+    it "raises an exception if text cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
-      expect(re !~ "My name is Robert Paulson").to eq(false)
-      expect(re !~ "My age is 99").to eq(true)
+
+      expect { re =~ 0 }.to raise_error(TypeError)
     end
   end
 
   describe "#===" do
-    it "returns only true or false if no matches are requested" do
+    it "returns only true or false even if there are capturing groups", :aggregate_failures do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
-      expect(re === "My name is Robert Paulson").to eq(true)
+
+      expect(re === "My name is Alice Bloggs").to eq(true)
       expect(re === "My age is 99").to eq(false)
+    end
+
+    it "returns false if the pattern is invalid" do
+      re = RE2::Regexp.new('???', log_errors: false)
+
+      expect(re === "My name is Alice Bloggs").to eq(false)
+    end
+
+    it "raises an exception if text cannot be coerced to a string" do
+      re = RE2::Regexp.new('My name is (\S+) (\S+)')
+
+      expect { re === 0 }.to raise_error(TypeError)
     end
   end
 
   describe "#ok?" do
-    it "returns true for valid regexps" do
+    it "returns true for valid patterns", :aggregate_failures do
       expect(RE2::Regexp.new('woo')).to be_ok
       expect(RE2::Regexp.new('wo(o)')).to be_ok
       expect(RE2::Regexp.new('((\d)\w+){3,}')).to be_ok
     end
 
-    it "returns false for invalid regexps" do
-      expect(RE2::Regexp.new('wo(o', :log_errors => false)).to_not be_ok
-      expect(RE2::Regexp.new('wo[o', :log_errors => false)).to_not be_ok
-      expect(RE2::Regexp.new('*', :log_errors => false)).to_not be_ok
+    it "returns false for invalid patterns", :aggregate_failures do
+      expect(RE2::Regexp.new('wo(o', log_errors: false)).to_not be_ok
+      expect(RE2::Regexp.new('wo[o', log_errors: false)).to_not be_ok
+      expect(RE2::Regexp.new('*', log_errors: false)).to_not be_ok
     end
   end
 
@@ -557,14 +660,14 @@ RSpec.describe RE2::Regexp do
   end
 
   describe "#number_of_capturing_groups" do
-    it "returns the number of groups in a regexp" do
+    it "returns the number of groups in a pattern", :aggregate_failures do
       expect(RE2::Regexp.new('(a)(b)(c)').number_of_capturing_groups).to eq(3)
       expect(RE2::Regexp.new('abc').number_of_capturing_groups).to eq(0)
       expect(RE2::Regexp.new('a((b)c)').number_of_capturing_groups).to eq(2)
     end
 
-    it "returns -1 for an invalid regexp" do
-      expect(RE2::Regexp.new('???', :log_errors => false).number_of_capturing_groups).to eq(-1)
+    it "returns -1 for an invalid pattern" do
+      expect(RE2::Regexp.new('???', log_errors: false).number_of_capturing_groups).to eq(-1)
     end
   end
 
@@ -575,17 +678,18 @@ RSpec.describe RE2::Regexp do
 
     it "maps names to indices with only one group" do
       groups = RE2::Regexp.new('(?P<bob>a)').named_capturing_groups
-      expect(groups["bob"]).to eq(1)
+
+      expect(groups).to eq("bob" => 1)
     end
 
     it "maps names to indices with several groups" do
       groups = RE2::Regexp.new('(?P<bob>a)(o)(?P<rob>e)').named_capturing_groups
-      expect(groups["bob"]).to eq(1)
-      expect(groups["rob"]).to eq(3)
+
+      expect(groups).to eq("bob" => 1, "rob" => 3)
     end
 
     it "returns an empty hash for an invalid regexp" do
-      expect(RE2::Regexp.new('???', :log_errors => false).named_capturing_groups).to be_empty
+      expect(RE2::Regexp.new('???', log_errors: false).named_capturing_groups).to be_empty
     end
   end
 
@@ -602,42 +706,48 @@ RSpec.describe RE2::Regexp do
     it "matches the pattern anywhere within the given text" do
       r = RE2::Regexp.new('f(o+)')
 
-      expect(r.partial_match('foo bar', submatches: 0)).to eq(true)
+      expect(r.partial_match("foo bar")).to be_a(RE2::MatchData)
+    end
+
+    it "returns true or false if there are no capturing groups" do
+      r = RE2::Regexp.new('fo+')
+
+      expect(r.partial_match("foo bar")).to eq(true)
     end
 
     it "can set the number of submatches to extract", :aggregate_failures do
       r = RE2::Regexp.new('f(o+)(a+)')
-      m = r.partial_match('fooaa bar', submatches: 1)
+      m = r.partial_match("fooaa bar", submatches: 1)
 
-      expect(m[1]).to eq('oo')
+      expect(m[1]).to eq("oo")
       expect(m[2]).to be_nil
 
-      m = r.partial_match('fooaa bar', submatches: 2)
+      m = r.partial_match("fooaa bar", submatches: 2)
 
-      expect(m[1]).to eq('oo')
-      expect(m[2]).to eq('aa')
+      expect(m[1]).to eq("oo")
+      expect(m[2]).to eq("aa")
     end
 
     it "raises an error if given non-hash options" do
       r = RE2::Regexp.new('f(o+)(a+)')
 
-      expect { r.partial_match('fooaa bar', 'not a hash') }.to raise_error(TypeError)
+      expect { r.partial_match("fooaa bar", "not a hash") }.to raise_error(TypeError)
     end
 
     it "accepts options that can be coerced to a hash", :aggregate_failures do
       r = RE2::Regexp.new('f(o+)(a+)')
 
-      m = r.partial_match('fooaa bar', nil)
+      m = r.partial_match("fooaa bar", nil)
       expect(m[1]).to eq('oo')
 
-      m = r.partial_match('fooaa bar', [])
+      m = r.partial_match("fooaa bar", [])
       expect(m[1]).to eq('oo')
     end
 
     it "accepts anything that can be coerced to a string" do
       r = RE2::Regexp.new('f(o+)(a+)')
 
-      expect(r.partial_match(StringLike.new('fooaa bar'), submatches: 0)).to eq(true)
+      expect(r.partial_match(StringLike.new("fooaa bar"))).to be_a(RE2::MatchData)
     end
   end
 
@@ -645,43 +755,49 @@ RSpec.describe RE2::Regexp do
     it "only matches the pattern if all of the given text matches", :aggregate_failures do
       r = RE2::Regexp.new('f(o+)')
 
-      expect(r.full_match('foo', submatches: 0)).to eq(true)
-      expect(r.full_match('foo bar', submatches: 0)).to eq(false)
+      expect(r.full_match("foo")).to be_a(RE2::MatchData)
+      expect(r.full_match("foo bar")).to be_nil
+    end
+
+    it "returns true or false if there are no capturing groups" do
+      r = RE2::Regexp.new('fo+')
+
+      expect(r.full_match("foo")).to eq(true)
     end
 
     it "can set the number of submatches to extract", :aggregate_failures do
       r = RE2::Regexp.new('f(o+)(a+)')
-      m = r.full_match('fooaa', submatches: 1)
+      m = r.full_match("fooaa", submatches: 1)
 
-      expect(m[1]).to eq('oo')
+      expect(m[1]).to eq("oo")
       expect(m[2]).to be_nil
 
-      m = r.full_match('fooaa', submatches: 2)
+      m = r.full_match("fooaa", submatches: 2)
 
-      expect(m[1]).to eq('oo')
-      expect(m[2]).to eq('aa')
+      expect(m[1]).to eq("oo")
+      expect(m[2]).to eq("aa")
     end
 
     it "raises an error if given non-hash options" do
       r = RE2::Regexp.new('f(o+)(a+)')
 
-      expect { r.full_match('fooaa', 'not a hash') }.to raise_error(TypeError)
+      expect { r.full_match("fooaa", "not a hash") }.to raise_error(TypeError)
     end
 
     it "accepts options that can be coerced to a hash", :aggregate_failures do
       r = RE2::Regexp.new('f(o+)(a+)')
 
-      m = r.full_match('fooaa', nil)
-      expect(m[1]).to eq('oo')
+      m = r.full_match("fooaa", nil)
+      expect(m[1]).to eq("oo")
 
-      m = r.full_match('fooaa', [])
-      expect(m[1]).to eq('oo')
+      m = r.full_match("fooaa", [])
+      expect(m[1]).to eq("oo")
     end
 
     it "accepts anything that can be coerced to a string" do
       r = RE2::Regexp.new('f(o+)(a+)')
 
-      expect(r.full_match(StringLike.new('fooaa'), submatches: 0)).to eq(true)
+      expect(r.full_match(StringLike.new("fooaa"), submatches: 0)).to eq(true)
     end
   end
 end

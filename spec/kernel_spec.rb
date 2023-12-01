@@ -5,7 +5,7 @@ RSpec.describe Kernel do
     end
 
     it "returns an RE2::Regexp instance given a pattern and options" do
-      re = RE2('w(o)(o)', :case_sensitive => false)
+      re = RE2('w(o)(o)', case_sensitive: false)
 
       expect(re).not_to be_case_sensitive
     end
@@ -15,7 +15,7 @@ RSpec.describe Kernel do
     end
 
     it "allows invalid patterns to be created" do
-      re = RE2('???', :log_errors => false)
+      re = RE2('???', log_errors: false)
 
       expect(re).to be_a(RE2::Regexp)
     end

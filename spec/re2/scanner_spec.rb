@@ -43,7 +43,7 @@ RSpec.describe RE2::Scanner do
     end
 
     it "returns ISO-8859-1 matches if the pattern is not UTF-8" do
-      r = RE2::Regexp.new('(\w+)', :utf8 => false)
+      r = RE2::Regexp.new('(\w+)', utf8: false)
       scanner = r.scan("It")
       matches = scanner.scan
 
@@ -75,7 +75,7 @@ RSpec.describe RE2::Scanner do
     end
 
     it "returns nil if the regexp is invalid" do
-      r = RE2::Regexp.new('???', :log_errors => false)
+      r = RE2::Regexp.new('???', log_errors: false)
       scanner = r.scan("Foo bar")
 
       expect(scanner.scan).to be_nil
@@ -173,12 +173,7 @@ RSpec.describe RE2::Scanner do
       r = RE2::Regexp.new('(\d)')
       scanner = r.scan("There are 1 some 2 numbers 3")
 
-      # Prior to Ruby 1.9, Enumerator was within Enumerable.
-      if defined?(Enumerator)
-        expect(scanner.each).to be_a(Enumerator)
-      elsif defined?(Enumerable::Enumerator)
-        expect(scanner.each).to be_a(Enumerable::Enumerator)
-      end
+      expect(scanner.each).to be_a(Enumerator)
     end
   end
 

@@ -27,7 +27,7 @@ RSpec.describe RE2 do
     end
 
     it "respects any passed RE2::Regexp's flags" do
-      re = RE2::Regexp.new('gOOD MORNING', :case_sensitive => false)
+      re = RE2::Regexp.new('gOOD MORNING', case_sensitive: false)
 
       expect(RE2.Replace("Good morning", re, "hi")).to eq("hi")
     end
@@ -53,7 +53,7 @@ RSpec.describe RE2 do
 
     it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
       original = "Foo"
-      replacement = RE2.Replace(original, RE2("oo", :utf8 => false), "ah")
+      replacement = RE2.Replace(original, RE2("oo", utf8: false), "ah")
 
       expect(replacement.encoding).to eq(Encoding::ISO_8859_1)
     end
@@ -105,7 +105,7 @@ RSpec.describe RE2 do
     end
 
     it "respects any passed RE2::Regexp's flags" do
-      re = RE2::Regexp.new('gOOD MORNING', :case_sensitive => false)
+      re = RE2::Regexp.new('gOOD MORNING', case_sensitive: false)
 
       expect(RE2.GlobalReplace("Good morning Good morning", re, "hi")).to eq("hi hi")
     end
@@ -131,7 +131,7 @@ RSpec.describe RE2 do
 
     it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
       original = "Foo"
-      replacement = RE2.GlobalReplace(original, RE2("oo", :utf8 => false), "ah")
+      replacement = RE2.GlobalReplace(original, RE2("oo", utf8: false), "ah")
 
       expect(replacement.encoding).to eq(Encoding::ISO_8859_1)
     end
