@@ -1794,12 +1794,12 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
 
   if (!NIL_P(anchor)) {
     Check_Type(anchor, T_SYMBOL);
-    ID id_anchor = SYM2ID(anchor);
-    if (id_anchor == id_unanchored) {
+    ID id_anchor_arg = SYM2ID(anchor);
+    if (id_anchor_arg == id_unanchored) {
       re2_anchor = RE2::UNANCHORED;
-    } else if (id_anchor == id_anchor_start) {
+    } else if (id_anchor_arg == id_anchor_start) {
       re2_anchor = RE2::ANCHOR_START;
-    } else if (id_anchor == id_anchor_both) {
+    } else if (id_anchor_arg == id_anchor_both) {
       re2_anchor = RE2::ANCHOR_BOTH;
     } else {
       rb_raise(rb_eArgError, "anchor should be one of: :unanchored, :anchor_start, :anchor_both");
