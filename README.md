@@ -91,16 +91,16 @@ different:
 ```ruby
 require "re2"
 
-r = RE2::Regexp.new('w(\d)(\d+)') # => #<RE2::Regexp /w(\d)(\d+)/>
-m = r.match("w1234")              # => #<RE2::MatchData "w1234" 1:"1" 2:"234">
-m[1]                              # => "1"
+r = RE2::Regexp.new('w(\d)(\d+)') #=> #<RE2::Regexp /w(\d)(\d+)/>
+m = r.match("w1234")              #=> #<RE2::MatchData "w1234" 1:"1" 2:"234">
+m[1]                              #=> "1"
 
 # Improve performance by requesting fewer submatches
-m = r.match("w1234", 1)           # => #<RE2::MatchData "w1234" 1:"1">
+m = r.match("w1234", 1)           #=> #<RE2::MatchData "w1234" 1:"1">
 
 # Or no submatches at all
-r.match("w1234", 0)               # => true
-r =~ "w1234"                      # => true
+r.match("w1234", 0)               #=> true
+r =~ "w1234"                      #=> true
 ```
 
 As
@@ -110,24 +110,24 @@ defined against `Kernel` so you can use a shorter version to create regular
 expressions:
 
 ```ruby
-RE2('(\d+)') # => #<RE2::Regexp /(\d+)/>
+RE2('(\d+)') #=> #<RE2::Regexp /(\d+)/>
 ```
 
 Note the use of *single quotes* as double quotes will interpret `\d` as `d` as
 in the following example:
 
 ```ruby
-RE2("(\d+)") # => #<RE2::Regexp /(d+)/>
+RE2("(\d+)") #=> #<RE2::Regexp /(d+)/>
 ```
 
 As of 0.3.0, you can use named groups:
 
 ```ruby
 r = RE2::Regexp.new('(?P<name>\w+) (?P<age>\d+)')
-# => #<RE2::Regexp /(?P<name>\w+) (?P<age>\d+)/>
-m = r.match("Bob 40") # => #<RE2::MatchData "Bob 40" 1:"Bob" 2:"40">
-m[:name]              # => "Bob"
-m["age"]              # => "40"
+#=> #<RE2::Regexp /(?P<name>\w+) (?P<age>\d+)/>
+m = r.match("Bob 40") #=> #<RE2::MatchData "Bob 40" 1:"Bob" 2:"40">
+m[:name]              #=> "Bob"
+m["age"]              #=> "40"
 ```
 
 As of 0.6.0, you can use `RE2::Regexp#scan` to incrementally scan text for

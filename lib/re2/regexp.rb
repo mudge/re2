@@ -22,9 +22,9 @@ module RE2
     # @example
     #   r = RE2::Regexp.new('w(o)(o)')
     #   r.partial_match('woot')
-    #   # => #<RE2::MatchData "woo" 1:"o" 2:"o">
-    #   r.partial_match('woot', submatches: 1) # => #<RE2::MatchData "woo" 1:"o">
-    #   r.partial_match('woot', submatches: 0) # => true
+    #   #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
+    #   r.partial_match('woot', submatches: 1) #=> #<RE2::MatchData "woo" 1:"o">
+    #   r.partial_match('woot', submatches: 0) #=> true
     def partial_match(text, options = {})
       match(text, Hash(options).merge(anchor: :unanchored))
     end
@@ -51,10 +51,10 @@ module RE2
     # @example
     #   r = RE2::Regexp.new('w(o)(o)')
     #   r.full_match('woo')
-    #   # => #<RE2::MatchData "woo" 1:"o" 2:"o">
-    #   r.full_match('woo', submatches: 1) # => #<RE2::MatchData "woo" 1:"o">
-    #   r.full_match('woo', submatches: 0) # => true
-    #   r.full_match('woot') # => nil
+    #   #=> #<RE2::MatchData "woo" 1:"o" 2:"o">
+    #   r.full_match('woo', submatches: 1) #=> #<RE2::MatchData "woo" 1:"o">
+    #   r.full_match('woo', submatches: 0) #=> true
+    #   r.full_match('woot') #=> nil
     def full_match(text, options = {})
       match(text, Hash(options).merge(anchor: :anchor_both))
     end
