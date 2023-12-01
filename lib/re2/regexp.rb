@@ -58,5 +58,8 @@ module RE2
     def full_match(text, options = {})
       match(text, Hash(options).merge(anchor: :anchor_both))
     end
+
+    alias_method :=~, :match?
+    alias_method :===, :match?
   end
 end
