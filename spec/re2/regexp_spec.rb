@@ -574,20 +574,41 @@ RSpec.describe RE2::Regexp do
     it "returns only true or false even if there are capturing groups", :aggregate_failures do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
-      expect(re).to match("My name is Alice Bloggs")
-      expect(re).not_to match("My age is 99")
+      expect(re.match?("My name is Alice Bloggs")).to eq(true)
+      expect(re.match?("My age is 99")).to eq(false)
     end
 
     it "returns false if the pattern is invalid" do
       re = RE2::Regexp.new('???', log_errors: false)
 
-      expect(re).not_to match("My name is Alice Bloggs")
+      expect(re.match?("My name is Alice Bloggs")).to eq(false)
     end
 
     it "raises an exception if text cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
       expect { re.match?(0) }.to raise_error(TypeError)
+    end
+  end
+
+  describe "#partial_match?" do
+    it "returns only true or false even if there are capturing groups", :aggregate_failures do
+      re = RE2::Regexp.new('My name is (\S+) (\S+)')
+
+      expect(re.partial_match?("My name is Alice Bloggs")).to eq(true)
+      expect(re.partial_match?("My age is 99")).to eq(false)
+    end
+
+    it "returns false if the pattern is invalid" do
+      re = RE2::Regexp.new('???', log_errors: false)
+
+      expect(re.partial_match?("My name is Alice Bloggs")).to eq(false)
+    end
+
+    it "raises an exception if text cannot be coerced to a string" do
+      re = RE2::Regexp.new('My name is (\S+) (\S+)')
+
+      expect { re.partial_match?(0) }.to raise_error(TypeError)
     end
   end
 
@@ -630,6 +651,27 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
       expect { re === 0 }.to raise_error(TypeError)
+    end
+  end
+
+  describe "#full_match?" do
+    it "returns only true or false even if there are capturing groups", :aggregate_failures do
+      re = RE2::Regexp.new('My name is (\S+) (\S+)')
+
+      expect(re.full_match?("My name is Alice Bloggs")).to eq(true)
+      expect(re.full_match?("My name is Alice Bloggs and I am 99")).to eq(false)
+    end
+
+    it "returns false if the pattern is invalid" do
+      re = RE2::Regexp.new('???', log_errors: false)
+
+      expect(re.full_match?("My name is Alice Bloggs")).to eq(false)
+    end
+
+    it "raises an exception if text cannot be coerced to a string" do
+      re = RE2::Regexp.new('My name is (\S+) (\S+)')
+
+      expect { re.full_match?(0) }.to raise_error(TypeError)
     end
   end
 
@@ -749,6 +791,12 @@ RSpec.describe RE2::Regexp do
 
       expect(r.partial_match(StringLike.new("fooaa bar"))).to be_a(RE2::MatchData)
     end
+
+    it "does not allow the anchor to be overridden" do
+      r = RE2::Regexp.new('(\d+)')
+
+      expect(r.partial_match('ruby:1234', anchor: :anchor_both)).to be_a(RE2::MatchData)
+    end
   end
 
   describe "#full_match" do
@@ -798,6 +846,12 @@ RSpec.describe RE2::Regexp do
       r = RE2::Regexp.new('f(o+)(a+)')
 
       expect(r.full_match(StringLike.new("fooaa"), submatches: 0)).to eq(true)
+    end
+
+    it "does not allow the anchor to be overridden" do
+      r = RE2::Regexp.new('(\d+)')
+
+      expect(r.full_match('ruby:1234', anchor: :unanchored)).to be_nil
     end
   end
 end

@@ -1532,7 +1532,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 }
 
 /*
- * Returns true or false to indicate a successful match.
+ * Returns true if the pattern matches any substring of the given text.
  *
  * @return [Boolean] whether the match was successful
  */
@@ -1545,6 +1545,22 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
 
   return BOOL2RUBY(RE2::PartialMatch(RSTRING_PTR(text), *p->pattern));
+}
+
+/*
+ * Returns true if the pattern matches the given text.
+ *
+ * @return [Boolean] whether the match was successful
+ */
+static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
+  re2_pattern *p;
+
+  /* Ensure text is a string. */
+  StringValue(text);
+
+  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+
+  return BOOL2RUBY(RE2::FullMatch(RSTRING_PTR(text), *p->pattern));
 }
 
 /*
@@ -2071,6 +2087,8 @@ extern "C" void Init_re2(void) {
       -1);
   rb_define_method(re2_cRegexp, "match?", RUBY_METHOD_FUNC(re2_regexp_match_p),
       1);
+  rb_define_method(re2_cRegexp, "full_match?",
+      RUBY_METHOD_FUNC(re2_regexp_full_match_p), 1);
   rb_define_method(re2_cRegexp, "scan",
       RUBY_METHOD_FUNC(re2_regexp_scan), 1);
   rb_define_method(re2_cRegexp, "to_s", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);

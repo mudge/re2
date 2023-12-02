@@ -61,5 +61,6 @@ module RE2
 
     alias_method :=~, :match?
     alias_method :===, :match?
+    alias_method :partial_match?, :match?
   end
 end
