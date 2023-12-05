@@ -5,6 +5,23 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.5.0] - 2023-12-05
+### Added
+- Add a new matching interface that more closely resembles the underlying RE2
+  library's: `RE2::Regexp#full_match?`, `RE2::Regexp#partial_match?` for
+  matching without extracting submatches and `RE2::Regexp#full_match` and
+  `RE2::Regexp#partial_match` for extracting submatches. The latter two are
+  built on the existing `RE2::Regexp#match` method which now exposes more of
+  RE2's general matching interface by accepting new `anchor`, `startpos` and
+  `endpos` (where supported) arguments.
+
+### Changed
+- Overhaul much of the documentation to better explain the library and more
+  closely match the underlying RE2 library's interface, primarily promoting
+  the new full and partial matching APIs.
+- Remove workarounds for building Abseil on Windows now that pkgconf 2.1.0 has
+  been released.
+
 ## [2.4.3] - 2023-11-22
 ### Fixed
 - Restore support for compiling the gem with gcc 7.3 (as used on Amazon Linux
@@ -205,6 +222,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.5.0]: https://github.com/mudge/re2/releases/tag/v2.5.0
 [2.4.3]: https://github.com/mudge/re2/releases/tag/v2.4.3
 [2.4.2]: https://github.com/mudge/re2/releases/tag/v2.4.2
 [2.4.1]: https://github.com/mudge/re2/releases/tag/v2.4.1

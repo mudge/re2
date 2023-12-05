@@ -4,7 +4,7 @@ Ruby bindings to [RE2][], a "fast, safe, thread-friendly alternative to
 backtracking regular expression engines like those used in PCRE, Perl, and
 Python".
 
-**Current version:** 2.4.3  
+**Current version:** 2.5.0  
 **Bundled RE2 version:** libre2.11 (2023-11-01)  
 
 ```ruby
