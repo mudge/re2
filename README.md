@@ -1,8 +1,10 @@
-# re2 - safer regular expressions in Ruby [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
+# re2 - safer regular expressions in Ruby
 
 Ruby bindings to [RE2][], a "fast, safe, thread-friendly alternative to
 backtracking regular expression engines like those used in PCRE, Perl, and
 Python".
+
+[![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 
 **Current version:** 2.5.0  
 **Bundled RE2 version:** libre2.11 (2023-11-01)  
