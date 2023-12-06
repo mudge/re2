@@ -1,4 +1,4 @@
-# re2 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
+# re2 - safer regular expressions in Ruby [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 
 Ruby bindings to [RE2][], a "fast, safe, thread-friendly alternative to
 backtracking regular expression engines like those used in PCRE, Perl, and
@@ -37,6 +37,17 @@ RE2('(\w+):(\d+)').full_match("ruby:1234")
 
 ## Why RE2?
 
+While [recent
+versions](https://www.ruby-lang.org/en/news/2022/12/25/ruby-3-2-0-released/) of
+Ruby have improved defences against [regular expression denial of service
+(ReDoS) attacks](https://en.wikipedia.org/wiki/ReDoS), it is still possible for
+users to craft malicious patterns that take a long time to process by using
+syntactic features such as [back-references, lookaheads and possessive
+quantifiers](https://bugs.ruby-lang.org/issues/19104#note-3). RE2 aims to
+eliminate ReDoS by design:
+
+> **_Safety is RE2's raison d'être._**
+>
 > RE2 was designed and implemented with an explicit goal of being able to
 > handle regular expressions from untrusted users without risk. One of its
 > primary guarantees is that the match time is linear in the length of the
@@ -110,7 +121,7 @@ See the API documentation for [`RE2::Regexp#initialize`](https://mudge.name/re2/
 
 ### Matching interface
 
-There are two main methods for matching: [`RE2::Regexp#full_match?`](https://mudge.name/re2/RE2/Regexp.html#full_match%3F-instance_method) requires the regular expression to match the entire input text, and [`RE2::Regexp#partial_match?`](https://mudge.name/re2/RE2/Regexp.html#match%3F-instance_method) looks for a match for a substring of the input text, returning a boolean to indicate whether a match was successful or not.
+There are two main methods for matching: [`RE2::Regexp#full_match?`](https://mudge.name/re2/RE2/Regexp.html#full_match%3F-instance_method) requires the regular expression to match the entire input text, and [`RE2::Regexp#partial_match?`](https://mudge.name/re2/RE2/Regexp.html#partial_match%3F-instance_method) looks for a match for a substring of the input text, returning a boolean to indicate whether a match was successful or not.
 
 ```ruby
 RE2('h.*o').full_match?("hello")    #=> true
