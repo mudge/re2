@@ -1588,7 +1588,7 @@ static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
  *
  * @param [text] text the text to scan incrementally
  * @return [RE2::Scanner] an `Enumerable` {RE2::Scanner} object
- * @raises [TypeError] if `text` cannot be coerced to a `String`
+ * @raise [TypeError] if `text` cannot be coerced to a `String`
  * @example
  *   c = RE2::Regexp.new('(\w+)').scan("Foo bar baz")
  *   #=> #<RE2::Scanner:0x0000000000000001>
@@ -1652,7 +1652,7 @@ static VALUE re2_regexp_match_has_endpos_argument_p(VALUE) {
  * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
  * @param [String] rewrite the string to replace with
  * @return [String] the resulting string
- * @raises [TypeError] if the given rewrite or pattern (if not provided as a
+ * @raise [TypeError] if the given rewrite or pattern (if not provided as a
  *   {RE2::Regexp}) cannot be coerced to `String`s
  * @example
  *   RE2.Replace("hello there", "hello", "howdy") #=> "howdy there"
@@ -1700,7 +1700,7 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
  * @param [String] str the string to modify
  * @param [String, RE2::Regexp] pattern a regexp matching text to be replaced
  * @param [String] rewrite the string to replace with
- * @raises [TypeError] if the given rewrite or pattern (if not provided as a
+ * @raise [TypeError] if the given rewrite or pattern (if not provided as a
  *   {RE2::Regexp}) cannot be coerced to `String`s
  * @return [String] the resulting string
  * @example
@@ -1745,7 +1745,7 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
  * exactly match the original string.
  *
  * @param [String] unquoted the unquoted string
- * @raises [TypeError] if the given unquoted string cannot be coerced to a `String`
+ * @raise [TypeError] if the given unquoted string cannot be coerced to a `String`
  * @return [String] the escaped string
  * @example
  *   RE2::Regexp.escape("1.5-2.0?") #=> "1\.5\-2\.0\?"

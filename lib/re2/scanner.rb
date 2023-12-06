@@ -6,6 +6,7 @@
 # Copyright (c) 2010, Paul Mucur (https://mudge.name)
 # Released under the BSD Licence, please see LICENSE.txt
 
+
 module RE2
   class Scanner
     include Enumerable

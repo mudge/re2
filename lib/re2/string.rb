@@ -9,6 +9,7 @@
 require "re2"
 
 module RE2
+  # @deprecated Use methods on {RE2} and {RE2::Regexp} instead.
   module String
     # @deprecated Use {RE2.Replace} instead.
     def re2_sub(*args)
