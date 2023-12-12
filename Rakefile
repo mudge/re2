@@ -33,7 +33,7 @@ Gem::PackageTask.new(RE2_GEM_SPEC) do |p|
   p.need_tar = false
 end
 
-CROSS_RUBY_VERSIONS = %w[3.2.0 3.1.0 3.0.0 2.7.0 2.6.0].join(':')
+CROSS_RUBY_VERSIONS = %w[3.3.0 3.2.0 3.1.0 3.0.0 2.7.0 2.6.0].join(':')
 CROSS_RUBY_PLATFORMS = %w[
   aarch64-linux
   arm-linux
