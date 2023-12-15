@@ -30,6 +30,7 @@ RE2('(\w+):(\d+)').full_match("ruby:1234")
     * [Encoding](#encoding)
 * [Requirements](#requirements)
     * [Native gems](#native-gems)
+    * [Verifying the gems](#verifying-the-gems)
     * [Installing the `ruby` platform gem](#installing-the-ruby-platform-gem)
     * [Using system libraries](#using-system-libraries)
 * [Thanks](#thanks)
@@ -266,10 +267,39 @@ It supports the following RE2 ABI versions:
 
 Where possible, a pre-compiled native gem will be provided for the following platforms:
 
-* Linux `aarch64-linux` and `arm-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+)
-* Linux `x86-linux` and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.17+) including [musl](https://musl.libc.org/)-based systems such as [Alpine](https://alpinelinux.org)
+* Linux
+    * `aarch64-linux` and `arm-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+)
+    * `x86-linux` and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.17+)
+    * [musl](https://musl.libc.org/)-based systems such as [Alpine](https://alpinelinux.org) are supported as long as a [glibc-compatible library is installed](https://wiki.alpinelinux.org/wiki/Running_glibc_programs)
 * macOS `x86_64-darwin` and `arm64-darwin`
 * Windows `x64-mingw32` and `x64-mingw-ucrt`
+
+### Verifying the gems
+
+SHA256 checksums are included in the [release notes](https://github.com/mudge/re2/releases) for each version and can be checked with `sha256sum`, e.g.
+
+```console
+$ gem fetch re2 -v 2.5.0
+Fetching re2-2.5.0-arm64-darwin.gem
+Downloaded re2-2.5.0-arm64-darwin
+$ sha256sum re2-2.5.0-arm64-darwin.gem
+4b20c4539a12787102b22012e678968af23f87e35f88843744835bd13ac9f6bc  re2-2.5.0-arm64-darwin.gem
+```
+
+[GPG](https://www.gnupg.org/) signatures are attached to each release (the assets ending in `.sig`) and can be verified if you import [our signing key `0x39AC3530070E0F75`](https://mudge.name/39AC3530070E0F75.asc) (or fetch it from a public keyserver, e.g. `gpg --keyserver keyserver.ubuntu.com --recv-key 0x39AC3530070E0F75`):
+
+```console
+$ gpg --verify re2-2.5.0-arm64-darwin.gem.sig re2-2.5.0-arm64-darwin.gem
+gpg: Signature made Fri 15 Dec 2023 12:58:58 GMT
+gpg:                using RSA key 702609D9C790F45B577D7BEC39AC3530070E0F75
+gpg: Good signature from "Paul Mucur <mudge@mudge.name>" [unknown]
+gpg:                 aka "Paul Mucur <paul@ghostcassette.com>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 7026 09D9 C790 F45B 577D  7BEC 39AC 3530 070E 0F75
+```
+
+The fingerprint should be as shown above or you can independently verify it with the ones shown in the footer of https://mudge.name.
 
 ### Installing the `ruby` platform gem
 
