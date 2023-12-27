@@ -16,7 +16,7 @@ jobs:
           ruby-version: "3.2"
       - run: gem install --no-document yard redcarpet
       - run: yardoc
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v2
         with:
           path: "doc/"
 
@@ -32,4 +32,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v3
