@@ -6,7 +6,7 @@ Python".
 
 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 
-**Current version:** 2.6.0  
+**Current version:** 2.7.0  
 **Bundled RE2 version:** libre2.11 (2023-11-01)  
 
 ```ruby
@@ -373,6 +373,8 @@ Alternatively, you can set the `RE2_USE_SYSTEM_LIBRARIES` environment variable i
 * Thanks to [Jean Boussier](https://github.com/byroot) for contributing the
   switch to Ruby's `TypedData` API and the resulting garbage collection
   improvements in 2.4.0.
+* Thanks to [Manuel Jacob](https://github.com/manueljacob) for reporting a bug
+  when passing strings with null bytes.
 
 ## Contact
 
