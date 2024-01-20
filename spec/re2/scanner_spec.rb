@@ -34,6 +34,16 @@ RSpec.describe RE2::Scanner do
       expect(scanner.scan).to be_nil
     end
 
+    it "supports scanning inputs with null bytes", :aggregate_failures do
+      r = RE2::Regexp.new("(\\w\0\\w)")
+      scanner = r.scan("a\0b c\0d e\0f")
+
+      expect(scanner.scan).to eq(["a\0b"])
+      expect(scanner.scan).to eq(["c\0d"])
+      expect(scanner.scan).to eq(["e\0f"])
+      expect(scanner.scan).to be_nil
+    end
+
     it "returns UTF-8 matches if the pattern is UTF-8" do
       r = RE2::Regexp.new('(\w+)')
       scanner = r.scan("It")
@@ -188,6 +198,18 @@ RSpec.describe RE2::Scanner do
       scanner.rewind
 
       expect(scanner.to_enum.first).to eq(["1"])
+    end
+
+    it "supports inputs with null bytes", :aggregate_failures do
+      r = RE2::Regexp.new("(\\w\0\\w)")
+      scanner = r.scan("a\0b c\0d")
+
+      expect(scanner.to_enum.first).to eq(["a\0b"])
+      expect(scanner.to_enum.first).to eq(["c\0d"])
+
+      scanner.rewind
+
+      expect(scanner.to_enum.first).to eq(["a\0b"])
     end
 
     it "resets the eof? check", :aggregate_failures do

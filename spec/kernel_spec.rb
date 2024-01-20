@@ -10,6 +10,12 @@ RSpec.describe Kernel do
       expect(re).not_to be_case_sensitive
     end
 
+    it "accepts patterns containing null bytes" do
+      re = RE2("a\0b")
+
+      expect(re.pattern).to eq("a\0b")
+    end
+
     it "raises an error if given an inappropriate type" do
       expect { RE2(nil) }.to raise_error(TypeError)
     end

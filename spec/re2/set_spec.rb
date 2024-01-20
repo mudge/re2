@@ -123,6 +123,14 @@ RSpec.describe RE2::Set do
       expect(set.match("def", exception: false)).to be_empty
     end
 
+    it "supports matching null bytes", :aggregate_failures do
+      set = RE2::Set.new
+      set.add("a\0b")
+      set.compile
+
+      expect(set.match("a\0b", exception: false)).to eq([0])
+    end
+
     it "returns an empty array if there is no match when :exception is true" do
       skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
 

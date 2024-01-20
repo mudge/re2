@@ -12,6 +12,12 @@ RSpec.describe RE2::Regexp do
       expect(re).to be_a(RE2::Regexp)
     end
 
+    it "accepts patterns containing null bytes" do
+      re = RE2::Regexp.new("a\0b")
+
+      expect(re.pattern).to eq("a\0b")
+    end
+
     it "raises an error if given an inappropriate type" do
       expect { RE2::Regexp.new(nil) }.to raise_error(TypeError)
     end
@@ -39,6 +45,12 @@ RSpec.describe RE2::Regexp do
     it "returns an instance given a pattern and options" do
       re = RE2::Regexp.compile('woo', case_sensitive: false)
       expect(re).to be_a(RE2::Regexp)
+    end
+
+    it "accepts patterns containing null bytes" do
+      re = RE2::Regexp.compile("a\0b")
+
+      expect(re.pattern).to eq("a\0b")
     end
 
     it "raises an error if given an inappropriate type" do
@@ -339,6 +351,12 @@ RSpec.describe RE2::Regexp do
       expect(re.match("My name is Alice Bloggs")).to eq(true)
     end
 
+    it "supports matching against text containing null bytes" do
+      re = RE2::Regexp.new("a\0b")
+
+      expect(re.match("a\0b")).to eq(true)
+    end
+
     it "returns nil if the text does not match the pattern" do
       re = RE2::Regexp.new('My name is (\w+) (\w+)')
 
@@ -511,6 +529,13 @@ RSpec.describe RE2::Regexp do
       expect(md[3]).to eq("three")
     end
 
+    it "supports extracting submatches containing null bytes" do
+      re = RE2::Regexp.new("(a\0b)")
+      md = re.match("a\0bc")
+
+      expect(md[1]).to eq("a\0b")
+    end
+
     it "extracts a specific number of submatches", :aggregate_failures do
       re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
       md = re.match("one two three", submatches: 2)
@@ -599,6 +624,13 @@ RSpec.describe RE2::Regexp do
       expect(re.partial_match?("My age is 99")).to eq(false)
     end
 
+    it "supports matching against text containing null bytes", :aggregate_failures do
+      re = RE2::Regexp.new("a\0b")
+
+      expect(re.partial_match?("a\0b")).to eq(true)
+      expect(re.partial_match?("ab")).to eq(false)
+    end
+
     it "returns false if the pattern is invalid" do
       re = RE2::Regexp.new('???', log_errors: false)
 
@@ -618,6 +650,13 @@ RSpec.describe RE2::Regexp do
 
       expect(re =~ "My name is Alice Bloggs").to eq(true)
       expect(re =~ "My age is 99").to eq(false)
+    end
+
+    it "supports matching against text containing null bytes", :aggregate_failures do
+      re = RE2::Regexp.new("a\0b")
+
+      expect(re =~ "a\0b").to eq(true)
+      expect(re =~ "ab").to eq(false)
     end
 
     it "returns false if the pattern is invalid" do
@@ -660,6 +699,13 @@ RSpec.describe RE2::Regexp do
 
       expect(re.full_match?("My name is Alice Bloggs")).to eq(true)
       expect(re.full_match?("My name is Alice Bloggs and I am 99")).to eq(false)
+    end
+
+    it "supports matching against text containing null bytes", :aggregate_failures do
+      re = RE2::Regexp.new("a\0b")
+
+      expect(re.full_match?("a\0b")).to eq(true)
+      expect(re.full_match?("a\0bc")).to eq(false)
     end
 
     it "returns false if the pattern is invalid" do
@@ -741,6 +787,12 @@ RSpec.describe RE2::Regexp do
       scanner = r.scan("It is a truth universally acknowledged")
 
       expect(scanner).to be_a(RE2::Scanner)
+    end
+
+    it "raises a type error if given invalid input" do
+      r = RE2::Regexp.new('(\w+)')
+
+      expect { r.scan(nil) }.to raise_error(TypeError)
     end
   end
 

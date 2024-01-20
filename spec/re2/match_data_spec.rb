@@ -190,7 +190,7 @@ RSpec.describe RE2::MatchData do
   describe "#inspect" do
     it "returns a text representation of the object and indices" do
       md = RE2::Regexp.new('(\d+) (\d+)').match("1234 56")
- 
+
       expect(md.inspect).to eq('#<RE2::MatchData "1234 56" 1:"1234" 2:"56">')
     end
 
@@ -198,6 +198,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d+) (\d+)?').match("1234 ")
 
       expect(md.inspect).to eq('#<RE2::MatchData "1234 " 1:"1234" 2:nil>')
+    end
+
+    it "supports matches with null bytes" do
+      md = RE2::Regexp.new("(\\w\0\\w) (\\w\0\\w)").match("a\0b c\0d")
+
+      expect(md.inspect).to eq("#<RE2::MatchData \"a\0b c\0d\" 1:\"a\0b\" 2:\"c\0d\">")
     end
   end
 
@@ -239,6 +245,12 @@ RSpec.describe RE2::MatchData do
       expect(md.string[md.begin(:foo)..-1]).to eq('foobar')
     end
 
+    it "returns the offset of the start of a match by something that can be coerced to a String" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+
+      expect(md.string[md.begin(StringLike.new("foo"))..-1]).to eq('foobar')
+    end
+
     it "returns the offset despite multibyte characters" do
       md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
 
@@ -268,6 +280,12 @@ RSpec.describe RE2::MatchData do
 
       expect(md.begin(:foo)).to be_nil
     end
+
+    it "raises a type error if given an invalid name or number" do
+      md = RE2::Regexp.new('(\d)').match('123')
+
+      expect { md.begin(nil) }.to raise_error(TypeError)
+    end
   end
 
   describe "#end" do
@@ -287,6 +305,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
 
       expect(md.string[0...md.end(:foo)]).to eq('a foo')
+    end
+
+    it "returns the offset of a match by something that can be coerced to a String" do
+      md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
+
+      expect(md.string[0...md.end(StringLike.new("foo"))]).to eq('a foo')
     end
 
     it "returns the offset despite multibyte characters" do
@@ -317,6 +341,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d)').match('123')
 
       expect(md.end(:foo)).to be_nil
+    end
+
+    it "raises a type error if given an invalid name or number" do
+      md = RE2::Regexp.new('(\d)').match('123')
+
+      expect { md.end(nil) }.to raise_error(TypeError)
     end
   end
 

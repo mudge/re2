@@ -4,6 +4,18 @@ RSpec.describe RE2 do
       expect(RE2.Replace("woo", "o", "a")).to eq("wao")
     end
 
+    it "supports inputs with null bytes" do
+      expect(RE2.Replace("w\0oo", "o", "a")).to eq("w\0ao")
+    end
+
+    it "supports patterns with null bytes" do
+      expect(RE2.Replace("w\0oo", "\0", "o")).to eq("wooo")
+    end
+
+    it "supports replacements with null bytes" do
+      expect(RE2.Replace("woo", "o", "\0")).to eq("w\0o")
+    end
+
     it "performs replacement based on regular expressions" do
       expect(RE2.Replace("woo", "o+", "e")).to eq("we")
     end
@@ -80,6 +92,18 @@ RSpec.describe RE2 do
   describe ".GlobalReplace" do
     it "replaces every occurrence of a pattern" do
       expect(RE2.GlobalReplace("woo", "o", "a")).to eq("waa")
+    end
+
+    it "supports inputs with null bytes" do
+      expect(RE2.GlobalReplace("w\0oo", "o", "a")).to eq("w\0aa")
+    end
+
+    it "supports patterns with null bytes" do
+      expect(RE2.GlobalReplace("w\0\0oo", "\0", "a")).to eq("waaoo")
+    end
+
+    it "supports replacements with null bytes" do
+      expect(RE2.GlobalReplace("woo", "o", "\0")).to eq("w\0\0")
     end
 
     it "performs replacement based on regular expressions" do
@@ -166,6 +190,10 @@ RSpec.describe RE2 do
 
     it "supports passing something that can be coerced to a String as input" do
       expect(RE2.QuoteMeta(StringLike.new("1.5"))).to eq('1\.5')
+    end
+
+    it "supports strings containing null bytes" do
+      expect(RE2.QuoteMeta("abc\0def")).to eq('abc\x00def')
     end
   end
 end
