@@ -279,18 +279,18 @@ Where possible, a pre-compiled native gem will be provided for the following pla
 SHA256 checksums are included in the [release notes](https://github.com/mudge/re2/releases) for each version and can be checked with `sha256sum`, e.g.
 
 ```console
-$ gem fetch re2 -v 2.6.0
-Fetching re2-2.6.0-arm64-darwin.gem
-Downloaded re2-2.6.0-arm64-darwin
-$ sha256sum re2-2.6.0-arm64-darwin.gem
-ba6fda7a29cd16179d5401c1b4917ba204c92e5ca9d25df80d840ed76fca439f  re2-2.6.0-arm64-darwin.gem
+$ gem fetch re2 -v 2.7.0
+Fetching re2-2.7.0-arm64-darwin.gem
+Downloaded re2-2.7.0-arm64-darwin
+$ sha256sum re2-2.7.0-arm64-darwin.gem
+7d993f27a1afac4001c539a829e2af211ced62604930c90df32a307cf74cb4a4  re2-2.7.0-arm64-darwin.gem
 ```
 
 [GPG](https://www.gnupg.org/) signatures are attached to each release (the assets ending in `.sig`) and can be verified if you import [our signing key `0x39AC3530070E0F75`](https://mudge.name/39AC3530070E0F75.asc) (or fetch it from a public keyserver, e.g. `gpg --keyserver keyserver.ubuntu.com --recv-key 0x39AC3530070E0F75`):
 
 ```console
-$ gpg --verify re2-2.6.0-arm64-darwin.gem.sig re2-2.6.0-arm64-darwin.gem
-gpg: Signature made Wed 27 Dec 19:26:53 2023 GMT
+$ gpg --verify re2-2.7.0-arm64-darwin.gem.sig re2-2.7.0-arm64-darwin.gem
+gpg: Signature made Sat 20 Jan 15:01:45 2024 GMT
 gpg:                using RSA key 702609D9C790F45B577D7BEC39AC3530070E0F75
 gpg: Good signature from "Paul Mucur <mudge@mudge.name>" [unknown]
 gpg:                 aka "Paul Mucur <paul@ghostcassette.com>" [unknown]
