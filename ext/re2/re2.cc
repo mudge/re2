@@ -743,8 +743,9 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
     if (match == Qnil) {
       output << "nil";
     } else {
-      output << "\"" << re2::StringPiece(RSTRING_PTR(match),
-          RSTRING_LEN(match)) << "\"";
+      output << "\"";
+      output.write(RSTRING_PTR(match), RSTRING_LEN(match));
+      output << "\"";
     }
   }
 
