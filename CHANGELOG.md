@@ -5,6 +5,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.8.0] - 2024-01-31
+### Changed
+- Upgrade the bundled version of RE2 to 2024-02-01.
+- Upgrade the bundled version of Abseil to 20240116.0.
+
 ## [2.7.0] - 2024-01-20
 ### Added
 - Support strings with null bytes as patterns and input throughout the library.
@@ -236,6 +241,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.8.0]: https://github.com/mudge/re2/releases/tag/v2.8.0
 [2.7.0]: https://github.com/mudge/re2/releases/tag/v2.7.0
 [2.6.0]: https://github.com/mudge/re2/releases/tag/v2.6.0
 [2.6.0.rc1]: https://github.com/mudge/re2/releases/tag/v2.6.0.rc1
