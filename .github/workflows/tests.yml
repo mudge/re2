@@ -126,16 +126,22 @@ jobs:
         include:
           - ruby: "2.6"
             runs-on: "windows-2019"
+            requires-pkgconf-pin: true
           - ruby: "2.7"
             runs-on: "windows-2019"
+            requires-pkgconf-pin: true
           - ruby: "3.0"
             runs-on: "windows-2019"
+            requires-pkgconf-pin: true
           - ruby: "3.1"
             runs-on: "windows-2022"
+            requires-pkgconf-pin: true
           - ruby: "3.2"
             runs-on: "windows-2022"
+            requires-pkgconf-pin: true
           - ruby: "3.3"
             runs-on: "windows-2022"
+            requires-pkgconf-pin: true
     runs-on: ${{matrix.runs-on}}
     steps:
       - uses: actions/checkout@v4
@@ -146,6 +152,15 @@ jobs:
         with:
           name: cruby-gem
           path: gems
+      - name: Show what version of pkgconf is installed
+        run: pacman -Qs pkgconf
+        if: matrix.requires-pkgconf-pin
+      - name: Download pkgconf 2.1.0
+        run: curl --remote-name-all https://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst
+        if: matrix.requires-pkgconf-pin
+      - name: Install pkgconf 2.1.0
+        run: pacman -U --noconfirm mingw-w64-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst mingw-w64-ucrt-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst
+        if: matrix.requires-pkgconf-pin
       - name: Show pkg-config version
         run: pkg-config --version
       - run: ./scripts/test-gem-install gems
