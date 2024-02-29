@@ -6,8 +6,8 @@ Python".
 
 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 
-**Current version:** 2.8.0  
-**Bundled RE2 version:** libre2.11 (2024-02-01)  
+**Current version:** 2.9.0  
+**Bundled RE2 version:** libre2.11 (2024-03-01)  
 
 ```ruby
 RE2('h.*o').full_match?("hello")    #=> true
@@ -261,7 +261,7 @@ This gem requires the following to run:
 
 It supports the following RE2 ABI versions:
 
-* libre2.0 (prior to release 2020-03-02) to libre2.11 (2023-07-01 to 2024-02-01)
+* libre2.0 (prior to release 2020-03-02) to libre2.11 (2023-07-01 to 2024-03-01)
 
 ### Native gems
 
