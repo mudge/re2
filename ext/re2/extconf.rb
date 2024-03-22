@@ -99,30 +99,60 @@ module RE2
 
       abseil_recipe, re2_recipe = load_recipes
 
+      # Compile Abseil
       process_recipe(abseil_recipe) do |recipe|
         recipe.configure_options += ['-DABSL_PROPAGATE_CXX_STD=ON', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
         # Workaround for https://github.com/abseil/abseil-cpp/issues/1510
         recipe.configure_options += ['-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4'] if windows?
       end
 
-      abseil_recipe.activate
-
+      # Compile RE2
       process_recipe(re2_recipe) do |recipe|
+        # Specify Abseil's path so RE2 will prefer that over any system Abseil
         recipe.configure_options += ["-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}", '-DCMAKE_CXX_FLAGS=-DNDEBUG',
                                      '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
       end
 
-      dir_config("re2", File.join(re2_recipe.path, 'include'), File.join(re2_recipe.path, 'lib'))
-      dir_config("abseil", File.join(abseil_recipe.path, 'include'), File.join(abseil_recipe.path, 'lib'))
+      # on macOS, pkg-config will not return --cflags without this
+      ENV["PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"] = "t"
+      ENV["PKG_CONFIG_PATH"] = [
+        "#{abseil_recipe.lib_path}/pkgconfig",
+        "#{re2_recipe.lib_path}/pkgconfig",
+        ENV["PKG_CONFIG_PATH"]
+      ].compact.join(File::PATH_SEPARATOR)
 
-      pkg_config_paths = [
-        "#{abseil_recipe.path}/lib/pkgconfig",
-        "#{re2_recipe.path}/lib/pkgconfig"
-      ]
-      pkg_config_paths.prepend(ENV['PKG_CONFIG_PATH']) if ENV['PKG_CONFIG_PATH']
-      ENV['PKG_CONFIG_PATH'] = pkg_config_paths.join(File::PATH_SEPARATOR)
+      pc_file = File.join(re2_recipe.lib_path, 'pkgconfig', 're2.pc')
 
-      re2_recipe.mkmf_config(pkg: 're2', static: 're2')
+      static_library_dirs = minimal_pkg_config(pc_file, '--libs-only-L', '--static')
+        .shellsplit
+        .map { |flag| flag.sub(/\A-L/, "") }
+
+      $LIBPATH = static_library_dirs | $LIBPATH
+
+      # Replace all -l flags that can be found in one of the static library
+      # directories with the full path instead.
+      libflags = minimal_pkg_config(pc_file, '--libs-only-l', '--static')
+        .shellsplit
+        .map do |flag|
+          next flag unless flag.start_with?("-l")
+
+          static_lib = "lib#{flag[2..]}.#{$LIBEXT}"
+          static_lib_dir = static_library_dirs.find { |dir| File.exist?(File.join(dir, static_lib)) }
+          next flag unless static_lib_dir
+
+          File.join(static_lib_dir, static_lib)
+        end
+
+      $libs = [libflags, $libs].join(" ").strip
+
+      # Prepend INCFLAGS
+      incflags = minimal_pkg_config(pc_file, '--cflags-only-I')
+      $INCFLAGS = [incflags, $INCFLAGS].join(" ").strip
+
+      # Append CFLAGS and CXXFLAGS
+      cflags = minimal_pkg_config(pc_file, '--cflags-only-other')
+      $CFLAGS = [$CFLAGS, cflags].join(" ").strip
+      $CXXFLAGS = [$CXXFLAGS, cflags].join(" ").strip
     end
 
     def build_extension
@@ -249,6 +279,21 @@ module RE2
 
         FileUtils.touch(checkpoint)
       end
+    end
+
+    def minimal_pkg_config(pc_file, *options)
+      if ($PKGCONFIG ||=
+          (pkgconfig = MakeMakefile.with_config("pkg-config") {MakeMakefile.config_string("PKG_CONFIG") || "pkg-config"}) &&
+          MakeMakefile.find_executable0(pkgconfig) && pkgconfig)
+        pkgconfig = $PKGCONFIG
+      else
+        raise RuntimeError, "pkg-config is not found"
+      end
+
+      response = xpopen([pkgconfig, *options, pc_file], err: %i[child out], &:read)
+      raise RuntimeError, response unless $?.success?
+
+      response.strip
     end
 
     def config_system_libraries?
