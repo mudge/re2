@@ -103,7 +103,7 @@ module RE2
       process_recipe(abseil_recipe) do |recipe|
         recipe.configure_options += ['-DABSL_PROPAGATE_CXX_STD=ON', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
         # Workaround for https://github.com/abseil/abseil-cpp/issues/1510
-        recipe.configure_options += ['-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4'] if windows?
+        recipe.configure_options += ['-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4'] if MiniPortile.windows?
       end
 
       # Compile RE2
@@ -302,10 +302,6 @@ module RE2
 
     def config_cross_build?
       enable_config("cross-build")
-    end
-
-    def windows?
-      RbConfig::CONFIG["target_os"].match?(/mingw|mswin/)
     end
 
     # We use 'host' to set compiler prefix for cross-compiling. Prefer host_alias over host. And
