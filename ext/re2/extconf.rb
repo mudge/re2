@@ -127,7 +127,7 @@ module RE2
 
       static_library_dirs = minimal_pkg_config(pc_file, '--libs-only-L', '--static')
         .shellsplit
-        .map { |flag| flag.sub(/\A-L/, "") }
+        .map { |flag| flag.delete_prefix('-L') }
 
       $LIBPATH = static_library_dirs | $LIBPATH
 
@@ -136,9 +136,9 @@ module RE2
       libflags = minimal_pkg_config(pc_file, '--libs-only-l', '--static')
         .shellsplit
         .map do |flag|
-          next flag unless flag.start_with?("-l")
+          next flag unless flag.start_with?('-l')
 
-          static_lib = "lib#{flag[2..]}.#{$LIBEXT}"
+          static_lib = "lib#{flag.delete_prefix('-l')}.#{$LIBEXT}"
           static_lib_dir = static_library_dirs.find { |dir| File.exist?(File.join(dir, static_lib)) }
           next flag unless static_lib_dir
 
