@@ -286,6 +286,10 @@ module RE2
       end
     end
 
+    # See MiniPortile2's minimal_pkg_config:
+    # https://github.com/flavorjones/mini_portile/blob/52fb0bc41c89a10f1ac7b5abcf0157e059194374/lib/mini_portile2/mini_portile.rb#L760-L783
+    # and Ruby's pkg_config:
+    # https://github.com/ruby/ruby/blob/c505bb0ca0fd61c7ae931d26451f11122a2644e9/lib/mkmf.rb#L1916-L2004
     def minimal_pkg_config(pc_file, *options)
       if ($PKGCONFIG ||=
           (pkgconfig = MakeMakefile.with_config("pkg-config") {MakeMakefile.config_string("PKG_CONFIG") || "pkg-config"}) &&
