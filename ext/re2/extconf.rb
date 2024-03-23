@@ -115,46 +115,14 @@ module RE2
         ]
       end
 
-      # on macOS, pkg-config will not return --cflags without this
-      ENV["PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"] = "t"
-      ENV["PKG_CONFIG_PATH"] = [
-        "#{abseil_recipe.lib_path}/pkgconfig",
-        "#{re2_recipe.lib_path}/pkgconfig",
-        ENV["PKG_CONFIG_PATH"]
-      ].compact.join(File::PATH_SEPARATOR)
+      pkg_config_paths = [
+        File.join(abseil_recipe.lib_path, 'pkgconfig'),
+        File.join(re2_recipe.lib_path, 'pkgconfig')
+      ]
 
       pc_file = File.join(re2_recipe.lib_path, 'pkgconfig', 're2.pc')
 
-      static_library_dirs = minimal_pkg_config(pc_file, '--libs-only-L', '--static')
-        .shellsplit
-        .map { |flag| flag.delete_prefix('-L') }
-
-      $LIBPATH = static_library_dirs | $LIBPATH
-
-      # Replace all -l flags that can be found in one of the static library
-      # directories with the full path instead.
-      libflags = minimal_pkg_config(pc_file, '--libs-only-l', '--static')
-        .shellsplit
-        .map do |flag|
-          next flag unless flag.start_with?('-l')
-
-          static_lib = "lib#{flag.delete_prefix('-l')}.#{$LIBEXT}"
-          static_lib_dir = static_library_dirs.find { |dir| File.exist?(File.join(dir, static_lib)) }
-          next flag unless static_lib_dir
-
-          File.join(static_lib_dir, static_lib)
-        end
-
-      $libs = [libflags, $libs].join(" ").strip
-
-      # Prepend INCFLAGS
-      incflags = minimal_pkg_config(pc_file, '--cflags-only-I')
-      $INCFLAGS = [incflags, $INCFLAGS].join(" ").strip
-
-      # Append CFLAGS and CXXFLAGS
-      cflags = minimal_pkg_config(pc_file, '--cflags-only-other')
-      $CFLAGS = [$CFLAGS, cflags].join(" ").strip
-      $CXXFLAGS = [$CXXFLAGS, cflags].join(" ").strip
+      static_pkg_config(pc_file, pkg_config_paths)
     end
 
     def build_extension
@@ -249,6 +217,41 @@ module RE2
           $defs.push("-DHAVE_ERROR_INFO_ARGUMENT")
         end
       end
+    end
+
+    def static_pkg_config(pc_file, pkg_config_paths)
+      # on macOS, pkg-config will not return --cflags without this
+      ENV["PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"] = "t"
+      ENV["PKG_CONFIG_PATH"] = [*pkg_config_paths, ENV["PKG_CONFIG_PATH"]].compact.join(File::PATH_SEPARATOR)
+
+      static_library_paths = minimal_pkg_config(pc_file, '--libs-only-L', '--static')
+        .shellsplit
+        .map { |flag| flag.delete_prefix('-L') }
+
+      $LIBPATH = static_library_paths | $LIBPATH
+
+      # Replace all -l flags that can be found in one of the static library
+      # paths with the absolute path instead.
+      libflags = minimal_pkg_config(pc_file, '--libs-only-l', '--static')
+        .shellsplit
+        .map do |flag|
+          next flag unless flag.start_with?('-l')
+
+          lib = "lib#{flag.delete_prefix('-l')}.#{$LIBEXT}"
+          static_lib_path = static_library_paths.find { |path| File.exist?(File.join(path, lib)) }
+          next flag unless static_lib_path
+
+          File.join(static_lib_path, lib)
+        end
+
+      $libs = [libflags, $libs].join(" ").strip
+
+      incflags = minimal_pkg_config(pc_file, '--cflags-only-I')
+      $INCFLAGS = [incflags, $INCFLAGS].join(" ").strip
+
+      cflags = minimal_pkg_config(pc_file, '--cflags-only-other')
+      $CFLAGS = [$CFLAGS, cflags].join(" ").strip
+      $CXXFLAGS = [$CXXFLAGS, cflags].join(" ").strip
     end
 
     def process_recipe(recipe)
