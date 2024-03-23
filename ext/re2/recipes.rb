@@ -43,7 +43,8 @@ def build_recipe(name, version)
       # needed for building the C extension shared library with -fPIC
       '-DCMAKE_POSITION_INDEPENDENT_CODE=ON',
       # ensures pkg-config and installed libraries will be in lib, not lib64
-      '-DCMAKE_INSTALL_LIBDIR=lib'
+      '-DCMAKE_INSTALL_LIBDIR=lib',
+      '-DCMAKE_CXX_VISIBILITY_PRESET=hidden'
     ]
 
     yield recipe

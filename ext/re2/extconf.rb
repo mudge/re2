@@ -101,18 +101,18 @@ module RE2
 
       abseil_recipe, re2_recipe = load_recipes
 
-      # Compile Abseil
       process_recipe(abseil_recipe) do |recipe|
-        recipe.configure_options += ['-DABSL_PROPAGATE_CXX_STD=ON', '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
+        recipe.configure_options << '-DABSL_PROPAGATE_CXX_STD=ON'
         # Workaround for https://github.com/abseil/abseil-cpp/issues/1510
-        recipe.configure_options += ['-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4'] if MiniPortile.windows?
+        recipe.configure_options << '-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4' if MiniPortile.windows?
       end
 
-      # Compile RE2
       process_recipe(re2_recipe) do |recipe|
-        # Specify Abseil's path so RE2 will prefer that over any system Abseil
-        recipe.configure_options += ["-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}", '-DCMAKE_CXX_FLAGS=-DNDEBUG',
-                                     '-DCMAKE_CXX_VISIBILITY_PRESET=hidden']
+        recipe.configure_options += [
+          # Specify Abseil's path so RE2 will prefer that over any system Abseil
+          "-DCMAKE_PREFIX_PATH=#{abseil_recipe.path}",
+          '-DCMAKE_CXX_FLAGS=-DNDEBUG'
+        ]
       end
 
       # on macOS, pkg-config will not return --cflags without this
