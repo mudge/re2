@@ -94,6 +94,10 @@ module RE2
       ]
 
       dir_config("re2", header_dirs, lib_dirs)
+
+      unless have_library("re2")
+        abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
+      end
     end
 
     def build_with_vendored_libraries
@@ -137,10 +141,6 @@ module RE2
       have_library("stdc++")
       have_header("stdint.h")
       have_func("rb_gc_mark_movable") # introduced in Ruby 2.7
-
-      unless have_library("re2")
-        abort "You must have re2 installed and specified with --with-re2-dir, please see https://github.com/google/re2/wiki/Install"
-      end
 
       minimal_program = <<~SRC
         #include <re2/re2.h>
@@ -232,19 +232,21 @@ module RE2
 
       # Replace all -l flags that can be found in one of the static library
       # paths with the absolute path instead.
-      libflags = minimal_pkg_config(pc_file, '--libs-only-l', '--static')
+      minimal_pkg_config(pc_file, '--libs-only-l', '--static')
         .shellsplit
-        .map do |flag|
-          next flag unless flag.start_with?('-l')
+        .each do |flag|
+          if flag.start_with?('-l')
+            lib = "lib#{flag.delete_prefix('-l')}.#{$LIBEXT}"
 
-          lib = "lib#{flag.delete_prefix('-l')}.#{$LIBEXT}"
-          static_lib_path = static_library_paths.find { |path| File.exist?(File.join(path, lib)) }
-          next flag unless static_lib_path
-
-          File.join(static_lib_path, lib)
+            if (static_lib_path = static_library_paths.find { |path| File.exist?(File.join(path, lib)) })
+              $LDFLAGS << ' ' << File.join(static_lib_path, lib)
+            else
+              append_ldflags(flag.shellescape)
+            end
+          else
+            append_ldflags(flag.shellescape)
+          end
         end
-
-      $libs = [libflags, $libs].join(" ").strip
 
       incflags = minimal_pkg_config(pc_file, '--cflags-only-I')
       $INCFLAGS = [incflags, $INCFLAGS].join(" ").strip
