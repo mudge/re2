@@ -246,6 +246,8 @@ module RE2
           end
         end
 
+      append_ldflags(minimal_pkg_config(pc_file, '--libs-only-other', '--static'))
+
       incflags = minimal_pkg_config(pc_file, '--cflags-only-I')
       $INCFLAGS = [incflags, $INCFLAGS].join(" ").strip
 
