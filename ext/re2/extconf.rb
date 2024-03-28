@@ -220,8 +220,6 @@ module RE2
     end
 
     def static_pkg_config(pc_file, pkg_config_paths)
-      # on macOS, pkg-config will not return --cflags without this
-      ENV["PKG_CONFIG_ALLOW_SYSTEM_CFLAGS"] = "t"
       ENV["PKG_CONFIG_PATH"] = [*pkg_config_paths, ENV["PKG_CONFIG_PATH"]].compact.join(File::PATH_SEPARATOR)
 
       static_library_paths = minimal_pkg_config(pc_file, '--libs-only-L', '--static')
