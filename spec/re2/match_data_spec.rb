@@ -1,4 +1,5 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 require 'objspace'
 
 RSpec.describe RE2::MatchData do
@@ -142,7 +143,7 @@ RSpec.describe RE2::MatchData do
     end
 
     it "returns a copy, not the actual original" do
-      string = "bob"
+      string = +"bob"
       re = RE2::Regexp.new('(\D+)').match(string)
 
       expect(re.string).to_not equal(string)
@@ -155,7 +156,7 @@ RSpec.describe RE2::MatchData do
     end
 
     it "does not copy the string if it was already frozen" do
-      string = "bob".freeze
+      string = "bob"
       re = RE2::Regexp.new('(\D+)').match(string)
 
       expect(re.string).to equal(string)

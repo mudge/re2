@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RE2::Regexp do
   describe "#initialize" do
     it "returns an instance given only a pattern" do

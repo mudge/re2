@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # re2 (https://github.com/mudge/re2)
 # Ruby bindings to RE2, a "fast, safe, thread-friendly alternative to
 # backtracking regular expression engines like those used in PCRE, Perl, and

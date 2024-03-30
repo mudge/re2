@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "re2"
 
 # To test passing objects that can be coerced to a String.

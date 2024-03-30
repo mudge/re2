@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Kernel do
   describe ".RE2" do
     it "returns an RE2::Regexp instance given a pattern" do

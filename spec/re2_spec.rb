@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RE2 do
   describe ".Replace" do
     it "only replaces the first occurrence of the pattern" do

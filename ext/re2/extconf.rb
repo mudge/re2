@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # re2 (https://github.com/mudge/re2)
 # Ruby bindings to RE2, a "fast, safe, thread-friendly alternative to
 # backtracking regular expression engines like those used in PCRE, Perl, and
@@ -126,7 +128,7 @@ def build_extension(static_p = false)
 
   # Pass -x c++ to force gcc to compile the test program
   # as C++ (as it will end in .c by default).
-  compile_options = "-x c++"
+  compile_options = +"-x c++"
 
   have_library("stdc++")
   have_header("stdint.h")
