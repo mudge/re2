@@ -29,7 +29,7 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
       - run: ./scripts/test-gem-build gems ruby ${{github.ref_type}}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: cruby-gem
           path: gems
@@ -60,7 +60,7 @@ jobs:
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             "ghcr.io/rake-compiler/rake-compiler-dock-image:1.4.0-mri-${{matrix.platform}}" \
             ./scripts/test-gem-build gems ${{matrix.platform}} ${{github.ref_type}}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: "cruby-${{matrix.platform}}-gem"
           path: gems
@@ -114,7 +114,7 @@ jobs:
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-gem
           path: gems
@@ -153,7 +153,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{matrix.ruby}}
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-gem
           path: gems
@@ -184,7 +184,7 @@ jobs:
         with:
           ruby-version: "3.2"
           bundler-cache: true
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-gem
           path: gems
@@ -202,7 +202,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-aarch64-linux-gem
           path: gems
@@ -224,7 +224,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-arm-linux-gem
           path: gems
@@ -249,7 +249,7 @@ jobs:
       - uses: MSP-Greg/setup-ruby-pkgs@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-x64-mingw-ucrt-gem
           path: gems
@@ -269,7 +269,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-x64-mingw32-gem
           path: gems
@@ -286,7 +286,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-x86-linux-gem
           path: gems
@@ -311,7 +311,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-x86_64-linux-gem
           path: gems
@@ -330,7 +330,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-x86_64-darwin-gem
           path: gems
@@ -348,7 +348,7 @@ jobs:
       image: "ruby:${{matrix.ruby}}-alpine"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: cruby-x86_64-linux-gem
           path: gems
