@@ -5,6 +5,13 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.10.0] - 2024-04-01
+### Changed
+- Upgrade the bundled version of RE2 to 2024-04-01.
+- Refactor how we statically link RE2 into the gem to also include any
+  preprocessor and compiler flags specified by its pkg-config file.
+- Ensure the gem compiles when frozen strings are enabled.
+
 ## [2.9.0] - 2024-02-29
 ### Changed
 - Upgrade the bundled version of RE2 to 2024-03-01.
@@ -246,6 +253,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.10.0]: https://github.com/mudge/re2/releases/tag/v2.10.0
 [2.9.0]: https://github.com/mudge/re2/releases/tag/v2.9.0
 [2.8.0]: https://github.com/mudge/re2/releases/tag/v2.8.0
 [2.7.0]: https://github.com/mudge/re2/releases/tag/v2.7.0
