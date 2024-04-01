@@ -1,13 +1,18 @@
 name: re2 Tests
+
 concurrency:
   group: "${{github.workflow}}-${{github.sha}}"
   cancel-in-progress: true
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
   pull_request:
+
+env:
+  RUBYOPT: "--enable-frozen-string-literal --debug-frozen-string-literal --debug"
 
 jobs:
   build-cruby-gem:
