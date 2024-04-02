@@ -226,8 +226,6 @@ module RE2
         .shellsplit
         .map { |flag| flag.delete_prefix('-L') }
 
-      $LIBPATH = static_library_paths | $LIBPATH
-
       # Replace all -l flags that can be found in one of the static library
       # paths with the absolute path instead.
       minimal_pkg_config(pc_file, '--libs-only-l', '--static')
