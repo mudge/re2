@@ -16,7 +16,6 @@ env:
 
 jobs:
   build-cruby-gem:
-    name: "Build CRuby gem"
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
@@ -26,16 +25,15 @@ jobs:
           key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2"
+          ruby-version: "3.3"
           bundler-cache: true
-      - run: ./scripts/test-gem-build gems ruby ${{github.ref_type}}
+      - run: ./scripts/test-gem-build gems ruby
       - uses: actions/upload-artifact@v4
         with:
           name: cruby-gem
           path: gems
 
   build-precompiled-gems:
-    name: "Precompile ${{ matrix.platform }} gem"
     strategy:
       fail-fast: false
       matrix:
@@ -65,19 +63,12 @@ jobs:
           name: "cruby-${{matrix.platform}}-gem"
           path: gems
 
-  compile-and-test-system-dependencies:
-    name: System libre2.${{ matrix.libre2.soname }} - Ruby ${{ matrix.ruby }}
+  compile-and-test-system-re2-versions:
     needs: ["build-cruby-gem"]
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        ruby:
-          - '3.3'
-          - '3.2'
-          - '3.1'
-          - '3.0'
-          - '2.7'
-          - '2.6'
+        ruby: ["3.3", "2.6"] # oldest and newest
         libre2:
           - version: "20150501"
             soname: 0
@@ -121,58 +112,67 @@ jobs:
       - run: ./scripts/test-gem-install gems --enable-system-libraries
 
   compile-and-test-vendored-dependencies:
-    name: Vendored - Ruby ${{ matrix.ruby }} - ${{ matrix.runs-on }}
     needs: ["build-cruby-gem"]
     strategy:
       fail-fast: false
       matrix:
         runs-on: ["ubuntu-latest", "macos-latest"]
         ruby: ["2.6", "2.7", "3.0", "3.1", "3.2", "3.3"]
+        sys: ["enable", "disable"]
         include:
           - ruby: "2.6"
             runs-on: "windows-2019"
-            requires-pkgconf-pin: true
+            sys: "enable"
+          - ruby: "2.6"
+            runs-on: "windows-2019"
+            sys: "disable"
           - ruby: "2.7"
             runs-on: "windows-2019"
-            requires-pkgconf-pin: true
+            sys: "enable"
+          - ruby: "2.7"
+            runs-on: "windows-2019"
+            sys: "disable"
           - ruby: "3.0"
             runs-on: "windows-2019"
-            requires-pkgconf-pin: true
+            sys: "enable"
+          - ruby: "3.0"
+            runs-on: "windows-2019"
+            sys: "disable"
           - ruby: "3.1"
             runs-on: "windows-2022"
-            requires-pkgconf-pin: true
+            sys: "enable"
+          - ruby: "3.1"
+            runs-on: "windows-2022"
+            sys: "disable"
           - ruby: "3.2"
             runs-on: "windows-2022"
-            requires-pkgconf-pin: true
+            sys: "enable"
+          - ruby: "3.2"
+            runs-on: "windows-2022"
+            sys: "disable"
           - ruby: "3.3"
             runs-on: "windows-2022"
-            requires-pkgconf-pin: true
-    runs-on: ${{matrix.runs-on}}
+            sys: "enable"
+          - ruby: "3.3"
+            runs-on: "windows-2022"
+            sys: "disable"
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby-pkgs@v1
         with:
-          ruby-version: ${{matrix.ruby}}
+          ruby-version: ${{ matrix.ruby }}
+          apt-get: libre2-dev
+          brew: re2
+          mingw: re2
       - uses: actions/download-artifact@v4
         with:
           name: cruby-gem
           path: gems
-      - name: Show what version of pkgconf is installed
-        run: pacman -Qs pkgconf
-        if: matrix.requires-pkgconf-pin
-      - name: Download pkgconf 2.1.0
-        run: curl --remote-name-all https://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst https://repo.msys2.org/mingw/ucrt64/mingw-w64-ucrt-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst
-        if: matrix.requires-pkgconf-pin
-      - name: Install pkgconf 2.1.0
-        run: pacman -U --noconfirm mingw-w64-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst mingw-w64-ucrt-x86_64-pkgconf-1~2.1.0-1-any.pkg.tar.zst
-        if: matrix.requires-pkgconf-pin
-      - name: Show pkg-config version
-        run: pkg-config --version
-      - run: ./scripts/test-gem-install gems
+      - run: ./scripts/test-gem-install gems --${{ matrix.sys }}-system-libraries
         shell: bash
 
   compile-and-test-vendored-dependencies-with-system-install:
-    name: Vendored - system libre2-dev - Ruby 3.2
     needs: ["build-cruby-gem"]
     runs-on: ubuntu-latest
     steps:
@@ -182,7 +182,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         id: setup-ruby
         with:
-          ruby-version: "3.2"
+          ruby-version: "3.3"
           bundler-cache: true
       - uses: actions/download-artifact@v4
         with:
@@ -192,8 +192,27 @@ jobs:
         run: ln -s /usr/lib/x86_64-linux-gnu/libre2.so ${{ steps.setup-ruby.outputs.ruby-prefix }}/lib/libre2.so
       - run: ./scripts/test-gem-install gems
 
+  compile-and-test-on-freebsd:
+    needs: ["build-cruby-gem"]
+    strategy:
+      fail-fast: false
+      matrix:
+        sys: ["enable", "disable"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: cruby-gem
+          path: gems
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          copyback: false
+          prepare: pkg install -y ruby devel/ruby-gems sysutils/rubygem-bundler devel/pkgconf devel/cmake shells/bash devel/re2
+          run: ./scripts/test-gem-install gems --${{ matrix.sys }}-system-libraries
+
   test-precompiled-aarch64-linux:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - aarch64-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -215,7 +234,6 @@ jobs:
             ./scripts/test-gem-install ./gems
 
   test-precompiled-arm-linux:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - arm-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -237,7 +255,6 @@ jobs:
             ./scripts/test-gem-install ./gems
 
   test-precompiled-x64-mingw-ucrt:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - x64-mingw-ucrt
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -257,7 +274,6 @@ jobs:
         shell: bash
 
   test-precompiled-x64-mingw32:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - x64-mingw32
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -277,7 +293,6 @@ jobs:
         shell: bash
 
   test-precompiled-x86-linux:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - x86-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -299,7 +314,6 @@ jobs:
             ./scripts/test-gem-install ./gems
 
   test-precompiled-x86_64-linux:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - x86_64-linux
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -318,7 +332,6 @@ jobs:
       - run: ./scripts/test-gem-install gems
 
   test-precompiled-x86_64-darwin:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - x86_64-darwin
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
@@ -337,7 +350,6 @@ jobs:
       - run: ./scripts/test-gem-install gems
 
   test-precompiled-x86_64-alpine:
-    name: Precompiled - Ruby ${{ matrix.ruby }} - x86_64-alpine
     needs: ["build-precompiled-gems"]
     strategy:
       fail-fast: false
