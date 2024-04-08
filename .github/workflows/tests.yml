@@ -95,7 +95,8 @@ jobs:
         if: ${{ matrix.libre2.needs_abseil }}
         run: |
           sudo apt-get install -y software-properties-common
-          sudo add-apt-repository ppa:savoury1/build-tools
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E996735927E427A733BB653E374C7797FB006459
+          sudo add-apt-repository "deb https://ppa.launchpadcontent.net/savoury1/build-tools/ubuntu focal main"
           sudo apt-get install -y libabsl-dev
       - name: Download and install specific release of libre2
         run: |
