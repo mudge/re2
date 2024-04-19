@@ -1,0 +1,26 @@
+name: Precompile native gem
+
+on:
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+
+jobs:
+  precompile-gem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ports/archives
+          key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
+      - run: |
+          docker run --rm -v "$(pwd):/re2" -w /re2 \
+            "ghcr.io/rake-compiler/rake-compiler-dock-image:1.5.0-mri-${{ inputs.platform }}" \
+            ./scripts/test-gem-build gems ${{inputs.platform}}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "cruby-${{inputs.platform}}-gem"
+          path: gems

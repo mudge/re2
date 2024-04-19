@@ -33,38 +33,53 @@ jobs:
           name: cruby-gem
           path: gems
 
-  build-precompiled-gems:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - "aarch64-linux"
-          - "arm-linux"
-          - "arm64-darwin"
-          - "x64-mingw-ucrt"
-          - "x64-mingw32"
-          - "x86-linux"
-          - "x86-mingw32" # github actions does not support this runtime as of 2022-12, but let's build anyway
-          - "x86_64-darwin"
-          - "x86_64-linux"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: ports/archives
-          key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
-      - run: |
-          docker run --rm -v "$(pwd):/re2" -w /re2 \
-            "ghcr.io/rake-compiler/rake-compiler-dock-image:1.5.0-mri-${{matrix.platform}}" \
-            ./scripts/test-gem-build gems ${{matrix.platform}}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "cruby-${{matrix.platform}}-gem"
-          path: gems
+  precompile-aarch64-linux:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: aarch64-linux
+
+  precompile-arm-linux:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: arm-linux
+
+  precompile-x86-linux:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: x86-linux
+
+  precompile-x86_64-linux:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: x86_64-linux
+
+  precompile-arm64-darwin:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: arm64-darwin
+
+  precompile-x86_64-darwin:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: x86_64-darwin
+
+  precompile-x64-mingw-ucrt:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: x64-mingw-ucrt
+
+  precompile-x64-mingw32:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: x64-mingw32
+
+  precompile-x86-mingw32:
+    uses: ./.github/workflows/precompile-gem.yml
+    with:
+      platform: x86-mingw32
 
   test-re2-abi:
-    needs: ["build-cruby-gem"]
+    needs: "build-cruby-gem"
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -112,8 +127,8 @@ jobs:
           path: gems
       - run: ./scripts/test-gem-install gems --enable-system-libraries
 
-  test-linux-vendored:
-    needs: ["build-cruby-gem"]
+  test-ubuntu:
+    needs: "build-cruby-gem"
     strategy:
       fail-fast: false
       matrix:
@@ -133,8 +148,8 @@ jobs:
       - run: ./scripts/test-gem-install gems --${{ matrix.sys }}-system-libraries
         shell: bash
 
-  test-macos-vendored:
-    needs: ["build-cruby-gem"]
+  test-macos:
+    needs: "build-cruby-gem"
     strategy:
       fail-fast: false
       matrix:
@@ -154,8 +169,8 @@ jobs:
       - run: ./scripts/test-gem-install gems --${{ matrix.sys }}-system-libraries
         shell: bash
 
-  test-windows-2019-vendored:
-    needs: ["build-cruby-gem"]
+  test-windows-2019:
+    needs: "build-cruby-gem"
     strategy:
       fail-fast: false
       matrix:
@@ -175,8 +190,8 @@ jobs:
       - run: ./scripts/test-gem-install gems --${{ matrix.sys }}-system-libraries
         shell: bash
 
-  test-windows-2022-vendored:
-    needs: ["build-cruby-gem"]
+  test-windows-2022:
+    needs: "build-cruby-gem"
     strategy:
       fail-fast: false
       matrix:
@@ -196,8 +211,8 @@ jobs:
       - run: ./scripts/test-gem-install gems --${{ matrix.sys }}-system-libraries
         shell: bash
 
-  test-freebsd-vendored:
-    needs: ["build-cruby-gem"]
+  test-freebsd:
+    needs: "build-cruby-gem"
     strategy:
       fail-fast: false
       matrix:
@@ -217,7 +232,7 @@ jobs:
           run: ./scripts/test-gem-install gems --${{ matrix.sys }}-system-libraries
 
   test-vendored-and-system:
-    needs: ["build-cruby-gem"]
+    needs: "build-cruby-gem"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -237,7 +252,7 @@ jobs:
       - run: ./scripts/test-gem-install gems
 
   test-precompiled-aarch64-linux:
-    needs: ["build-precompiled-gems"]
+    needs: "precompile-aarch64-linux"
     strategy:
       fail-fast: false
       matrix:
@@ -258,7 +273,7 @@ jobs:
             ./scripts/test-gem-install ./gems
 
   test-precompiled-arm-linux:
-    needs: ["build-precompiled-gems"]
+    needs: "precompile-arm-linux"
     strategy:
       fail-fast: false
       matrix:
@@ -278,46 +293,8 @@ jobs:
             ruby:${{matrix.ruby}} \
             ./scripts/test-gem-install ./gems
 
-  test-precompiled-x64-mingw-ucrt:
-    needs: ["build-precompiled-gems"]
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["3.1", "3.2", "3.3"]
-    runs-on: windows-2022
-    steps:
-      - uses: actions/checkout@v4
-      - uses: MSP-Greg/setup-ruby-pkgs@v1
-        with:
-          ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v4
-        with:
-          name: cruby-x64-mingw-ucrt-gem
-          path: gems
-      - run: ./scripts/test-gem-install gems
-        shell: bash
-
-  test-precompiled-x64-mingw32:
-    needs: ["build-precompiled-gems"]
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["2.6", "2.7", "3.0"]
-    runs-on: windows-2019
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v4
-        with:
-          name: cruby-x64-mingw32-gem
-          path: gems
-      - run: ./scripts/test-gem-install gems
-        shell: bash
-
   test-precompiled-x86-linux:
-    needs: ["build-precompiled-gems"]
+    needs: "precompile-x86-linux"
     strategy:
       fail-fast: false
       matrix:
@@ -338,7 +315,7 @@ jobs:
             ./scripts/test-gem-install ./gems
 
   test-precompiled-x86_64-linux:
-    needs: ["build-precompiled-gems"]
+    needs: "precompile-x86_64-linux"
     strategy:
       fail-fast: false
       matrix:
@@ -355,26 +332,8 @@ jobs:
           path: gems
       - run: ./scripts/test-gem-install gems
 
-  test-precompiled-x86_64-darwin:
-    needs: ["build-precompiled-gems"]
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["2.6", "2.7", "3.0", "3.1", "3.2", "3.3"]
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "${{matrix.ruby}}"
-      - uses: actions/download-artifact@v4
-        with:
-          name: cruby-x86_64-darwin-gem
-          path: gems
-      - run: ./scripts/test-gem-install gems
-
   test-precompiled-arm64-darwin:
-    needs: ["build-precompiled-gems"]
+    needs: "precompile-arm64-darwin"
     strategy:
       fail-fast: false
       matrix:
@@ -391,8 +350,64 @@ jobs:
           path: gems
       - run: ./scripts/test-gem-install gems
 
+  test-precompiled-x86_64-darwin:
+    needs: "precompile-x86_64-darwin"
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.6", "2.7", "3.0", "3.1", "3.2", "3.3"]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v4
+        with:
+          name: cruby-x86_64-darwin-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+
+  test-precompiled-x64-mingw-ucrt:
+    needs: "precompile-x64-mingw-ucrt"
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.1", "3.2", "3.3"]
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: MSP-Greg/setup-ruby-pkgs@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v4
+        with:
+          name: cruby-x64-mingw-ucrt-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+        shell: bash
+
+  test-precompiled-x64-mingw32:
+    needs: "precompile-x64-mingw32"
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.6", "2.7", "3.0"]
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "${{matrix.ruby}}"
+      - uses: actions/download-artifact@v4
+        with:
+          name: cruby-x64-mingw32-gem
+          path: gems
+      - run: ./scripts/test-gem-install gems
+        shell: bash
+
   test-precompiled-x86_64-alpine:
-    needs: ["build-precompiled-gems"]
+    needs: "precompile-x86_64-linux"
     strategy:
       fail-fast: false
       matrix:
