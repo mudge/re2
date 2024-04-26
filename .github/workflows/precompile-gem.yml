@@ -12,15 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
       - uses: actions/cache@v4
         with:
           path: ports/archives
-          key: archives-ubuntu-${{hashFiles('ext/re2/extconf.rb')}}
-      - run: |
-          docker run --rm -v "$(pwd):/re2" -w /re2 \
-            "ghcr.io/rake-compiler/rake-compiler-dock-image:1.5.0-mri-${{ inputs.platform }}" \
-            ./scripts/test-gem-build gems ${{inputs.platform}}
+          key: archives-ubuntu-${{ hashFiles('ext/re2/extconf.rb') }}
+      - run: bundle exec rake gem:${{ inputs.platform }}
       - uses: actions/upload-artifact@v4
         with:
-          name: "cruby-${{inputs.platform}}-gem"
-          path: gems
+          name: "cruby-${{ inputs.platform }}-gem"
+          path: pkg/*.gem
