@@ -452,3 +452,20 @@ jobs:
           path: pkg
       - run: apk add bash libstdc++ gcompat
       - run: ./scripts/test-gem-install
+
+  ruby-memcheck:
+    runs-on: "ubuntu-latest"
+    env:
+      BUNDLE_WITH: memcheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ports/archives
+          key: archives-ubuntu-${{ hashFiles('ext/re2/extconf.rb') }}
+      - uses: ruby/setup-ruby-pkgs@v1
+        with:
+          ruby-version: "3.3"
+          apt-get: valgrind
+          bundler-cache: true
+      - run: bundle exec rake spec:valgrind
