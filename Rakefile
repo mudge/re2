@@ -46,6 +46,17 @@ end
 
 RSpec::Core::RakeTask.new(:spec)
 
+begin
+  require 'ruby_memcheck'
+  require 'ruby_memcheck/rspec/rake_task'
+
+  namespace :spec do
+    RubyMemcheck::RSpec::RakeTask.new(valgrind: :compile)
+  end
+rescue LoadError
+  # Only define the spec:valgrind task if ruby_memcheck is installed
+end
+
 namespace :gem do
   cross_platforms.each do |platform|
 
