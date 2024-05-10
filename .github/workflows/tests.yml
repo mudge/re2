@@ -22,7 +22,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ports/archives
-          key: archives-ubuntu-${{ hashFiles('ext/re2/extconf.rb') }}
+          key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
@@ -462,7 +462,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ports/archives
-          key: archives-ubuntu-${{ hashFiles('ext/re2/extconf.rb') }}
+          key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
       - uses: ruby/setup-ruby-pkgs@v1
         with:
           ruby-version: "3.3"

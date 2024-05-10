@@ -19,7 +19,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ports/archives
-          key: archives-ubuntu-${{ hashFiles('ext/re2/extconf.rb') }}
+          key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
       - run: bundle exec rake gem:${{ inputs.platform }}
       - uses: actions/upload-artifact@v4
         with:
