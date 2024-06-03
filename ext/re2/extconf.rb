@@ -105,12 +105,14 @@ module RE2
 
       abseil_recipe, re2_recipe = load_recipes
 
+      message "Processing Abseil recipe.\n"
       process_recipe(abseil_recipe) do |recipe|
         recipe.configure_options << '-DABSL_PROPAGATE_CXX_STD=ON'
         # Workaround for https://github.com/abseil/abseil-cpp/issues/1510
         recipe.configure_options << '-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4' if MiniPortile.windows?
       end
 
+      message "Processing RE2 recipe.\n"
       process_recipe(re2_recipe) do |recipe|
         recipe.configure_options += [
           # Specify Abseil's path so RE2 will prefer that over any system Abseil
@@ -222,29 +224,38 @@ module RE2
     def static_pkg_config(pc_file, pkg_config_paths)
       ENV["PKG_CONFIG_PATH"] = [*pkg_config_paths, ENV["PKG_CONFIG_PATH"]].compact.join(File::PATH_SEPARATOR)
 
+      message "pkg-config --libs-only-L --static\n"
       static_library_paths = minimal_pkg_config(pc_file, '--libs-only-L', '--static')
         .shellsplit
         .map { |flag| flag.delete_prefix('-L') }
 
+      message "Static library paths: #{static_library_paths.join(', ')}\n"
+
       # Replace all -l flags that can be found in one of the static library
       # paths with the absolute path instead.
+      message "pkg-config --libs-only-l --static\n"
       minimal_pkg_config(pc_file, '--libs-only-l', '--static')
         .shellsplit
         .each do |flag|
           lib = "lib#{flag.delete_prefix('-l')}.#{$LIBEXT}"
 
           if (static_lib_path = static_library_paths.find { |path| File.exist?(File.join(path, lib)) })
+            message "#{lib} found in #{static_lib_path}\n"
             $libs << ' ' << File.join(static_lib_path, lib).shellescape
           else
+            message "#{lib} not found in static lib, adding it directly\n"
             $libs << ' ' << flag.shellescape
           end
         end
 
+      message "appending pkg-config --libs-only-other --static to LDFLAGS\n"
       append_ldflags(minimal_pkg_config(pc_file, '--libs-only-other', '--static'))
 
+      message "appending pkg-config --cflags-only-i to INCFLAGS\n"
       incflags = minimal_pkg_config(pc_file, '--cflags-only-I')
       $INCFLAGS = [incflags, $INCFLAGS].join(" ").strip
 
+      message "appending pkg-config --cflags-only-other to C(XX)FLAGS\n"
       cflags = minimal_pkg_config(pc_file, '--cflags-only-other')
       $CFLAGS = [$CFLAGS, cflags].join(" ").strip
       $CXXFLAGS = [$CXXFLAGS, cflags].join(" ").strip
@@ -277,6 +288,8 @@ module RE2
         # Use a temporary base directory to reduce filename lengths since
         # Windows can hit a limit of 250 characters (CMAKE_OBJECT_PATH_MAX).
         Dir.mktmpdir { |dir| Dir.chdir(dir) { recipe.cook } }
+
+        message "#{name}-#{version} cooked\n"
 
         FileUtils.touch(checkpoint)
       end
