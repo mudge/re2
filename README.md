@@ -328,9 +328,10 @@ You will need a full compiler toolchain for compiling Ruby C extensions (see
 [Nokogiri's "The Compiler
 Toolchain"](https://nokogiri.org/tutorials/installing_nokogiri.html#appendix-a-the-compiler-toolchain))
 plus the toolchain required for compiling the vendored version of RE2 and its
-dependency [Abseil][] which includes
-[CMake](https://cmake.org) and a compiler with C++14 support such as
-[clang](http://clang.llvm.org/) 3.4 or [gcc](https://gcc.gnu.org/) 5. On
+dependency [Abseil][] which includes [CMake](https://cmake.org), a compiler
+with C++14 support such as [clang](http://clang.llvm.org/) 3.4 or
+[gcc](https://gcc.gnu.org/) 5 and a recent version of
+[pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/). On
 Windows, you'll also need pkgconf 2.1.0+ to avoid [`undefined reference`
 errors](https://github.com/pkgconf/pkgconf/issues/322) when attempting to
 compile Abseil.
