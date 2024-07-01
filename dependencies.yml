@@ -1,7 +1,7 @@
 ---
 libre2:
-  version: '2024-07-01'
-  sha256: b767b92cd1e4d2f5eb3fea3401fdc3f45b7541fef59f0f516cc4e3b8f19afbdc
+  version: '2024-07-02'
+  sha256: eb2df807c781601c14a260a507a5bb4509be1ee626024cb45acbd57cb9d4032b
 abseil:
   version: '20240116.2'
   sha256: 733726b8c3a6d39a4120d7e45ea8b41a434cdacde401cba500f14236c49b39dc
