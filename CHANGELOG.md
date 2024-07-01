@@ -5,6 +5,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.13.1] - 2024-07-01
+### Changed
+- Upgrade the bundled version of RE2 to 2024-07-02.
+
 ## [2.13.0] - 2024-06-30
 ### Changed
 - Upgrade the bundled version of RE2 to 2024-07-01.
@@ -266,6 +270,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.13.1]: https://github.com/mudge/re2/releases/tag/v2.13.1
 [2.13.0]: https://github.com/mudge/re2/releases/tag/v2.13.0
 [2.12.0]: https://github.com/mudge/re2/releases/tag/v2.12.0
 [2.11.0]: https://github.com/mudge/re2/releases/tag/v2.11.0
