@@ -20,6 +20,7 @@ def load_recipes
       url: "https://github.com/abseil/abseil-cpp/archive/refs/tags/#{recipe.version}.tar.gz",
       sha256: dependencies['abseil']['sha256']
     }]
+    recipe.patch_files = Dir[File.join(PACKAGE_ROOT_DIR, "patches/abseil/*.patch")].sort
   end
 
   re2_recipe = build_recipe('libre2', dependencies['libre2']['version']) do |recipe|
