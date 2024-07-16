@@ -80,7 +80,7 @@ jobs:
 
   test-re2-abi:
     needs: "build-cruby-gem"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         ruby: ["3.3", "2.6"] # oldest and newest
@@ -101,22 +101,14 @@ jobs:
             soname: 10
           - version: "20230701"
             soname: 11
-            needs_abseil: true
     steps:
       - uses: actions/checkout@v4
       - name: Remove any existing libre2 installation
-        run: sudo apt-get remove -y libre2-dev libre2-5
-      - name: Install Abseil for newer re2 releases
-        if: ${{ matrix.libre2.needs_abseil }}
-        run: |
-          sudo apt-get install -y software-properties-common
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E996735927E427A733BB653E374C7797FB006459
-          sudo add-apt-repository "deb https://ppa.launchpadcontent.net/savoury1/build-tools/ubuntu focal main"
-          sudo apt-get install -y libabsl-dev
+        run: sudo apt-get remove -y libre2-dev libre2-9
       - name: Download and install specific release of libre2
         run: |
-          curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v2/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
-          sudo dpkg -i libre2-dev.deb
+          curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v22.04/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
+          sudo apt -f install ./libre2-dev.deb
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{ matrix.ruby }}"
