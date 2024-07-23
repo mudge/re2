@@ -10,6 +10,8 @@ on:
     branches:
       - main
   pull_request:
+  schedule:
+    - cron: "30 4 * * 4"
 
 env:
   RUBYOPT: "--enable-frozen-string-literal --debug-frozen-string-literal"
