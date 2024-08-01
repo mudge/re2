@@ -16,9 +16,6 @@ re2_archive = File.join("ports/archives", File.basename(re2_recipe.files[0][:url
 
 re2_gemspec.files << abseil_archive
 re2_gemspec.files << re2_archive
-Dir[File.join("patches/**/*.patch")].each do |patch|
-  re2_gemspec.files << patch
-end
 
 cross_platforms = %w[
   aarch64-linux
@@ -42,7 +39,7 @@ Rake::ExtensionTask.new('re2', re2_gemspec) do |e|
   e.config_options << '--disable-system-libraries'
   e.cross_platform = cross_platforms
   e.cross_compiling do |spec|
-    spec.files.reject! { |path| File.fnmatch?('ports/*', path) || File.fnmatch?('patches/*', path) }
+    spec.files.reject! { |path| File.fnmatch?('ports/*', path) }
     spec.dependencies.reject! { |dep| dep.name == 'mini_portile2' }
   end
 end
