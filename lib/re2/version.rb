@@ -10,5 +10,5 @@
 
 
 module RE2
-  VERSION = "2.13.2"
+  VERSION = "2.14.0"
 end

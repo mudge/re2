@@ -5,6 +5,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.14.0] - 2024-08-02
+### Changed
+- Upgrade the bundled version of Abseil to 20240722.0, removing the need to
+  patch it for CMake 3.30.0.
+
 ## [2.13.2] - 2024-07-16
 ### Fixed
 - Patch the bundled Abseil to work with CMake 3.30.0.
@@ -274,6 +279,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.14.0]: https://github.com/mudge/re2/releases/tag/v2.14.0
 [2.13.2]: https://github.com/mudge/re2/releases/tag/v2.13.2
 [2.13.1]: https://github.com/mudge/re2/releases/tag/v2.13.1
 [2.13.0]: https://github.com/mudge/re2/releases/tag/v2.13.0
