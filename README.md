@@ -268,8 +268,7 @@ It supports the following RE2 ABI versions:
 Where possible, a pre-compiled native gem will be provided for the following platforms:
 
 * Linux
-    * `aarch64-linux` and `arm-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+)
-    * `x86-linux` and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.17+)
+    * `aarch64-linux`, `arm-linux`, `x86-linux` and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+)
     * [musl](https://musl.libc.org/)-based systems such as [Alpine](https://alpinelinux.org) are supported as long as a [glibc-compatible library is installed](https://wiki.alpinelinux.org/wiki/Running_glibc_programs)
 * macOS `x86_64-darwin` and `arm64-darwin`
 * Windows `x64-mingw32` and `x64-mingw-ucrt`
