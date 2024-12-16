@@ -5,6 +5,19 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.15.0.rc1] - 2024-12-16
+### Added
+- Add support for Ruby 3.4.0-rc1 in precompiled, native gems.
+
+### Changed
+- Provide separate precompiled, native gems for GNU and Musl.
+- Require glibc 2.29+ for x86-linux-gnu and x86_64-linux-gnu (and recommend
+  RubyGems 3.3.22+ and Bundler 2.3.21+).
+
+### Removed
+- Drop support for Ruby versions older than 3.1 as they do not ship with a
+  version of RubyGems new enough to handle the new Musl gems.
+
 ## [2.14.0] - 2024-08-02
 ### Changed
 - Upgrade the bundled version of Abseil to 20240722.0, removing the need to
@@ -279,6 +292,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.15.0.rc1]: https://github.com/mudge/re2/releases/tag/v2.15.0.rc1
 [2.14.0]: https://github.com/mudge/re2/releases/tag/v2.14.0
 [2.13.2]: https://github.com/mudge/re2/releases/tag/v2.13.2
 [2.13.1]: https://github.com/mudge/re2/releases/tag/v2.13.1
