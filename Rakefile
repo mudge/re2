@@ -18,18 +18,22 @@ re2_gemspec.files << abseil_archive
 re2_gemspec.files << re2_archive
 
 cross_platforms = %w[
-  aarch64-linux
-  arm-linux
+  aarch64-linux-gnu
+  aarch64-linux-musl
+  arm-linux-gnu
+  arm-linux-musl
   arm64-darwin
   x64-mingw-ucrt
   x64-mingw32
-  x86-linux
+  x86-linux-gnu
+  x86-linux-musl
   x86-mingw32
   x86_64-darwin
-  x86_64-linux
+  x86_64-linux-gnu
+  x86_64-linux-musl
 ].freeze
 
-ENV['RUBY_CC_VERSION'] = %w[3.4.0 3.3.5 3.2.0 3.1.0 3.0.0 2.7.0 2.6.0].join(':')
+ENV['RUBY_CC_VERSION'] = %w[3.4.0 3.3.5 3.2.0 3.1.0 3.0.0].join(':')
 
 Gem::PackageTask.new(re2_gemspec).define
 
