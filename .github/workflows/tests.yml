@@ -285,7 +285,7 @@ jobs:
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/arm64 \
             ruby:${{ matrix.ruby }}-alpine \
-            sh -c "gem update --system && apk add bash && ./scripts/test-gem-install"
+            ./scripts/test-gem-install
 
   test-precompiled-arm-linux-gnu:
     needs: "precompile-arm-linux-gnu"
@@ -327,7 +327,7 @@ jobs:
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/arm/v7 \
             ruby:${{ matrix.ruby }}-alpine \
-            sh -c "gem update --system && apk add bash && ./scripts/test-gem-install"
+            ./scripts/test-gem-install
 
   test-precompiled-x86-linux-gnu:
     needs: "precompile-x86-linux-gnu"
@@ -369,7 +369,7 @@ jobs:
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/386 \
             ruby:${{ matrix.ruby }}-alpine \
-            sh -c "gem update --system && apk add bash && ./scripts/test-gem-install"
+            ./scripts/test-gem-install
 
   test-precompiled-x86_64-linux-gnu:
     needs: "precompile-x86_64-linux-gnu"
@@ -407,8 +407,6 @@ jobs:
         with:
           name: cruby-x86_64-linux-musl-gem
           path: pkg
-      - run: gem update --system
-      - run: apk add bash
       - run: ./scripts/test-gem-install
 
   test-precompiled-arm64-darwin:
