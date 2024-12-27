@@ -257,7 +257,7 @@ RE2(non_latin1_pattern.encode("ISO-8859-1"), utf8: false).match(non_latin1_text.
 
 This gem requires the following to run:
 
-* [Ruby](https://www.ruby-lang.org/en/) 3.1 to 3.4.0-rc1
+* [Ruby](https://www.ruby-lang.org/en/) 2.6 to 3.4
 
 It supports the following RE2 ABI versions:
 
@@ -271,7 +271,7 @@ Where possible, a pre-compiled native gem will be provided for the following pla
     * `aarch64-linux`, `arm-linux`, `x86-linux` and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+, RubyGems 3.3.22+ and Bundler 2.3.21+)
     * [musl](https://musl.libc.org/)-based systems such as [Alpine](https://alpinelinux.org) are supported with Bundler 2.5.6+
 * macOS `x86_64-darwin` and `arm64-darwin`
-* Windows `x64-mingw-ucrt`
+* Windows `x64-mingw32` and `x64-mingw-ucrt`
 
 ### Verifying the gems
 

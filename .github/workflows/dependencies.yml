@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4.0-rc1"
+          ruby-version: "3.4"
       - name: Upgrade all vendored dependencies to their latest versions
         run: ./scripts/update-dependencies
       - uses: actions/create-github-app-token@v1

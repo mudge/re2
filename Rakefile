@@ -33,7 +33,7 @@ cross_platforms = %w[
   x86_64-linux-musl
 ].freeze
 
-ENV['RUBY_CC_VERSION'] = %w[3.4.0 3.3.5 3.2.0 3.1.0].join(':')
+ENV['RUBY_CC_VERSION'] = '3.4.1:3.3.5:3.2.6:3.1.6:3.0.7:2.7.8:2.6.10'
 
 Gem::PackageTask.new(re2_gemspec).define
 
