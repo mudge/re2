@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/mudge/re2"
   s.extensions = ["ext/re2/extconf.rb"]
   s.license = "BSD-3-Clause"
-  s.required_ruby_version = ">= 3.1.0"
+  s.required_ruby_version = ">= 2.6.0"
   s.files = [
     "dependencies.yml",
     "ext/re2/extconf.rb",
@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
     "spec/re2/scanner_spec.rb"
   ]
   s.add_development_dependency("rake-compiler", "~> 1.2.7")
-  s.add_development_dependency("rake-compiler-dock", "~> 1.7.0.rc1")
+  s.add_development_dependency("rake-compiler-dock", "~> 1.8.0")
   s.add_development_dependency("rspec", "~> 3.2")
   s.add_runtime_dependency("mini_portile2", "~> 2.8.7") # keep version in sync with extconf.rb
 end
