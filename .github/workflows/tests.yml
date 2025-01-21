@@ -335,7 +335,7 @@ jobs:
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/arm64 \
             ruby:${{ matrix.ruby }}-alpine \
-            ./scripts/test-gem-install ${{ matrix.rubygems }}
+            /bin/sh -c "apk update && apk add libstdc++ && ./scripts/test-gem-install ${{ matrix.rubygems }}"
 
   test-precompiled-arm-linux-gnu:
     needs: "precompile-arm-linux-gnu"
@@ -393,7 +393,7 @@ jobs:
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/arm/v7 \
             ruby:${{ matrix.ruby }}-alpine \
-            ./scripts/test-gem-install ${{ matrix.rubygems }}
+            /bin/sh -c "apk update && apk add libstdc++ && ./scripts/test-gem-install ${{ matrix.rubygems }}"
 
   test-precompiled-x86-linux-gnu:
     needs: "precompile-x86-linux-gnu"
@@ -451,7 +451,7 @@ jobs:
           docker run --rm -v "$(pwd):/re2" -w /re2 \
             --platform=linux/386 \
             ruby:${{ matrix.ruby }}-alpine \
-            ./scripts/test-gem-install ${{ matrix.rubygems }}
+            /bin/sh -c "apk update && apk add libstdc++ && ./scripts/test-gem-install ${{ matrix.rubygems }}"
 
   test-precompiled-x86_64-linux-gnu:
     needs: "precompile-x86_64-linux-gnu"
@@ -506,6 +506,7 @@ jobs:
         with:
           name: cruby-x86_64-linux-musl-gem
           path: pkg
+      - run: apk update && apk add libstdc++
       - run: ./scripts/test-gem-install ${{ matrix.rubygems }}
 
   test-precompiled-arm64-darwin:
