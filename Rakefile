@@ -70,6 +70,7 @@ namespace :gem do
     desc "Compile and build native gem for #{platform} platform"
     task platform do
       RakeCompilerDock.sh <<~SCRIPT, platform: platform, verbose: true
+        rbenv shell 3.1.6 &&
         gem install bundler --no-document &&
         bundle &&
         bundle exec rake native:#{platform} pkg/#{re2_gemspec.full_name}-#{Gem::Platform.new(platform)}.gem PATH="/usr/local/bin:$PATH"
