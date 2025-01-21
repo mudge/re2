@@ -33,7 +33,7 @@ cross_platforms = %w[
   x86_64-linux-musl
 ].freeze
 
-ENV['RUBY_CC_VERSION'] = RakeCompilerDock.ruby_cc_version("3.4", "3.3", "3.2", "3.1", "3.0", "2.7", "2.6")
+RakeCompilerDock.set_ruby_cc_version("~> 2.6", "~> 3.0")
 
 Gem::PackageTask.new(re2_gemspec).define
 
