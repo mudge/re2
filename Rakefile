@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rake/extensiontask'
-require 'rake_compiler_dock'
 require 'rspec/core/rake_task'
 
 require_relative 'ext/re2/recipes'
@@ -33,8 +32,6 @@ cross_platforms = %w[
   x86_64-linux-musl
 ].freeze
 
-RakeCompilerDock.set_ruby_cc_version("~> 2.6", "~> 3.0")
-
 Gem::PackageTask.new(re2_gemspec).define
 
 Rake::ExtensionTask.new('re2', re2_gemspec) do |e|
@@ -63,6 +60,9 @@ end
 
 namespace :gem do
   cross_platforms.each do |platform|
+    require 'rake_compiler_dock'
+
+    RakeCompilerDock.set_ruby_cc_version("~> 2.6", "~> 3.0")
 
     # Compile each platform's native gem, packaging up the result. Note we add
     # /usr/local/bin to the PATH as it contains the newest version of CMake in
