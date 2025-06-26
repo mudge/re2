@@ -206,6 +206,8 @@ RSpec.describe RE2::Set do
 
   describe "#size" do
     it "returns the number of patterns added to the set", :aggregate_failures do
+      skip "Underlying RE2::Set has no Size method" unless RE2::Set.size?
+
       set = RE2::Set.new
 
       expect(set.size).to eq(0)
@@ -218,10 +220,20 @@ RSpec.describe RE2::Set do
 
       expect(set.size).to eq(2)
     end
+
+    it "raises an error if RE2 does not support Set::Size" do
+      skip "Underlying RE2::Set has a Size method" if RE2::Set.size?
+
+      set = RE2::Set.new
+
+      expect { set.size }.to raise_error(RE2::Set::UnsupportedError)
+    end
   end
 
   describe "#length" do
     it "is an alias for size" do
+      skip "Underlying RE2::Set has no Size method" unless RE2::Set.size?
+
       set = RE2::Set.new
 
       expect(set.length).to eq(0)
