@@ -204,6 +204,38 @@ RSpec.describe RE2::Set do
     end
   end
 
+  describe "#size" do
+    it "returns the number of patterns added to the set", :aggregate_failures do
+      set = RE2::Set.new
+
+      expect(set.size).to eq(0)
+
+      set.add("abc")
+
+      expect(set.size).to eq(1)
+
+      set.add("def")
+
+      expect(set.size).to eq(2)
+    end
+  end
+
+  describe "#length" do
+    it "is an alias for size" do
+      set = RE2::Set.new
+
+      expect(set.length).to eq(0)
+
+      set.add("abc")
+
+      expect(set.length).to eq(1)
+
+      set.add("def")
+
+      expect(set.length).to eq(2)
+    end
+  end
+
   def silence_stderr
     original_stream = STDERR
 
