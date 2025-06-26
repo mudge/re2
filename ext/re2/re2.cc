@@ -1963,6 +1963,22 @@ static VALUE re2_set_compile(VALUE self) {
 }
 
 /*
+ * Returns the size of the {RE2::Set}.
+ *
+ * @return [Integer] the number of patterns in the set
+ * @example
+ *   set = RE2::Set.new
+ *   set.add("abc")
+ *   set.size #=> 1
+ */
+static VALUE re2_set_size(VALUE self) {
+  re2_set *s;
+  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
+
+  return INT2FIX(s->set->Size());
+}
+
+/*
  * Returns whether the underlying RE2 version outputs error information from
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/set.h#L62-L65
  * `RE2::Set::Match`}. If not, {RE2::Set#match} will raise an error if attempting to set
@@ -2213,6 +2229,8 @@ extern "C" void Init_re2(void) {
   rb_define_method(re2_cSet, "add", RUBY_METHOD_FUNC(re2_set_add), 1);
   rb_define_method(re2_cSet, "compile", RUBY_METHOD_FUNC(re2_set_compile), 0);
   rb_define_method(re2_cSet, "match", RUBY_METHOD_FUNC(re2_set_match), -1);
+  rb_define_method(re2_cSet, "size", RUBY_METHOD_FUNC(re2_set_size), 0);
+  rb_define_method(re2_cSet, "length", RUBY_METHOD_FUNC(re2_set_size), 0);
 
   rb_define_module_function(re2_mRE2, "Replace",
       RUBY_METHOD_FUNC(re2_Replace), 3);

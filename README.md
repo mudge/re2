@@ -224,12 +224,15 @@ the set. After all patterns have been added, the set can be compiled using
 and then
 [`RE2::Set#match`](https://mudge.name/re2/RE2/Set.html#match-instance_method)
 will return an array containing the indices of all the patterns that matched.
+[`RE2::Set#size`](https://mudge.name/re2/RE2/Set.html#size-instance_method)
+will return the number of patterns in the set.
 
 ```ruby
 set = RE2::Set.new
 set.add("abc")         #=> 0
 set.add("def")         #=> 1
 set.add("ghi")         #=> 2
+set.size               #=> 3
 set.compile            #=> true
 set.match("abcdefghi") #=> [0, 1, 2]
 set.match("ghidefabc") #=> [2, 1, 0]
