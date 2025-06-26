@@ -217,6 +217,24 @@ module RE2
           $defs.push("-DHAVE_ERROR_INFO_ARGUMENT")
         end
       end
+
+      checking_for("RE2::Set::Size()") do
+        test_re2_set_size = <<~SRC
+          #include <re2/re2.h>
+          #include <re2/set.h>
+
+          int main() {
+            RE2::Set s(RE2::DefaultOptions, RE2::UNANCHORED);
+            s.Size();
+
+            return 0;
+          }
+        SRC
+
+        if try_compile(test_re2_set_size, compile_options)
+          $defs.push("-DHAVE_SET_SIZE")
+        end
+      end
     end
 
     def static_pkg_config(pc_file, pkg_config_paths)

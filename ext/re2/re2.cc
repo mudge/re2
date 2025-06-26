@@ -1972,10 +1972,14 @@ static VALUE re2_set_compile(VALUE self) {
  *   set.size #=> 1
  */
 static VALUE re2_set_size(VALUE self) {
+#ifdef HAVE_SET_SIZE
   re2_set *s;
   TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
 
   return INT2FIX(s->set->Size());
+#else
+  rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set does not have Size method");
+#endif
 }
 
 /*
@@ -1988,6 +1992,19 @@ static VALUE re2_set_size(VALUE self) {
  */
 static VALUE re2_set_match_raises_errors_p(VALUE) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
+  return Qtrue;
+#else
+  return Qfalse;
+#endif
+}
+
+/*
+ * Returns whether the underlying RE2 version has a Set::Size method.
+ *
+ * @return [Boolean] whether the underlying RE2 has a Set::Size method
+ */
+static VALUE re2_set_size_p(VALUE) {
+#ifdef HAVE_SET_SIZE
   return Qtrue;
 #else
   return Qfalse;
@@ -2224,6 +2241,8 @@ extern "C" void Init_re2(void) {
 
   rb_define_singleton_method(re2_cSet, "match_raises_errors?",
       RUBY_METHOD_FUNC(re2_set_match_raises_errors_p), 0);
+  rb_define_singleton_method(re2_cSet, "size?",
+      RUBY_METHOD_FUNC(re2_set_size_p), 0);
   rb_define_method(re2_cSet, "initialize",
       RUBY_METHOD_FUNC(re2_set_initialize), -1);
   rb_define_method(re2_cSet, "add", RUBY_METHOD_FUNC(re2_set_add), 1);
