@@ -5,6 +5,14 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.16.0] - 2025-06-27
+### Changed
+- Upgrade the bundled version of RE2 to 2025-06-26b.
+- Upgrade the bundled version of Abseil to 20250127.1.
+
+### Added
+- Added `RE2::Set#size` to return the number of patterns in a set.
+
 ## [2.15.0] - 2025-01-06
 ### Added
 - Add support for Ruby 3.4 in precompiled, native gems.
@@ -302,6 +310,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.16.0]: https://github.com/mudge/re2/releases/tag/v2.16.0
 [2.15.0]: https://github.com/mudge/re2/releases/tag/v2.15.0
 [2.15.0.rc1]: https://github.com/mudge/re2/releases/tag/v2.15.0.rc1
 [2.14.0]: https://github.com/mudge/re2/releases/tag/v2.14.0
