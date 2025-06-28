@@ -40,8 +40,8 @@ def build_recipe(name, version)
   MiniPortileCMake.new(name, version).tap do |recipe|
     recipe.target = File.join(PACKAGE_ROOT_DIR, 'ports')
     recipe.configure_options += [
-      # abseil needs a C++14 compiler
-      '-DCMAKE_CXX_STANDARD=14',
+      # abseil needs a C++17 compiler
+      '-DCMAKE_CXX_STANDARD=17',
       # needed for building the C extension shared library with -fPIC
       '-DCMAKE_POSITION_INDEPENDENT_CODE=ON',
       # ensures pkg-config and installed libraries will be in lib, not lib64
