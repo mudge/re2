@@ -566,33 +566,6 @@ jobs:
         env:
           BUNDLE_PATH: ${{ github.workspace }}/vendor/bundle
 
-  test-precompiled-x64-mingw32:
-    needs: "precompile-x64-mingw32"
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: ["2.6", "2.7", "3.0"]
-        include:
-          - { ruby: "2.6", rubygems: "3.4.22" }
-          - { ruby: "2.7", rubygems: "3.4.22" }
-          - { ruby: "3.0", rubygems: "3.5.23" }
-    runs-on: windows-2019
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "${{ matrix.ruby }}"
-          rubygems: "${{ matrix.rubygems }}"
-          bundler-cache: true
-      - uses: actions/download-artifact@v4
-        with:
-          name: cruby-x64-mingw32-gem
-          path: pkg
-      - run: ./scripts/test-gem-install default
-        shell: bash
-        env:
-          BUNDLE_PATH: ${{ github.workspace }}/vendor/bundle
-
   ruby-memcheck:
     runs-on: "ubuntu-latest"
     env:
