@@ -212,6 +212,29 @@ jobs:
         env:
           BUNDLE_PATH: ${{ github.workspace }}/vendor/bundle
 
+  test-windows-2025:
+    needs: "build-cruby-gem"
+    strategy:
+      fail-fast: false
+      matrix:
+        sys: ["enable", "disable"]
+    runs-on: "windows-2025"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby-pkgs@v1
+        with:
+          ruby-version: "3.4"
+          mingw: re2
+          bundler-cache: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: cruby-gem
+          path: pkg
+      - run: ./scripts/test-gem-install default --${{ matrix.sys }}-system-libraries
+        shell: bash
+        env:
+          BUNDLE_PATH: ${{ github.workspace }}/vendor/bundle
+
   test-freebsd:
     needs: "build-cruby-gem"
     strategy:
