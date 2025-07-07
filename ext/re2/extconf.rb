@@ -105,6 +105,8 @@ module RE2
 
       abseil_recipe, re2_recipe = load_recipes
 
+      ENV["MACOSX_DEPLOYMENT_TARGET"] = "10.14"
+
       process_recipe(abseil_recipe) do |recipe|
         recipe.configure_options << '-DABSL_PROPAGATE_CXX_STD=ON'
         # Workaround for https://github.com/abseil/abseil-cpp/issues/1510
