@@ -70,6 +70,10 @@ namespace :gem do
     desc "Compile and build native gem for #{platform} platform"
     task platform do
       RakeCompilerDock.sh <<~SCRIPT, platform: platform, verbose: true
+        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null &&
+        echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null &&
+        sudo apt-get update &&
+        sudo apt-get install -y cmake=3.22.2-0kitware1ubuntu20.04.1 cmake-data=3.22.2-0kitware1ubuntu20.04.1 &&
         rbenv shell 3.1.6 &&
         gem install bundler --no-document &&
         bundle &&
