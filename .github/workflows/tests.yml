@@ -20,7 +20,7 @@ jobs:
   build-cruby-gem:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/cache@v4
         with:
           path: ports/archives
@@ -124,7 +124,7 @@ jobs:
           - version: "20230701"
             soname: 11
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Remove any existing libre2 installation
         run: sudo apt-get remove -y libre2-dev libre2-9
       - name: Download and install specific release of libre2
@@ -152,7 +152,7 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby-pkgs@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -175,7 +175,7 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "macos-13"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby-pkgs@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -198,7 +198,7 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "windows-2022"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby-pkgs@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -222,7 +222,7 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "windows-2025"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby-pkgs@v1
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -245,7 +245,7 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-gem
@@ -261,7 +261,7 @@ jobs:
     needs: "build-cruby-gem"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install RE2
         run: sudo apt-get install -y libre2-dev
       - uses: ruby/setup-ruby@v1
@@ -295,7 +295,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-aarch64-linux-gnu-gem
@@ -324,7 +324,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-aarch64-linux-musl-gem
@@ -353,7 +353,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-arm-linux-gnu-gem
@@ -382,7 +382,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-arm-linux-musl-gem
@@ -411,7 +411,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-x86-linux-gnu-gem
@@ -440,7 +440,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-x86-linux-musl-gem
@@ -469,7 +469,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{ matrix.ruby }}"
@@ -501,7 +501,7 @@ jobs:
     container:
       image: "ruby:${{ matrix.ruby }}-alpine"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: cruby-x86_64-linux-musl-gem
@@ -525,7 +525,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{ matrix.ruby }}"
@@ -555,7 +555,7 @@ jobs:
           - { ruby: "3.4", rubygems: "default" }
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{ matrix.ruby }}"
@@ -577,7 +577,7 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4"]
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: MSP-Greg/setup-ruby-pkgs@v1
         with:
           ruby-version: "${{ matrix.ruby }}"
@@ -596,7 +596,7 @@ jobs:
     env:
       BUNDLE_WITH: memcheck
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/cache@v4
         with:
           path: ports/archives
