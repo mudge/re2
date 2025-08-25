@@ -16,7 +16,7 @@ jobs:
           ruby-version: "3.4"
       - run: gem install --no-document yard redcarpet
       - run: yardoc
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: "doc/"
 
