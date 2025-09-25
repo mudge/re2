@@ -9,7 +9,7 @@
 # Released under the BSD Licence, please see LICENSE.txt
 
 PACKAGE_ROOT_DIR = File.expand_path('../..', __dir__)
-REQUIRED_MINI_PORTILE_VERSION = '~> 2.8.7' # keep this version in sync with the one in the gemspec
+REQUIRED_MINI_PORTILE_VERSION = '~> 2.8.9' # keep this version in sync with the one in the gemspec
 
 def load_recipes
   require 'yaml'
