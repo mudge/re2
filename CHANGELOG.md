@@ -5,6 +5,17 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.20.0] - 2025-09-26
+### Removed
+- Compilation on macOS now targets macOS 10.14 so older versions of macOS are
+  no longer supported.
+
+### Changed
+- Upgrade the bundled version of Abseil to 20250814.1. Note this now requires
+  a C++17 compiler.
+- Upgrade the bundled version of RE2 to 2025-08-12. Note this now requires
+  a C++17 compiler.
+
 ## [2.19.0] - 2025-08-07
 ### Changed
 - Upgrade the bundled version of RE2 to 2025-08-05. Note this now requires
@@ -323,6 +334,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.20.0]: https://github.com/mudge/re2/releases/tag/v2.20.0
 [2.19.0]: https://github.com/mudge/re2/releases/tag/v2.19.0
 [2.18.0]: https://github.com/mudge/re2/releases/tag/v2.18.0
 [2.17.0]: https://github.com/mudge/re2/releases/tag/v2.17.0

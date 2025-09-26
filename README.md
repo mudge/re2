@@ -6,7 +6,7 @@ Python".
 
 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 
-**Current version:** 2.19.0  
+**Current version:** 2.20.0  
 **Bundled RE2 version:** libre2.11 (2025-08-12)  
 
 ```ruby
