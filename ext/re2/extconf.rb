@@ -103,6 +103,8 @@ module RE2
     def build_with_vendored_libraries
       message "Building re2 using packaged libraries.\n"
 
+      ENV["MACOSX_DEPLOYMENT_TARGET"] = "10.14"
+
       abseil_recipe, re2_recipe = load_recipes
 
       process_recipe(abseil_recipe) do |recipe|
@@ -158,7 +160,7 @@ module RE2
         # https://github.com/abseil/abseil-cpp/issues/1431). However, the
         # `std=c++14` flag doesn't appear to suffice; we need at least
         # `std=c++17`.
-        abort "Cannot compile re2 with your compiler: recent versions require C++14 support." unless %w[c++20 c++17 c++11 c++0x].any? do |std|
+        abort "Cannot compile re2 with your compiler: recent versions require C++17 support." unless %w[c++23 c++20 c++17 c++11 c++0x].any? do |std|
           checking_for("re2 that compiles with #{std} standard") do
             if try_compile(minimal_program, compile_options + " -std=#{std}")
               compile_options << " -std=#{std}"
