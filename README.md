@@ -7,7 +7,7 @@ Python".
 [![Build Status](https://github.com/mudge/re2/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mudge/re2/actions)
 
 **Current version:** 2.19.0  
-**Bundled RE2 version:** libre2.11 (2025-08-05)  
+**Bundled RE2 version:** libre2.11 (2025-08-12)  
 
 ```ruby
 RE2('h.*o').full_match?("hello")    #=> true
@@ -264,7 +264,7 @@ This gem requires the following to run:
 
 It supports the following RE2 ABI versions:
 
-* libre2.0 (prior to release 2020-03-02) to libre2.11 (2023-07-01 to 2025-08-05)
+* libre2.0 (prior to release 2020-03-02) to libre2.11 (2023-07-01 to 2025-08-12)
 
 ### Native gems
 
@@ -273,8 +273,8 @@ Where possible, a pre-compiled native gem will be provided for the following pla
 * Linux
     * `aarch64-linux`, `arm-linux`, `x86-linux` and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+, RubyGems 3.3.22+ and Bundler 2.3.21+)
     * [musl](https://musl.libc.org/)-based systems such as [Alpine](https://alpinelinux.org) are supported with Bundler 2.5.6+
-* macOS `x86_64-darwin` and `arm64-darwin`
-* Windows `x64-mingw32` and `x64-mingw-ucrt`
+* macOS 10.14+ `x86_64-darwin` and `arm64-darwin`
+* Windows 2022+ `x64-mingw32` and `x64-mingw-ucrt`
 
 ### Verifying the gems
 
@@ -331,8 +331,8 @@ You will need a full compiler toolchain for compiling Ruby C extensions (see
 Toolchain"](https://nokogiri.org/tutorials/installing_nokogiri.html#appendix-a-the-compiler-toolchain))
 plus the toolchain required for compiling the vendored version of RE2 and its
 dependency [Abseil][] which includes [CMake](https://cmake.org), a compiler
-with C++14 support such as [clang](http://clang.llvm.org/) 3.4 or
-[gcc](https://gcc.gnu.org/) 5 and a recent version of
+with C++17 support such as [clang](http://clang.llvm.org/) 5 or
+[gcc](https://gcc.gnu.org/) 8 and a recent version of
 [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/). On
 Windows, you'll also need pkgconf 2.1.0+ to avoid [`undefined reference`
 errors](https://github.com/pkgconf/pkgconf/issues/322) when attempting to
