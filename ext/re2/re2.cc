@@ -125,27 +125,17 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
   }
 }
 
-/* For compatibility with Ruby < 2.7 */
-#ifdef HAVE_RB_GC_MARK_MOVABLE
-#define re2_compact_callback(x) (x),
-#else
-#define rb_gc_mark_movable(x) rb_gc_mark(x)
-#define re2_compact_callback(x)
-#endif
-
 static void re2_matchdata_mark(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
   rb_gc_mark_movable(m->regexp);
   rb_gc_mark_movable(m->text);
 }
 
-#ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_matchdata_compact(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
   m->regexp = rb_gc_location(m->regexp);
   m->text = rb_gc_location(m->text);
 }
-#endif
 
 static void re2_matchdata_free(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
@@ -171,7 +161,7 @@ static const rb_data_type_t re2_matchdata_data_type = {
     re2_matchdata_mark,
     re2_matchdata_free,
     re2_matchdata_memsize,
-    re2_compact_callback(re2_matchdata_compact)
+    re2_matchdata_compact
   },
   0,
   0,
@@ -186,13 +176,11 @@ static void re2_scanner_mark(void *ptr) {
   rb_gc_mark_movable(s->text);
 }
 
-#ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_scanner_compact(void *ptr) {
   re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
   s->regexp = rb_gc_location(s->regexp);
   s->text = rb_gc_location(s->text);
 }
-#endif
 
 static void re2_scanner_free(void *ptr) {
   re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
@@ -218,7 +206,7 @@ static const rb_data_type_t re2_scanner_data_type = {
     re2_scanner_mark,
     re2_scanner_free,
     re2_scanner_memsize,
-    re2_compact_callback(re2_scanner_compact)
+    re2_scanner_compact
   },
   0,
   0,

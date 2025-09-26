@@ -140,7 +140,6 @@ module RE2
 
       have_library("stdc++")
       have_header("stdint.h")
-      have_func("rb_gc_mark_movable") # introduced in Ruby 2.7
 
       minimal_program = <<~SRC
         #include <re2/re2.h>
