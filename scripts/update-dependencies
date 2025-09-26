@@ -16,10 +16,21 @@ re2_archive = Net::HTTP.get_response(URI(re2_redirect["Location"]))
 exit 1 unless re2_archive.is_a?(Net::HTTPSuccess)
 re2_sha256sum = Digest::SHA2.hexdigest(re2_archive.body)
 
+abseil_response = Net::HTTP.get_response(URI("https://github.com/abseil/abseil-cpp/releases/latest"))
+exit 1 unless abseil_response.is_a?(Net::HTTPRedirection)
+
+abseil_tag = File.basename(URI(abseil_response["Location"]).path)
+abseil_redirect = Net::HTTP.get_response(URI("https://github.com/abseil/abseil-cpp/releases/download/#{abseil_tag}/abseil-cpp-#{abseil_tag}.tar.gz"))
+exit 1 unless abseil_redirect.is_a?(Net::HTTPRedirection)
+
+abseil_archive = Net::HTTP.get_response(URI(abseil_redirect["Location"]))
+exit 1 unless abseil_archive.is_a?(Net::HTTPSuccess)
+abseil_sha256sum = Digest::SHA2.hexdigest(abseil_archive.body)
+
 File.write(
   File.expand_path("../dependencies.yml", __dir__),
   {
     "libre2" => { "version" => re2_release, "sha256" => re2_sha256sum },
-    "abseil" => { "version" => "20250127.1", "sha256" => "b396401fd29e2e679cace77867481d388c807671dc2acc602a0259eeb79b7811" }
+    "abseil" => { "version" => abseil_tag, "sha256" => abseil_sha256sum }
   }.to_yaml
 )
