@@ -11,6 +11,8 @@ releases](https://github.com/mudge/re2/releases) for this project.
   no longer supported.
 - Remove support and native gems for Ruby 2.6, 2.7, and 3.0 (as it accounts
   for less than 1% of downloads in the past 60 days).
+- Remove native gems for 32-bit platforms, specifically x86-linux-gnu,
+  x86-linux-musl, and x86-mingw32
 
 ### Changed
 - Upgrade the bundled version of Abseil to 20250814.1. Note this now requires

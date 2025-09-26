@@ -271,10 +271,10 @@ It supports the following RE2 ABI versions:
 Where possible, a pre-compiled native gem will be provided for the following platforms:
 
 * Linux
-    * `aarch64-linux`, `arm-linux`, `x86-linux` and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+, RubyGems 3.3.22+ and Bundler 2.3.21+)
+    * `aarch64-linux`, `arm-linux`, and `x86_64-linux` (requires [glibc](https://www.gnu.org/software/libc/) 2.29+, RubyGems 3.3.22+ and Bundler 2.3.21+)
     * [musl](https://musl.libc.org/)-based systems such as [Alpine](https://alpinelinux.org) are supported with Bundler 2.5.6+
 * macOS 10.14+ `x86_64-darwin` and `arm64-darwin`
-* Windows 2022+ `x64-mingw32` and `x64-mingw-ucrt`
+* Windows 2022+ `x64-mingw-ucrt`
 
 ### Verifying the gems
 
