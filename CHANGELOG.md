@@ -9,6 +9,8 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Removed
 - Compilation on macOS now targets macOS 10.14 so older versions of macOS are
   no longer supported.
+- Remove support and native gems for Ruby 2.6, 2.7, and 3.0 (as it accounts
+  for less than 1% of downloads in the past 60 days).
 
 ### Changed
 - Upgrade the bundled version of Abseil to 20250814.1. Note this now requires

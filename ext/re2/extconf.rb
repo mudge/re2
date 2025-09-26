@@ -131,10 +131,8 @@ module RE2
     end
 
     def build_extension
-      # Enable optional warnings but disable deprecated register warning for Ruby 2.6 support
       $CFLAGS << " -Wall -Wextra -funroll-loops"
       $CXXFLAGS << " -Wall -Wextra -funroll-loops"
-      $CPPFLAGS << " -Wno-register"
 
       # Pass -x c++ to force gcc to compile the test program
       # as C++ (as it will end in .c by default).
@@ -154,13 +152,9 @@ module RE2
       end
 
       if re2_requires_version_flag
-        # Recent versions of re2 depend directly on abseil, which requires a
-        # compiler with C++14 support (see
-        # https://github.com/abseil/abseil-cpp/issues/1127 and
-        # https://github.com/abseil/abseil-cpp/issues/1431). However, the
-        # `std=c++14` flag doesn't appear to suffice; we need at least
-        # `std=c++17`.
-        abort "Cannot compile re2 with your compiler: recent versions require C++17 support." unless %w[c++23 c++20 c++17 c++11 c++0x].any? do |std|
+        # Recent versions of RE2 depend directly on Abseil, which requires a
+        # compiler with C++17 support.
+        abort "Cannot compile re2 with your compiler: recent versions require C++17 support." unless %w[c++20 c++17 c++11 c++0x].any? do |std|
           checking_for("re2 that compiles with #{std} standard") do
             if try_compile(minimal_program, compile_options + " -std=#{std}")
               compile_options << " -std=#{std}"

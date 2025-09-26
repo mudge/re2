@@ -260,7 +260,7 @@ RE2(non_latin1_pattern.encode("ISO-8859-1"), utf8: false).match(non_latin1_text.
 
 This gem requires the following to run:
 
-* [Ruby](https://www.ruby-lang.org/en/) 2.6 to 3.4
+* [Ruby](https://www.ruby-lang.org/en/) 3.1 to 3.4
 
 It supports the following RE2 ABI versions:
 

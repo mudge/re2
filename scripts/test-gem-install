@@ -2,14 +2,6 @@
 
 set -eu
 
-rubygems=${1:-default}
-shift
-
-if [ "$rubygems" != "default" ]
-then
-  gem update --system "$rubygems"
-fi
-
 gem install --no-document pkg/*.gem -- "$@"
 cd "$(dirname "$(gem which re2)")/.."
 bundle
