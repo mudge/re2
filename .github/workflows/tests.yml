@@ -115,7 +115,7 @@ jobs:
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-gem
           path: pkg
@@ -138,7 +138,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           apt-get: libre2-dev
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-gem
           path: pkg
@@ -161,7 +161,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           brew: re2
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-gem
           path: pkg
@@ -184,7 +184,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           mingw: re2
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-gem
           path: pkg
@@ -208,7 +208,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           mingw: re2
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-gem
           path: pkg
@@ -226,7 +226,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-gem
           path: pkg
@@ -249,7 +249,7 @@ jobs:
         with:
           ruby-version: "3.4"
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-gem
           path: pkg
@@ -268,7 +268,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-aarch64-linux-gnu-gem
           path: pkg
@@ -289,7 +289,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-aarch64-linux-musl-gem
           path: pkg
@@ -310,7 +310,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-arm-linux-gnu-gem
           path: pkg
@@ -331,7 +331,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-arm-linux-musl-gem
           path: pkg
@@ -356,7 +356,7 @@ jobs:
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-x86_64-linux-gnu-gem
           path: pkg
@@ -375,7 +375,7 @@ jobs:
       image: "ruby:${{ matrix.ruby }}-alpine"
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-x86_64-linux-musl-gem
           path: pkg
@@ -395,7 +395,7 @@ jobs:
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-arm64-darwin-gem
           path: pkg
@@ -416,7 +416,7 @@ jobs:
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-x86_64-darwin-gem
           path: pkg
@@ -437,7 +437,7 @@ jobs:
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: cruby-x64-mingw-ucrt-gem
           path: pkg
