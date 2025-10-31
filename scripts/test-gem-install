@@ -4,5 +4,5 @@ set -eu
 
 gem install --no-document pkg/*.gem -- "$@"
 cd "$(dirname "$(gem which re2)")/.."
-bundle
+bundle install
 bundle exec rake spec
