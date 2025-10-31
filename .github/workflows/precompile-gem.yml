@@ -21,7 +21,7 @@ jobs:
           path: ports/archives
           key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
       - run: bundle exec rake gem:${{ inputs.platform }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: "cruby-${{ inputs.platform }}-gem"
           path: pkg/*.gem
