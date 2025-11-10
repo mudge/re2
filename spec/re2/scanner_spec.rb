@@ -162,6 +162,14 @@ RSpec.describe RE2::Scanner do
       expect(scanner.scan).to eq(["world"])
       expect(scanner.scan).to be_nil
     end
+
+    it "supports GC compaction" do
+      r = RE2::Regexp.new('(\w+)')
+      scanner = r.scan("Hello world" * 2)
+      GC.compact
+
+      expect(scanner.scan).to eq(["Hello"])
+    end
   end
 
   it "is enumerable" do

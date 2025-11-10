@@ -128,13 +128,12 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 static void re2_matchdata_mark(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
   rb_gc_mark_movable(m->regexp);
-  rb_gc_mark_movable(m->text);
+  rb_gc_mark(m->text);
 }
 
 static void re2_matchdata_compact(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
   m->regexp = rb_gc_location(m->regexp);
-  m->text = rb_gc_location(m->text);
 }
 
 static void re2_matchdata_free(void *ptr) {
@@ -173,13 +172,12 @@ static const rb_data_type_t re2_matchdata_data_type = {
 static void re2_scanner_mark(void *ptr) {
   re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
   rb_gc_mark_movable(s->regexp);
-  rb_gc_mark_movable(s->text);
+  rb_gc_mark(s->text);
 }
 
 static void re2_scanner_compact(void *ptr) {
   re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
   s->regexp = rb_gc_location(s->regexp);
-  s->text = rb_gc_location(s->text);
 }
 
 static void re2_scanner_free(void *ptr) {

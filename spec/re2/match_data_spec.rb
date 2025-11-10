@@ -133,6 +133,13 @@ RSpec.describe RE2::MatchData do
       expect(md["name"].encoding.name).to eq("ISO-8859-1")
       expect(md[:name].encoding.name).to eq("ISO-8859-1")
     end
+
+    it "supports GC compaction" do
+      md = RE2::Regexp.new('(wo{2})').match('woohoo' * 5)
+      GC.compact
+
+      expect(md[1]).to eq("woo")
+    end
   end
 
   describe "#string" do
@@ -287,6 +294,13 @@ RSpec.describe RE2::MatchData do
 
       expect { md.begin(nil) }.to raise_error(TypeError)
     end
+
+    it "supports GC compaction" do
+      md = RE2::Regexp.new('(wo{2})').match('woohoo' * 5)
+      GC.compact
+
+      expect(md.string[md.begin(0)..-1]).to eq('woohoo' * 5)
+    end
   end
 
   describe "#end" do
@@ -348,6 +362,13 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d)').match('123')
 
       expect { md.end(nil) }.to raise_error(TypeError)
+    end
+
+    it "supports GC compaction" do
+      md = RE2::Regexp.new('(wo{2})').match('woohoo' * 5)
+      GC.compact
+
+      expect(md.string[0...md.end(0)]).to eq('woo')
     end
   end
 
