@@ -5,6 +5,17 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.21.0] - 2025-11-10
+### Fixed
+- Fixed bugs in RE2::Scanner and RE2::MatchData after Ruby's GC compaction
+  where references to string data would no longer be valid.
+
+### Changed
+- Strings given to RE2::Regexp#scan are now frozen (if they aren't already) so
+  that mutating a string after creating an RE2::Scanner does not affect its
+  matches.
+- Upgrade the bundled version of RE2 to 2025-11-05.
+
 ## [2.20.0] - 2025-09-26
 ### Removed
 - Compilation on macOS now targets macOS 10.14 so older versions of macOS are
@@ -338,6 +349,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.21.0]: https://github.com/mudge/re2/releases/tag/v2.21.0
 [2.20.0]: https://github.com/mudge/re2/releases/tag/v2.20.0
 [2.19.0]: https://github.com/mudge/re2/releases/tag/v2.19.0
 [2.18.0]: https://github.com/mudge/re2/releases/tag/v2.18.0
