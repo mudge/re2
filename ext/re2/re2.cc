@@ -1522,10 +1522,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
     m->matches = new(std::nothrow) re2::StringPiece[n];
     RB_OBJ_WRITE(matchdata, &m->regexp, self);
-    if (!RTEST(rb_obj_frozen_p(text))) {
-      text = rb_str_freeze(rb_str_dup(text));
-    }
-    RB_OBJ_WRITE(matchdata, &m->text, text);
+    RB_OBJ_WRITE(matchdata, &m->text, rb_str_new_frozen(text));
 
     if (m->matches == 0) {
       rb_raise(rb_eNoMemError,
@@ -1615,12 +1612,9 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   TypedData_Get_Struct(scanner, re2_scanner, &re2_scanner_data_type, c);
 
   RB_OBJ_WRITE(scanner, &c->regexp, self);
-  if (!RTEST(rb_obj_frozen_p(text))) {
-    text = rb_str_freeze(rb_str_dup(text));
-  }
-  RB_OBJ_WRITE(scanner, &c->text, text);
+  RB_OBJ_WRITE(scanner, &c->text, rb_str_new_frozen(text));
   c->input = new(std::nothrow) re2::StringPiece(
-      RSTRING_PTR(text), RSTRING_LEN(text));
+      RSTRING_PTR(c->text), RSTRING_LEN(c->text));
 
   if (p->pattern->ok()) {
     c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
