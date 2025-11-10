@@ -276,10 +276,12 @@ static VALUE re2_matchdata_string(const VALUE self) {
 }
 
 /*
- * Returns the text supplied when incrementally matching with
+ * Returns a frozen copy of the text supplied when incrementally matching with
  * {RE2::Regexp#scan}.
  *
- * @return [String] the original string passed to {RE2::Regexp#scan}
+ * If the text was already a frozen string, returns the original.
+ *
+ * @return [String] a frozen string with the text passed to {RE2::Regexp#scan}
  * @example
  *   c = RE2::Regexp.new('(\d+)').scan("foo")
  *   c.string #=> "foo"
@@ -1612,10 +1614,13 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   VALUE scanner = rb_class_new_instance(0, 0, re2_cScanner);
   TypedData_Get_Struct(scanner, re2_scanner, &re2_scanner_data_type, c);
 
+  RB_OBJ_WRITE(scanner, &c->regexp, self);
+  if (!RTEST(rb_obj_frozen_p(text))) {
+    text = rb_str_freeze(rb_str_dup(text));
+  }
+  RB_OBJ_WRITE(scanner, &c->text, text);
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(text), RSTRING_LEN(text));
-  RB_OBJ_WRITE(scanner, &c->regexp, self);
-  RB_OBJ_WRITE(scanner, &c->text, text);
 
   if (p->pattern->ok()) {
     c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
