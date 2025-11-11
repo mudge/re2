@@ -5,6 +5,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.19.1] - 2025-11-11
+### Changed
+- Backport GC compaction fixes and string freezing inside RE2::Scanner from
+  2.21.0 for users of Ruby older than 3.1.
+
 ## [2.19.0] - 2025-08-07
 ### Changed
 - Upgrade the bundled version of RE2 to 2025-08-05. Note this now requires
@@ -323,6 +328,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.19.1]: https://github.com/mudge/re2/releases/tag/v2.19.1
 [2.19.0]: https://github.com/mudge/re2/releases/tag/v2.19.0
 [2.18.0]: https://github.com/mudge/re2/releases/tag/v2.18.0
 [2.17.0]: https://github.com/mudge/re2/releases/tag/v2.17.0
