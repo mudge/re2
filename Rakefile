@@ -76,7 +76,7 @@ namespace :gem do
         sudo apt-get install -y cmake=3.22.2-0kitware1ubuntu20.04.1 cmake-data=3.22.2-0kitware1ubuntu20.04.1 &&
         rbenv shell 3.1.6 &&
         gem install bundler --no-document &&
-        bundle &&
+        bundle install &&
         bundle exec rake native:#{platform} pkg/#{re2_gemspec.full_name}-#{Gem::Platform.new(platform)}.gem PATH="/usr/local/bin:$PATH"
       SCRIPT
     end

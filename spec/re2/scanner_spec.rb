@@ -11,7 +11,39 @@ RSpec.describe RE2::Scanner do
   end
 
   describe "#string" do
-    it "returns the original text for the scanner" do
+    it "returns the text for the scanner" do
+      re = RE2::Regexp.new('(\w+)')
+      text = "It is a truth"
+      scanner = re.scan(text)
+
+      expect(scanner.string).to eq("It is a truth")
+    end
+
+    it "returns a frozen string" do
+      re = RE2::Regexp.new('(\w+)')
+      text = "It is a truth"
+      scanner = re.scan(text)
+
+      expect(scanner.string).to be_frozen
+    end
+
+    it "freezes unfrozen strings" do
+      re = RE2::Regexp.new('(\w+)')
+      text = +"It is a truth"
+      scanner = re.scan(text)
+
+      expect(scanner.string).to be_frozen
+    end
+
+    it "copies unfrozen strings" do
+      re = RE2::Regexp.new('(\w+)')
+      text = +"It is a truth"
+      scanner = re.scan(text)
+
+      expect(scanner.string).to_not equal(text)
+    end
+
+    it "does not copy the string if it was already frozen" do
       re = RE2::Regexp.new('(\w+)')
       text = "It is a truth"
       scanner = re.scan(text)
@@ -161,6 +193,15 @@ RSpec.describe RE2::Scanner do
       expect(scanner.scan).to eq(["Hello"])
       expect(scanner.scan).to eq(["world"])
       expect(scanner.scan).to be_nil
+    end
+
+    it "works even if the original input is mutated" do
+      r = RE2::Regexp.new('(\w+)')
+      text = +"It is a truth universally acknowledged"
+      scanner = r.scan(text)
+      text.upcase!
+
+      expect(scanner.scan).to eq(["It"])
     end
   end
 

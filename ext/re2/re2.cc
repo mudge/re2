@@ -136,14 +136,13 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 static void re2_matchdata_mark(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
   rb_gc_mark_movable(m->regexp);
-  rb_gc_mark_movable(m->text);
+  rb_gc_mark(m->text);
 }
 
 #ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_matchdata_compact(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
   m->regexp = rb_gc_location(m->regexp);
-  m->text = rb_gc_location(m->text);
 }
 #endif
 
@@ -183,14 +182,13 @@ static const rb_data_type_t re2_matchdata_data_type = {
 static void re2_scanner_mark(void *ptr) {
   re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
   rb_gc_mark_movable(s->regexp);
-  rb_gc_mark_movable(s->text);
+  rb_gc_mark(s->text);
 }
 
 #ifdef HAVE_RB_GC_MARK_MOVABLE
 static void re2_scanner_compact(void *ptr) {
   re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
   s->regexp = rb_gc_location(s->regexp);
-  s->text = rb_gc_location(s->text);
 }
 #endif
 
@@ -290,8 +288,10 @@ static VALUE re2_matchdata_string(const VALUE self) {
 }
 
 /*
- * Returns the text supplied when incrementally matching with
+ * Returns a frozen copy of the text supplied when incrementally matching with
  * {RE2::Regexp#scan}.
+ *
+ * If the text was already a frozen string, returns the original.
  *
  * @return [String] the original string passed to {RE2::Regexp#scan}
  * @example
@@ -1534,10 +1534,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
     m->matches = new(std::nothrow) re2::StringPiece[n];
     RB_OBJ_WRITE(matchdata, &m->regexp, self);
-    if (!RTEST(rb_obj_frozen_p(text))) {
-      text = rb_str_freeze(rb_str_dup(text));
-    }
-    RB_OBJ_WRITE(matchdata, &m->text, text);
+    RB_OBJ_WRITE(matchdata, &m->text, rb_str_new_frozen(text));
 
     if (m->matches == 0) {
       rb_raise(rb_eNoMemError,
@@ -1626,10 +1623,10 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   VALUE scanner = rb_class_new_instance(0, 0, re2_cScanner);
   TypedData_Get_Struct(scanner, re2_scanner, &re2_scanner_data_type, c);
 
-  c->input = new(std::nothrow) re2::StringPiece(
-      RSTRING_PTR(text), RSTRING_LEN(text));
   RB_OBJ_WRITE(scanner, &c->regexp, self);
-  RB_OBJ_WRITE(scanner, &c->text, text);
+  RB_OBJ_WRITE(scanner, &c->text, rb_str_new_frozen(text));
+  c->input = new(std::nothrow) re2::StringPiece(
+      RSTRING_PTR(c->text), RSTRING_LEN(c->text));
 
   if (p->pattern->ok()) {
     c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
