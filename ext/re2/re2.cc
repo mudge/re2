@@ -1427,7 +1427,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
   if (RTEST(options)) {
     if (FIXNUM_P(options)) {
-      n = NUM2INT(options);
+      n = FIX2INT(options);
 
       if (n < 0) {
         rb_raise(rb_eArgError, "number of matches should be >= 0");
@@ -1442,7 +1442,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 #ifdef HAVE_ENDPOS_ARGUMENT
         Check_Type(endpos_option, T_FIXNUM);
 
-        endpos = NUM2INT(endpos_option);
+        endpos = FIX2INT(endpos_option);
 
         if (endpos < 0) {
           rb_raise(rb_eArgError, "endpos should be >= 0");
@@ -1472,7 +1472,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
       if (!NIL_P(submatches_option)) {
         Check_Type(submatches_option, T_FIXNUM);
 
-        n = NUM2INT(submatches_option);
+        n = FIX2INT(submatches_option);
 
         if (n < 0) {
           rb_raise(rb_eArgError, "number of matches should be >= 0");
@@ -1489,7 +1489,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
       if (!NIL_P(startpos_option)) {
         Check_Type(startpos_option, T_FIXNUM);
 
-        startpos = NUM2INT(startpos_option);
+        startpos = FIX2INT(startpos_option);
 
         if (startpos < 0) {
           rb_raise(rb_eArgError, "startpos should be >= 0");
