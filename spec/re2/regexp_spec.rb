@@ -566,6 +566,12 @@ RSpec.describe RE2::Regexp do
       expect { re.match("one two three", submatches: :invalid) }.to raise_error(TypeError)
     end
 
+    it "raises an exception when given too large a number of submatches" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+
+      expect { re.match("one two three", submatches: 2147483647) }.to raise_error(RangeError)
+    end
+
     it "defaults to extracting all submatches when given nil", :aggregate_failures do
       re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
       md = re.match("one two three", submatches: nil)
@@ -582,6 +588,13 @@ RSpec.describe RE2::Regexp do
       expect(md[1]).to eq("one")
       expect(md[2]).to eq("two")
       expect(md[3]).to be_nil
+    end
+
+    it "raises an exception if given too large a number of submatches instead of options" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+      md = re.match("one two three", 2)
+
+      expect { re.match("one two three", 2147483647) }.to raise_error(RangeError)
     end
 
     it "raises an exception when given invalid options" do

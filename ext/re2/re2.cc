@@ -1520,6 +1520,10 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 #endif
     return BOOL2RUBY(matched);
   } else {
+    if (n == INT_MAX) {
+      rb_raise(rb_eRangeError, "number of matches should be < %d", INT_MAX);
+    }
+
     /* Because match returns the whole match as well. */
     n += 1;
 
