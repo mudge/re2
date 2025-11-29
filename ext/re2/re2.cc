@@ -326,6 +326,11 @@ static VALUE re2_scanner_rewind(VALUE self) {
   delete c->input;
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(c->text), RSTRING_LEN(c->text));
+  if (c->input == 0) {
+    rb_raise(rb_eNoMemError,
+             "not enough memory to allocate StringPiece for input");
+  }
+
   c->eof = false;
 
   return self;
@@ -1521,13 +1526,13 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
     TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
     m->matches = new(std::nothrow) re2::StringPiece[n];
-    RB_OBJ_WRITE(matchdata, &m->regexp, self);
-    RB_OBJ_WRITE(matchdata, &m->text, rb_str_new_frozen(text));
-
     if (m->matches == 0) {
       rb_raise(rb_eNoMemError,
                "not enough memory to allocate StringPieces for matches");
     }
+
+    RB_OBJ_WRITE(matchdata, &m->regexp, self);
+    RB_OBJ_WRITE(matchdata, &m->text, rb_str_new_frozen(text));
 
     m->number_of_matches = n;
 
@@ -1615,6 +1620,10 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   RB_OBJ_WRITE(scanner, &c->text, rb_str_new_frozen(text));
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(c->text), RSTRING_LEN(c->text));
+  if (c->input == 0) {
+    rb_raise(rb_eNoMemError,
+             "not enough memory to allocate StringPiece for input");
+  }
 
   if (p->pattern->ok()) {
     c->number_of_capturing_groups = p->pattern->NumberOfCapturingGroups();
