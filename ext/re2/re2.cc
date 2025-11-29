@@ -417,8 +417,8 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
 
   int id;
 
-  if (FIXNUM_P(idx)) {
-    id = FIX2INT(idx);
+  if (RB_INTEGER_TYPE_P(idx)) {
+    id = NUM2INT(idx);
   } else if (SYMBOL_P(idx)) {
     const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
     std::map<std::string, int>::const_iterator search = groups.find(rb_id2name(SYM2ID(idx)));
@@ -686,10 +686,10 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, const VALUE self) {
         std::string(RSTRING_PTR(idx), RSTRING_LEN(idx)), self);
   } else if (SYMBOL_P(idx)) {
     return re2_matchdata_named_match(rb_id2name(SYM2ID(idx)), self);
-  } else if (!NIL_P(rest) || !FIXNUM_P(idx) || FIX2INT(idx) < 0) {
+  } else if (!NIL_P(rest) || !RB_INTEGER_TYPE_P(idx) || NUM2INT(idx) < 0) {
     return rb_ary_aref(argc, argv, re2_matchdata_to_a(self));
   } else {
-    return re2_matchdata_nth_match(FIX2INT(idx), self);
+    return re2_matchdata_nth_match(NUM2INT(idx), self);
   }
 }
 
@@ -1426,7 +1426,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   RE2::Anchor anchor = RE2::UNANCHORED;
 
   if (RTEST(options)) {
-    if (FIXNUM_P(options)) {
+    if (RB_INTEGER_TYPE_P(options)) {
       n = NUM2INT(options);
 
       if (n < 0) {
@@ -1440,8 +1440,6 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
       VALUE endpos_option = rb_hash_aref(options, ID2SYM(id_endpos));
       if (!NIL_P(endpos_option)) {
 #ifdef HAVE_ENDPOS_ARGUMENT
-        Check_Type(endpos_option, T_FIXNUM);
-
         endpos = NUM2INT(endpos_option);
 
         if (endpos < 0) {
@@ -1470,8 +1468,6 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
       VALUE submatches_option = rb_hash_aref(options, ID2SYM(id_submatches));
       if (!NIL_P(submatches_option)) {
-        Check_Type(submatches_option, T_FIXNUM);
-
         n = NUM2INT(submatches_option);
 
         if (n < 0) {
@@ -1487,8 +1483,6 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
       VALUE startpos_option = rb_hash_aref(options, ID2SYM(id_startpos));
       if (!NIL_P(startpos_option)) {
-        Check_Type(startpos_option, T_FIXNUM);
-
         startpos = NUM2INT(startpos_option);
 
         if (startpos < 0) {
@@ -1520,6 +1514,10 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 #endif
     return BOOL2RUBY(matched);
   } else {
+    if (n == INT_MAX) {
+      rb_raise(rb_eRangeError, "number of matches should be < %d", INT_MAX);
+    }
+
     /* Because match returns the whole match as well. */
     n += 1;
 

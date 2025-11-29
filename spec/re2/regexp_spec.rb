@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+require "rbconfig/sizeof"
+
 RSpec.describe RE2::Regexp do
+  INT_MAX = 2**(RbConfig::SIZEOF.fetch("int") * 8 - 1) - 1
+
   describe "#initialize" do
     it "returns an instance given only a pattern" do
       re = RE2::Regexp.new('woo')
@@ -566,6 +570,12 @@ RSpec.describe RE2::Regexp do
       expect { re.match("one two three", submatches: :invalid) }.to raise_error(TypeError)
     end
 
+    it "raises an exception when given too large a number of submatches" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+
+      expect { re.match("one two three", submatches: INT_MAX) }.to raise_error(RangeError, "number of matches should be < #{INT_MAX}")
+    end
+
     it "defaults to extracting all submatches when given nil", :aggregate_failures do
       re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
       md = re.match("one two three", submatches: nil)
@@ -582,6 +592,13 @@ RSpec.describe RE2::Regexp do
       expect(md[1]).to eq("one")
       expect(md[2]).to eq("two")
       expect(md[3]).to be_nil
+    end
+
+    it "raises an exception if given too large a number of submatches instead of options" do
+      re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
+      md = re.match("one two three", 2)
+
+      expect { re.match("one two three", INT_MAX) }.to raise_error(RangeError, "number of matches should be < #{INT_MAX}")
     end
 
     it "raises an exception when given invalid options" do
