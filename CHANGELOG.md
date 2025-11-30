@@ -5,6 +5,16 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.22.0] - 2025-11-30
+### Changed
+- RE2::Set#add now includes the full error message from the underlying
+  RE2 library if it fails rather than only the first 100 characters.
+- Matching no longer allocates an RE2::MatchData object if there are no
+  matches.
+- Matching now better guards against integer overflows when specifying
+  the number of matches.
+- Be more defensive against allocations failing.
+
 ## [2.21.0] - 2025-11-10
 ### Fixed
 - Fixed bugs in RE2::Scanner and RE2::MatchData after Ruby's GC compaction
@@ -354,6 +364,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.22.0]: https://github.com/mudge/re2/releases/tag/v2.22.0
 [2.21.0]: https://github.com/mudge/re2/releases/tag/v2.21.0
 [2.20.0]: https://github.com/mudge/re2/releases/tag/v2.20.0
 [2.19.1]: https://github.com/mudge/re2/releases/tag/v2.19.1
