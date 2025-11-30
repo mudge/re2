@@ -66,10 +66,10 @@ RSpec.describe RE2::Set do
       expect { set.add("???") }.to raise_error(ArgumentError, /str rejected by RE2::Set->Add\(\)/)
     end
 
-    it "truncates error messages to 100 characters" do
+    it "includes the full error message" do
       set = RE2::Set.new(:unanchored, log_errors: false)
 
-      expect { set.add("(?P<#{'o' * 200}") }.to raise_error(ArgumentError, "str rejected by RE2::Set->Add(): invalid named capture group: (?P<oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+      expect { set.add("(?P<#{'o' * 200}") }.to raise_error(ArgumentError, "str rejected by RE2::Set->Add(): invalid named capture group: (?P<oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
     end
 
     it "raises an error if called after #compile" do

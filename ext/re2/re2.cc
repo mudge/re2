@@ -1917,21 +1917,19 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
   re2_set *s;
   TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
 
-  /* To prevent the memory of the err string leaking when we call rb_raise,
-   * take a copy of it and let it go out of scope.
-   */
-  char msg[100];
   int index;
+  VALUE msg;
 
   {
     std::string err;
     index = s->set->Add(
         re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)), &err);
-    strlcpy(msg, err.c_str(), sizeof(msg));
+    msg = rb_str_new(err.data(), err.size());
   }
 
   if (index < 0) {
-    rb_raise(rb_eArgError, "str rejected by RE2::Set->Add(): %s", msg);
+    rb_raise(rb_eArgError,
+             "str rejected by RE2::Set->Add(): %s", RSTRING_PTR(msg));
   }
 
   return INT2FIX(index);
