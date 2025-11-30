@@ -1521,31 +1521,36 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     /* Because match returns the whole match as well. */
     n += 1;
 
-    VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
-    TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
-    m->matches = new(std::nothrow) re2::StringPiece[n];
-    if (m->matches == 0) {
+    re2::StringPiece *matches = new(std::nothrow) re2::StringPiece[n];
+    if (matches == 0) {
       rb_raise(rb_eNoMemError,
                "not enough memory to allocate StringPieces for matches");
     }
 
-    RB_OBJ_WRITE(matchdata, &m->regexp, self);
-    RB_OBJ_WRITE(matchdata, &m->text, rb_str_new_frozen(text));
-
-    m->number_of_matches = n;
+    text = rb_str_new_frozen(text);
 
 #ifdef HAVE_ENDPOS_ARGUMENT
     bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(m->text), RSTRING_LEN(m->text)),
-        startpos, endpos, anchor, m->matches, n);
+        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
+        startpos, endpos, anchor, matches, n);
 #else
     bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(m->text), RSTRING_LEN(m->text)),
-        startpos, anchor, m->matches, n);
+        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
+        startpos, anchor, matches, n);
 #endif
     if (matched) {
+      VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
+      TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
+
+      RB_OBJ_WRITE(matchdata, &m->regexp, self);
+      RB_OBJ_WRITE(matchdata, &m->text, text);
+      m->matches = matches;
+      m->number_of_matches = n;
+
       return matchdata;
     } else {
+      delete[] matches;
+
       return Qnil;
     }
   }
