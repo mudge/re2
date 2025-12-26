@@ -69,7 +69,7 @@ namespace :gem do
     # the rake-compiler-dock images.
     desc "Compile and build native gem for #{platform} platform"
     task platform do
-      RakeCompilerDock.sh <<~SCRIPT, platform: platform, verbose: true, ruby: "3.1.7"
+      RakeCompilerDock.sh <<~SCRIPT, platform: platform, verbose: true
         wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null &&
         echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null &&
         sudo apt-get update &&

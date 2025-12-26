@@ -27,7 +27,7 @@ jobs:
           key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4"
+          ruby-version: "4.0"
           bundler-cache: true
       - run: bundle exec rake gem
       - uses: actions/upload-artifact@v4
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        ruby: ["3.4", "3.1"] # oldest and newest
+        ruby: ["4.0", "3.1"] # oldest and newest
         libre2:
           - version: "20150501"
             soname: 0
@@ -174,7 +174,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.4", "head"]
+        ruby: ["3.4", "4.0"]
         sys: ["enable", "disable"]
     runs-on: "windows-2022"
     steps:
@@ -198,7 +198,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.4", "head"]
+        ruby: ["3.4", "4.0"]
         sys: ["enable", "disable"]
     runs-on: "windows-2025"
     steps:
@@ -247,7 +247,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         id: setup-ruby
         with:
-          ruby-version: "3.4"
+          ruby-version: "4.0"
           bundler-cache: true
       - uses: actions/download-artifact@v5
         with:
@@ -264,7 +264,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -285,7 +285,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -306,7 +306,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -327,7 +327,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -348,7 +348,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -369,7 +369,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     container:
       image: "ruby:${{ matrix.ruby }}-alpine"
@@ -387,7 +387,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: "macos-14"
     steps:
       - uses: actions/checkout@v5
@@ -408,7 +408,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0.0-preview2"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: "macos-15-intel"
     steps:
       - uses: actions/checkout@v5
@@ -429,7 +429,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.1", "3.2", "3.3", "3.4"]
+        ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v5
