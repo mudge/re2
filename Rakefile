@@ -33,7 +33,7 @@ cross_platforms = %w[
   x86_64-linux-musl
 ].freeze
 
-RakeCompilerDock.set_ruby_cc_version("~> 3.1")
+RakeCompilerDock.set_ruby_cc_version("~> 3.1", "~> 4.0")
 
 Gem::PackageTask.new(re2_gemspec).define
 
@@ -74,7 +74,6 @@ namespace :gem do
         echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null &&
         sudo apt-get update &&
         sudo apt-get install -y cmake=3.22.2-0kitware1ubuntu20.04.1 cmake-data=3.22.2-0kitware1ubuntu20.04.1 &&
-        rbenv shell 3.1.6 &&
         gem install bundler --no-document &&
         bundle install &&
         bundle exec rake native:#{platform} pkg/#{re2_gemspec.full_name}-#{Gem::Platform.new(platform)}.gem PATH="/usr/local/bin:$PATH"
