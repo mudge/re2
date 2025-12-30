@@ -5,6 +5,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.23.0] - 2025-12-30
+### Added
+- Add support for Ruby 4.0 in precompiled, native gems.
+
 ## [2.22.0] - 2025-11-30
 ### Changed
 - RE2::Set#add now includes the full error message from the underlying
@@ -364,6 +368,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.23.0]: https://github.com/mudge/re2/releases/tag/v2.23.0
 [2.22.0]: https://github.com/mudge/re2/releases/tag/v2.22.0
 [2.21.0]: https://github.com/mudge/re2/releases/tag/v2.21.0
 [2.20.0]: https://github.com/mudge/re2/releases/tag/v2.20.0
