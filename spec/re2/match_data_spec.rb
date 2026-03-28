@@ -34,6 +34,10 @@ RSpec.describe RE2::MatchData do
 
       expect(a.map(&:encoding)).to all eq(Encoding::ISO_8859_1)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.to_a }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
   end
 
   describe "#[]" do
@@ -140,6 +144,10 @@ RSpec.describe RE2::MatchData do
 
       expect(md[1]).to eq("woo")
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate[0] }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
   end
 
   describe "#string" do
@@ -168,6 +176,10 @@ RSpec.describe RE2::MatchData do
 
       expect(re.string).to equal(string)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.string }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
   end
 
   describe "#size" do
@@ -175,6 +187,10 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d+) (\d+)').match("1234 56")
 
       expect(md.size).to eq(3)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.size }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
   end
 
@@ -184,6 +200,10 @@ RSpec.describe RE2::MatchData do
 
       expect(md.length).to eq(3)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.length }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
   end
 
   describe "#regexp" do
@@ -192,6 +212,10 @@ RSpec.describe RE2::MatchData do
       md = re.match("123")
 
       expect(md.regexp).to equal(re)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.regexp }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
   end
 
@@ -213,6 +237,10 @@ RSpec.describe RE2::MatchData do
 
       expect(md.inspect).to eq("#<RE2::MatchData \"a\0b c\0d\" 1:\"a\0b\" 2:\"c\0d\">")
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.inspect }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
   end
 
   describe "#to_s" do
@@ -220,6 +248,10 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d{2,5})').match("one two 23456")
 
       expect(md.to_s).to eq("23456")
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.to_s }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
   end
 
@@ -301,6 +333,10 @@ RSpec.describe RE2::MatchData do
 
       expect(md.string[md.begin(0)..-1]).to eq('woohoo' * 5)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.begin(0) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
   end
 
   describe "#end" do
@@ -370,6 +406,10 @@ RSpec.describe RE2::MatchData do
 
       expect(md.string[0...md.end(0)]).to eq('woo')
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.end(0) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
   end
 
   describe "#deconstruct" do
@@ -383,6 +423,10 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('w(.)(.)(.)?').match('woo')
 
       expect(md.deconstruct).to eq(['o', 'o', nil])
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.deconstruct }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
   end
 
@@ -427,6 +471,10 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
 
       expect { md.deconstruct_keys([0]) }.to raise_error(TypeError)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.deconstruct_keys(nil) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
   end
 end

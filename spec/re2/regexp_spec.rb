@@ -102,6 +102,10 @@ RSpec.describe RE2::Regexp do
 
       expect(options).to include(case_sensitive: false)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.options }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#error" do
@@ -117,6 +121,10 @@ RSpec.describe RE2::Regexp do
 
       expect(error).to eq("missing ): wo(o")
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.error }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#error_arg" do
@@ -130,6 +138,10 @@ RSpec.describe RE2::Regexp do
       error_arg = RE2::Regexp.new('wo(o', log_errors: false).error_arg
 
       expect(error_arg).to eq("wo(o")
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.error_arg }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -145,6 +157,10 @@ RSpec.describe RE2::Regexp do
 
       expect(program_size).to eq(-1)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.program_size }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#to_str" do
@@ -158,6 +174,10 @@ RSpec.describe RE2::Regexp do
       string = RE2::Regexp.new('???', log_errors: false).to_str
 
       expect(string).to eq("???")
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.to_str }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -173,6 +193,10 @@ RSpec.describe RE2::Regexp do
 
       expect(pattern).to eq("???")
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.pattern }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#inspect" do
@@ -187,6 +211,10 @@ RSpec.describe RE2::Regexp do
 
       expect(string.encoding).to eq(Encoding::ISO_8859_1)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.inspect }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#utf8?" do
@@ -198,6 +226,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('woo', utf8: false)
 
       expect(re).to_not be_utf8
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.utf8? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -211,6 +243,10 @@ RSpec.describe RE2::Regexp do
 
       expect(re).to be_posix_syntax
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.posix_syntax? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#literal?" do
@@ -222,6 +258,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('woo', literal: true)
 
       expect(re).to be_literal
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.literal? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -235,6 +275,10 @@ RSpec.describe RE2::Regexp do
 
       expect(re).to be_never_nl
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.never_nl? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#case_sensitive?" do
@@ -245,6 +289,10 @@ RSpec.describe RE2::Regexp do
     it "can be overridden on initialization" do
       re = RE2::Regexp.new('woo', case_sensitive: false)
       expect(re).to_not be_case_sensitive
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.case_sensitive? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -258,6 +306,10 @@ RSpec.describe RE2::Regexp do
 
       expect(re).to be_case_insensitive
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.case_insensitive? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#casefold?" do
@@ -269,6 +321,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('woo', case_sensitive: false)
 
       expect(re).to be_casefold
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.casefold? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -282,6 +338,10 @@ RSpec.describe RE2::Regexp do
 
       expect(re).to be_longest_match
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.longest_match? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#log_errors?" do
@@ -293,6 +353,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('woo', log_errors: false)
 
       expect(re).to_not be_log_errors
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.log_errors? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -306,6 +370,10 @@ RSpec.describe RE2::Regexp do
 
       expect(re).to be_perl_classes
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.perl_classes? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#word_boundary?" do
@@ -317,6 +385,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('woo', word_boundary: true)
 
       expect(re).to be_word_boundary
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.word_boundary? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -330,6 +402,10 @@ RSpec.describe RE2::Regexp do
 
       expect(re).to be_one_line
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.one_line? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#max_mem" do
@@ -341,6 +417,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('woo', max_mem: 1024)
 
       expect(re.max_mem).to eq(1024)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.max_mem }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -612,6 +692,10 @@ RSpec.describe RE2::Regexp do
 
       expect(re.match("one two three", nil)).to be_a(RE2::MatchData)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.match("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#match?" do
@@ -632,6 +716,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
       expect { re.match?(0) }.to raise_error(TypeError)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.match?("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -661,6 +749,10 @@ RSpec.describe RE2::Regexp do
 
       expect { re.partial_match?(0) }.to raise_error(TypeError)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.partial_match?("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#=~" do
@@ -689,6 +781,10 @@ RSpec.describe RE2::Regexp do
 
       expect { re =~ 0 }.to raise_error(TypeError)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate =~ "test" }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#===" do
@@ -709,6 +805,10 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
       expect { re === 0 }.to raise_error(TypeError)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate === "test" }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -738,6 +838,10 @@ RSpec.describe RE2::Regexp do
 
       expect { re.full_match?(0) }.to raise_error(TypeError)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.full_match?("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#ok?" do
@@ -751,6 +855,10 @@ RSpec.describe RE2::Regexp do
       expect(RE2::Regexp.new('wo(o', log_errors: false)).to_not be_ok
       expect(RE2::Regexp.new('wo[o', log_errors: false)).to_not be_ok
       expect(RE2::Regexp.new('*', log_errors: false)).to_not be_ok
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.ok? }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -776,6 +884,10 @@ RSpec.describe RE2::Regexp do
     it "returns -1 for an invalid pattern" do
       expect(RE2::Regexp.new('???', log_errors: false).number_of_capturing_groups).to eq(-1)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.number_of_capturing_groups }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#named_capturing_groups" do
@@ -798,6 +910,10 @@ RSpec.describe RE2::Regexp do
     it "returns an empty hash for an invalid regexp" do
       expect(RE2::Regexp.new('???', log_errors: false).named_capturing_groups).to be_empty
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.named_capturing_groups }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
 
   describe "#scan" do
@@ -812,6 +928,10 @@ RSpec.describe RE2::Regexp do
       r = RE2::Regexp.new('(\w+)')
 
       expect { r.scan(nil) }.to raise_error(TypeError)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.scan("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -867,6 +987,10 @@ RSpec.describe RE2::Regexp do
       r = RE2::Regexp.new('(\d+)')
 
       expect(r.partial_match('ruby:1234', anchor: :anchor_both)).to be_a(RE2::MatchData)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.partial_match('test') }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
 
@@ -924,5 +1048,10 @@ RSpec.describe RE2::Regexp do
 
       expect(r.full_match('ruby:1234', anchor: :unanchored)).to be_nil
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.full_match('test') }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
   end
+
 end

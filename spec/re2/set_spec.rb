@@ -93,6 +93,10 @@ RSpec.describe RE2::Set do
 
       expect(set.add(StringLike.new("abc"))).to eq(0)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.add("foo") }.to raise_error(TypeError, /uninitialized RE2::Set/)
+    end
   end
 
   describe "#compile" do
@@ -103,6 +107,10 @@ RSpec.describe RE2::Set do
       set.add("ghi")
 
       expect(set.compile).to be_truthy
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.compile }.to raise_error(TypeError, /uninitialized RE2::Set/)
     end
   end
 
@@ -202,6 +210,10 @@ RSpec.describe RE2::Set do
 
       expect(set.match(StringLike.new("abcdef"), exception: false)).to contain_exactly(0)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.match("foo") }.to raise_error(TypeError, /uninitialized RE2::Set/)
+    end
   end
 
   describe "#size" do
@@ -228,6 +240,12 @@ RSpec.describe RE2::Set do
 
       expect { set.size }.to raise_error(RE2::Set::UnsupportedError)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      skip "Underlying RE2::Set has no Size method" unless RE2::Set.size?
+
+      expect { described_class.allocate.size }.to raise_error(TypeError, /uninitialized RE2::Set/)
+    end
   end
 
   describe "#length" do
@@ -245,6 +263,12 @@ RSpec.describe RE2::Set do
       set.add("def")
 
       expect(set.length).to eq(2)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      skip "Underlying RE2::Set has no Size method" unless RE2::Set.size?
+
+      expect { described_class.allocate.length }.to raise_error(TypeError, /uninitialized RE2::Set/)
     end
   end
 
