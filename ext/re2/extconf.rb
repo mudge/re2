@@ -110,7 +110,7 @@ module RE2
       process_recipe(abseil_recipe) do |recipe|
         recipe.configure_options << '-DABSL_PROPAGATE_CXX_STD=ON'
         # Workaround for https://github.com/abseil/abseil-cpp/issues/1510
-        recipe.configure_options << '-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4' if MiniPortile.windows?
+        recipe.configure_options << '-DCMAKE_CXX_FLAGS=-DABSL_FORCE_WAITER_MODE=4 -D_WIN32_WINNT=0x0601' if MiniPortile.windows?
       end
 
       process_recipe(re2_recipe) do |recipe|
