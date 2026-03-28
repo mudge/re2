@@ -15,7 +15,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
   with dup and clone (RE2::Set objects cannot be copied but will now raise an
   error)
 
-## Fixed
+### Fixed
 - Calling methods on uninitialized RE2::Regexp, RE2::MatchData, RE2::Set, and
   RE2::Scanner objects will now raise a type error instead of crashing to match
   Ruby's own Regexp's behaviour
