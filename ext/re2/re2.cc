@@ -245,6 +245,33 @@ static const rb_data_type_t re2_regexp_data_type = {
   RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
 
+static re2_pattern *unwrap_re2_regexp(VALUE self) {
+  re2_pattern *p;
+  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  if (!p->pattern) {
+    rb_raise(rb_eTypeError, "uninitialized RE2::Regexp");
+  }
+  return p;
+}
+
+static re2_matchdata *unwrap_re2_matchdata(VALUE self) {
+  re2_matchdata *m;
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
+  if (!RTEST(m->regexp)) {
+    rb_raise(rb_eTypeError, "uninitialized RE2::MatchData");
+  }
+  return m;
+}
+
+static re2_scanner *unwrap_re2_scanner(VALUE self) {
+  re2_scanner *c;
+  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
+  if (!RTEST(c->regexp)) {
+    rb_raise(rb_eTypeError, "uninitialized RE2::Scanner");
+  }
+  return c;
+}
+
 static VALUE re2_matchdata_allocate(VALUE klass) {
   re2_matchdata *m;
 
@@ -269,8 +296,7 @@ static VALUE re2_scanner_allocate(VALUE klass) {
  *   m.string #=> "bob 123"
  */
 static VALUE re2_matchdata_string(const VALUE self) {
-  re2_matchdata *m;
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
 
   return m->text;
 }
@@ -287,8 +313,7 @@ static VALUE re2_matchdata_string(const VALUE self) {
  *   c.string #=> "foo"
  */
 static VALUE re2_scanner_string(const VALUE self) {
-  re2_scanner *c;
-  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
+  re2_scanner *c = unwrap_re2_scanner(self);
 
   return c->text;
 }
@@ -302,8 +327,7 @@ static VALUE re2_scanner_string(const VALUE self) {
  *   c.eof? #=> true
  */
 static VALUE re2_scanner_eof(const VALUE self) {
-  re2_scanner *c;
-  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
+  re2_scanner *c = unwrap_re2_scanner(self);
 
   return BOOL2RUBY(c->eof);
 }
@@ -320,8 +344,7 @@ static VALUE re2_scanner_eof(const VALUE self) {
  *   e.scan #=> ["1"]
  */
 static VALUE re2_scanner_rewind(VALUE self) {
-  re2_scanner *c;
-  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
+  re2_scanner *c = unwrap_re2_scanner(self);
 
   delete c->input;
   c->input = new(std::nothrow) re2::StringPiece(
@@ -356,11 +379,8 @@ static VALUE re2_scanner_rewind(VALUE self) {
  *   s.scan #=> ["bar"]
  */
 static VALUE re2_scanner_scan(VALUE self) {
-  re2_pattern *p;
-  re2_scanner *c;
-
-  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
-  TypedData_Get_Struct(c->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_scanner *c = unwrap_re2_scanner(self);
+  re2_pattern *p = unwrap_re2_regexp(c->regexp);
 
   std::vector<RE2::Arg> argv(c->number_of_capturing_groups);
   std::vector<RE2::Arg*> args(c->number_of_capturing_groups);
@@ -409,11 +429,8 @@ static VALUE re2_scanner_scan(VALUE self) {
 }
 
 static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
-  re2_matchdata *m;
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
-  TypedData_Get_Struct(m->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   int id;
 
@@ -463,9 +480,7 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
  *   m.length #=> 2
  */
 static VALUE re2_matchdata_size(const VALUE self) {
-  re2_matchdata *m;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
 
   return INT2FIX(m->number_of_matches);
 }
@@ -482,9 +497,7 @@ static VALUE re2_matchdata_size(const VALUE self) {
  *   m.begin(1) #=> 4
  */
 static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
-  re2_matchdata *m;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
   if (match == NULL) {
@@ -509,9 +522,7 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
  *   m.end(1) #=> 7
  */
 static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
-  re2_matchdata *m;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
   if (match == NULL) {
@@ -532,8 +543,7 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
  *   m.regexp #=> #<RE2::Regexp /(\d+)/>
  */
 static VALUE re2_matchdata_regexp(const VALUE self) {
-  re2_matchdata *m;
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
 
   return m->regexp;
 }
@@ -547,8 +557,7 @@ static VALUE re2_matchdata_regexp(const VALUE self) {
  *   c.regexp #=> #<RE2::Regexp /(\d+)/>
  */
 static VALUE re2_scanner_regexp(const VALUE self) {
-  re2_scanner *c;
-  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, c);
+  re2_scanner *c = unwrap_re2_scanner(self);
 
   return c->regexp;
 }
@@ -573,11 +582,8 @@ static VALUE re2_regexp_allocate(VALUE klass) {
  *   m.to_a #=> ["123", "123"]
  */
 static VALUE re2_matchdata_to_a(const VALUE self) {
-  re2_matchdata *m;
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
-  TypedData_Get_Struct(m->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   VALUE array = rb_ary_new2(m->number_of_matches);
   for (int i = 0; i < m->number_of_matches; ++i) {
@@ -595,11 +601,8 @@ static VALUE re2_matchdata_to_a(const VALUE self) {
 }
 
 static VALUE re2_matchdata_nth_match(int nth, const VALUE self) {
-  re2_matchdata *m;
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
-  TypedData_Get_Struct(m->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   if (nth < 0 || nth >= m->number_of_matches) {
     return Qnil;
@@ -616,11 +619,8 @@ static VALUE re2_matchdata_nth_match(int nth, const VALUE self) {
 }
 
 static VALUE re2_matchdata_named_match(const std::string &name, const VALUE self) {
-  re2_matchdata *m;
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
-  TypedData_Get_Struct(m->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
   std::map<std::string, int>::const_iterator search = groups.find(name);
@@ -715,11 +715,8 @@ static VALUE re2_matchdata_to_s(const VALUE self) {
  *   m.inspect #=> "#<RE2::MatchData \"123\" 1:\"123\">"
  */
 static VALUE re2_matchdata_inspect(const VALUE self) {
-  re2_matchdata *m;
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
-  TypedData_Get_Struct(m->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   std::ostringstream output;
   output << "#<RE2::MatchData";
@@ -770,11 +767,8 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
  *   end
  */
 static VALUE re2_matchdata_deconstruct(const VALUE self) {
-  re2_matchdata *m;
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
-  TypedData_Get_Struct(m->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   VALUE array = rb_ary_new2(m->number_of_matches - 1);
   for (int i = 1; i < m->number_of_matches; ++i) {
@@ -821,11 +815,8 @@ static VALUE re2_matchdata_deconstruct(const VALUE self) {
  *   end
  */
 static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) {
-  re2_matchdata *m;
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, m);
-  TypedData_Get_Struct(m->regexp, re2_pattern, &re2_regexp_data_type, p);
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
   VALUE capturing_groups = rb_hash_new();
@@ -913,6 +904,10 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
 
+  if (p->pattern) {
+    delete p->pattern;
+  }
+
   if (RTEST(options)) {
     RE2::Options re2_options;
     parse_re2_options(&re2_options, options);
@@ -945,9 +940,7 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
  *   re2.inspect #=> "#<RE2::Regexp /woo?/>"
  */
 static VALUE re2_regexp_inspect(const VALUE self) {
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   std::ostringstream output;
 
@@ -970,8 +963,7 @@ static VALUE re2_regexp_inspect(const VALUE self) {
  *   re2.to_s #=> "woo?"
  */
 static VALUE re2_regexp_to_s(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return encoded_str_new(p->pattern->pattern().data(),
       p->pattern->pattern().size(),
@@ -987,8 +979,7 @@ static VALUE re2_regexp_to_s(const VALUE self) {
  *   re2.ok? #=> true
  */
 static VALUE re2_regexp_ok(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->ok());
 }
@@ -1003,8 +994,7 @@ static VALUE re2_regexp_ok(const VALUE self) {
  *   re2.utf8? #=> true
  */
 static VALUE re2_regexp_utf8(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().encoding() == RE2::Options::EncodingUTF8);
 }
@@ -1019,8 +1009,7 @@ static VALUE re2_regexp_utf8(const VALUE self) {
  *   re2.posix_syntax? #=> true
  */
 static VALUE re2_regexp_posix_syntax(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().posix_syntax());
 }
@@ -1035,8 +1024,7 @@ static VALUE re2_regexp_posix_syntax(const VALUE self) {
  *   re2.longest_match? #=> true
  */
 static VALUE re2_regexp_longest_match(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().longest_match());
 }
@@ -1051,8 +1039,7 @@ static VALUE re2_regexp_longest_match(const VALUE self) {
  *   re2.log_errors? #=> true
  */
 static VALUE re2_regexp_log_errors(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().log_errors());
 }
@@ -1066,8 +1053,7 @@ static VALUE re2_regexp_log_errors(const VALUE self) {
  *   re2.max_mem #=> 1024
  */
 static VALUE re2_regexp_max_mem(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return INT2FIX(p->pattern->options().max_mem());
 }
@@ -1082,8 +1068,7 @@ static VALUE re2_regexp_max_mem(const VALUE self) {
  *   re2.literal? #=> true
  */
 static VALUE re2_regexp_literal(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().literal());
 }
@@ -1098,8 +1083,7 @@ static VALUE re2_regexp_literal(const VALUE self) {
  *   re2.never_nl? #=> true
  */
 static VALUE re2_regexp_never_nl(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().never_nl());
 }
@@ -1114,8 +1098,7 @@ static VALUE re2_regexp_never_nl(const VALUE self) {
  *   re2.case_sensitive? #=> true
  */
 static VALUE re2_regexp_case_sensitive(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().case_sensitive());
 }
@@ -1144,8 +1127,7 @@ static VALUE re2_regexp_case_insensitive(const VALUE self) {
  *   re2.perl_classes? #=> true
  */
 static VALUE re2_regexp_perl_classes(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().perl_classes());
 }
@@ -1160,8 +1142,7 @@ static VALUE re2_regexp_perl_classes(const VALUE self) {
  *   re2.word_boundary? #=> true
  */
 static VALUE re2_regexp_word_boundary(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().word_boundary());
 }
@@ -1176,8 +1157,7 @@ static VALUE re2_regexp_word_boundary(const VALUE self) {
  *   re2.one_line? #=> true
  */
 static VALUE re2_regexp_one_line(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(p->pattern->options().one_line());
 }
@@ -1189,8 +1169,7 @@ static VALUE re2_regexp_one_line(const VALUE self) {
  * @return [String, nil] the error string or `nil`
  */
 static VALUE re2_regexp_error(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   if (p->pattern->ok()) {
     return Qnil;
@@ -1210,8 +1189,7 @@ static VALUE re2_regexp_error(const VALUE self) {
  * @return [String, nil] the offending portion of the regexp or `nil`
  */
 static VALUE re2_regexp_error_arg(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   if (p->pattern->ok()) {
     return Qnil;
@@ -1230,8 +1208,7 @@ static VALUE re2_regexp_error_arg(const VALUE self) {
  * @return [Integer] the regexp "cost"
  */
 static VALUE re2_regexp_program_size(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return INT2FIX(p->pattern->ProgramSize());
 }
@@ -1242,9 +1219,7 @@ static VALUE re2_regexp_program_size(const VALUE self) {
  * @return [Hash] the options
  */
 static VALUE re2_regexp_options(const VALUE self) {
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
   VALUE options = rb_hash_new();
 
   rb_hash_aset(options, ID2SYM(id_utf8),
@@ -1294,8 +1269,7 @@ static VALUE re2_regexp_options(const VALUE self) {
  * @return [Integer] the number of capturing subpatterns
  */
 static VALUE re2_regexp_number_of_capturing_groups(const VALUE self) {
-  re2_pattern *p;
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return INT2FIX(p->pattern->NumberOfCapturingGroups());
 }
@@ -1310,9 +1284,7 @@ static VALUE re2_regexp_number_of_capturing_groups(const VALUE self) {
  * @return [Hash] a hash of names to capturing indices
  */
 static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
-  re2_pattern *p;
-
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
   const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
   VALUE capturing_groups = rb_hash_new();
 
@@ -1418,7 +1390,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   /* Ensure text is a string. */
   StringValue(text);
 
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  p = unwrap_re2_regexp(self);
 
   int n;
   int startpos = 0;
@@ -1565,12 +1537,10 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
-  re2_pattern *p;
-
   /* Ensure text is a string. */
   StringValue(text);
 
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(RE2::PartialMatch(
         re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)), *p->pattern));
@@ -1585,12 +1555,10 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
-  re2_pattern *p;
-
   /* Ensure text is a string. */
   StringValue(text);
 
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
+  re2_pattern *p = unwrap_re2_regexp(self);
 
   return BOOL2RUBY(RE2::FullMatch(
         re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)), *p->pattern));
@@ -1612,10 +1580,8 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   /* Ensure text is a string. */
   StringValue(text);
 
-  re2_pattern *p;
+  re2_pattern *p = unwrap_re2_regexp(self);
   re2_scanner *c;
-
-  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
   VALUE scanner = rb_class_new_instance(0, 0, re2_cScanner);
   TypedData_Get_Struct(scanner, re2_scanner, &re2_scanner_data_type, c);
 
@@ -1694,7 +1660,7 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
 
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
-    TypedData_Get_Struct(pattern, re2_pattern, &re2_regexp_data_type, p);
+    p = unwrap_re2_regexp(pattern);
     RE2::Replace(&str_as_string, *p->pattern,
         re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
 
@@ -1746,7 +1712,7 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
 
   /* Do the replacement. */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
-    TypedData_Get_Struct(pattern, re2_pattern, &re2_regexp_data_type, p);
+    p = unwrap_re2_regexp(pattern);
     RE2::GlobalReplace(&str_as_string, *p->pattern,
         re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
 
@@ -1817,6 +1783,15 @@ static const rb_data_type_t re2_set_data_type = {
   // macro to update VALUE references, as to trigger write barriers.
   RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
 };
+
+static re2_set *unwrap_re2_set(VALUE self) {
+  re2_set *s;
+  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
+  if (!s->set) {
+    rb_raise(rb_eTypeError, "uninitialized RE2::Set");
+  }
+  return s;
+}
 
 static VALUE re2_set_allocate(VALUE klass) {
   re2_set *s;
@@ -1895,6 +1870,10 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
     parse_re2_options(&re2_options, options);
   }
 
+  if (s->set) {
+    delete s->set;
+  }
+
   s->set = new(std::nothrow) RE2::Set(re2_options, re2_anchor);
   if (s->set == 0) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2::Set object");
@@ -1919,8 +1898,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
 static VALUE re2_set_add(VALUE self, VALUE pattern) {
   StringValue(pattern);
 
-  re2_set *s;
-  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
+  re2_set *s = unwrap_re2_set(self);
 
   int index;
   VALUE msg;
@@ -1951,8 +1929,7 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
  *   set.compile #=> true
  */
 static VALUE re2_set_compile(VALUE self) {
-  re2_set *s;
-  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
+  re2_set *s = unwrap_re2_set(self);
 
   return BOOL2RUBY(s->set->Compile());
 }
@@ -1968,8 +1945,7 @@ static VALUE re2_set_compile(VALUE self) {
  */
 static VALUE re2_set_size(VALUE self) {
 #ifdef HAVE_SET_SIZE
-  re2_set *s;
-  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
+  re2_set *s = unwrap_re2_set(self);
 
   return INT2FIX(s->set->Size());
 #else
@@ -2052,8 +2028,7 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   rb_scan_args(argc, argv, "11", &str, &options);
 
   StringValue(str);
-  re2_set *s;
-  TypedData_Get_Struct(self, re2_set, &re2_set_data_type, s);
+  re2_set *s = unwrap_re2_set(self);
 
   if (RTEST(options)) {
     Check_Type(options, T_HASH);

@@ -8,6 +8,10 @@ RSpec.describe RE2::Scanner do
 
       expect(scanner.regexp).to equal(re)
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.regexp }.to raise_error(TypeError, /uninitialized RE2::Scanner/)
+    end
   end
 
   describe "#string" do
@@ -49,6 +53,10 @@ RSpec.describe RE2::Scanner do
       scanner = re.scan(text)
 
       expect(scanner.string).to equal(text)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.string }.to raise_error(TypeError, /uninitialized RE2::Scanner/)
     end
   end
 
@@ -211,6 +219,10 @@ RSpec.describe RE2::Scanner do
 
       expect(scanner.scan).to eq(["It"])
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.scan }.to raise_error(TypeError, /uninitialized RE2::Scanner/)
+    end
   end
 
   it "is enumerable" do
@@ -272,6 +284,10 @@ RSpec.describe RE2::Scanner do
 
       expect(scanner).not_to be_eof
     end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.rewind }.to raise_error(TypeError, /uninitialized RE2::Scanner/)
+    end
   end
 
   describe "#eof?" do
@@ -319,6 +335,10 @@ RSpec.describe RE2::Scanner do
       scanner.scan
 
       expect(scanner).to be_eof
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.eof? }.to raise_error(TypeError, /uninitialized RE2::Scanner/)
     end
   end
 end
