@@ -41,6 +41,53 @@ RSpec.describe RE2::Regexp do
     end
   end
 
+  describe "#dup" do
+    it "returns a copy with the same pattern" do
+      re = described_class.new('(\d+)')
+      copy = re.dup
+
+      expect(copy.to_s).to eq('(\d+)')
+    end
+
+    it "returns a different object" do
+      re = described_class.new('(\d+)')
+      copy = re.dup
+
+      expect(copy).to_not equal(re)
+    end
+
+    it "returns a valid copy" do
+      re = described_class.new('(\d+)')
+      copy = re.dup
+
+      expect(copy.ok?).to eq(true)
+    end
+
+    it "copies options from the original" do
+      re = described_class.new('(\d+)', case_sensitive: false)
+      copy = re.dup
+
+      expect(copy).to_not be_case_sensitive
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.dup }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+  end
+
+  describe "#clone" do
+    it "returns a copy with the same pattern" do
+      re = described_class.new('woo')
+      copy = re.clone
+
+      expect(copy.to_s).to eq('woo')
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.clone }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+  end
+
   describe ".compile" do
     it "returns an instance given only a pattern" do
       re = RE2::Regexp.compile('woo')
@@ -1053,5 +1100,4 @@ RSpec.describe RE2::Regexp do
       expect { described_class.allocate.full_match('test') }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
   end
-
 end

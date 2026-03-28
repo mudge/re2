@@ -14,6 +14,52 @@ RSpec.describe RE2::Scanner do
     end
   end
 
+  describe "#dup" do
+    it "returns a usable copy of the scanner at the same position" do
+      scanner = RE2::Regexp.new('(\w+)').scan("foo bar baz")
+      scanner.scan
+
+      copy = scanner.dup
+
+      expect(copy.scan).to eq(["bar"])
+    end
+
+    it "creates an independent copy" do
+      scanner = RE2::Regexp.new('(\w+)').scan("foo bar baz")
+      scanner.scan
+
+      copy = scanner.dup
+      copy.scan
+
+      expect(scanner.scan).to eq(["bar"])
+    end
+
+    it "copies the EOF state of the scanner" do
+      scanner = RE2::Regexp.new('(\w+)').scan("foo")
+      scanner.scan
+      scanner.scan
+
+      copy = scanner.dup
+
+      expect(copy).to be_eof
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.dup }.to raise_error(TypeError, /uninitialized RE2::Scanner/)
+    end
+  end
+
+  describe "#clone" do
+    it "returns a usable copy of the scanner at the same position" do
+      scanner = RE2::Regexp.new('(\w+)').scan("foo bar baz")
+      scanner.scan
+
+      copy = scanner.clone
+
+      expect(copy.scan).to eq(["bar"])
+    end
+  end
+
   describe "#string" do
     it "returns the text for the scanner" do
       re = RE2::Regexp.new('(\w+)')

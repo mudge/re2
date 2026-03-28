@@ -10,6 +10,55 @@ RSpec.describe RE2::MatchData do
     expect(ObjectSpace.memsize_of(matches1)).to be < ObjectSpace.memsize_of(matches2)
   end
 
+  describe "#dup" do
+    it "returns a copy of the match data" do
+      md = RE2::Regexp.new('(\d+) (\d+)').match("123 456")
+      copy = md.dup
+
+      expect(copy.to_a).to eq(["123 456", "123", "456"])
+    end
+
+    it "returns a different object" do
+      md = RE2::Regexp.new('(\d+) (\d+)').match("123 456")
+      copy = md.dup
+
+      expect(copy).to_not equal(md)
+    end
+
+    it "preserves the original string" do
+      str = "bob 123"
+      md = RE2::Regexp.new('(\d+)').match(str)
+      copy = md.dup
+
+      expect(copy.string).to equal(str)
+    end
+
+    it "preserves the original regexp" do
+      re = RE2::Regexp.new('(\d+)')
+      md = re.match("123")
+      copy = md.dup
+
+      expect(copy.regexp).to equal(re)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.dup }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
+  describe "#clone" do
+    it "returns a copy of the match data" do
+      md = RE2::Regexp.new('(\d+) (\d+)').match("123 456")
+      copy = md.clone
+
+      expect(copy.to_a).to eq(["123 456", "123", "456"])
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.clone }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
   describe "#to_a" do
     it "is populated with the match and capturing groups" do
       a = RE2::Regexp.new('w(o)(o)').match('woo').to_a

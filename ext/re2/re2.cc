@@ -359,6 +359,34 @@ static VALUE re2_scanner_rewind(VALUE self) {
   return self;
 }
 
+static VALUE re2_scanner_initialize_copy(VALUE self, VALUE other) {
+  re2_scanner *self_c;
+  re2_scanner *other_c = unwrap_re2_scanner(other);
+
+  TypedData_Get_Struct(self, re2_scanner, &re2_scanner_data_type, self_c);
+
+  if (self_c->input) {
+    delete self_c->input;
+  }
+
+  RB_OBJ_WRITE(self, &self_c->regexp, other_c->regexp);
+  RB_OBJ_WRITE(self, &self_c->text, other_c->text);
+  self_c->number_of_capturing_groups = other_c->number_of_capturing_groups;
+  self_c->eof = other_c->eof;
+
+  if (other_c->input) {
+    self_c->input = new(std::nothrow) re2::StringPiece(*other_c->input);
+    if (self_c->input == 0) {
+      rb_raise(rb_eNoMemError,
+               "not enough memory to allocate StringPiece for input");
+    }
+  } else {
+    self_c->input = NULL;
+  }
+
+  return self;
+}
+
 /*
  * Scan the given text incrementally for matches using
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L447-L463
@@ -849,6 +877,36 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
   return capturing_groups;
 }
 
+static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
+  re2_matchdata *self_m;
+  re2_matchdata *other_m = unwrap_re2_matchdata(other);
+
+  TypedData_Get_Struct(self, re2_matchdata, &re2_matchdata_data_type, self_m);
+
+  if (self_m->matches) {
+    delete[] self_m->matches;
+  }
+
+  self_m->number_of_matches = other_m->number_of_matches;
+  RB_OBJ_WRITE(self, &self_m->regexp, other_m->regexp);
+  RB_OBJ_WRITE(self, &self_m->text, other_m->text);
+
+  if (other_m->matches) {
+    self_m->matches = new(std::nothrow) re2::StringPiece[other_m->number_of_matches];
+    if (self_m->matches == 0) {
+      rb_raise(rb_eNoMemError,
+               "not enough memory to allocate StringPiece for matches");
+    }
+    for (int i = 0; i < other_m->number_of_matches; ++i) {
+      self_m->matches[i] = other_m->matches[i];
+    }
+  } else {
+    self_m->matches = NULL;
+  }
+
+  return self;
+}
+
 /*
  * Shorthand to compile a new {RE2::Regexp}.
  *
@@ -920,6 +978,25 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
   }
 
   if (p->pattern == 0) {
+    rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
+  }
+
+  return self;
+}
+
+static VALUE re2_regexp_initialize_copy(VALUE self, VALUE other) {
+  re2_pattern *self_p;
+  re2_pattern *other_p = unwrap_re2_regexp(other);
+
+  TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, self_p);
+
+  if (self_p->pattern) {
+    delete self_p->pattern;
+  }
+
+  self_p->pattern = new(std::nothrow) RE2(other_p->pattern->pattern(),
+                                          other_p->pattern->options());
+  if (self_p->pattern == 0) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
   }
 
@@ -1800,6 +1877,10 @@ static VALUE re2_set_allocate(VALUE klass) {
   return result;
 }
 
+static VALUE re2_set_initialize_copy(VALUE, VALUE) {
+  rb_raise(rb_eTypeError, "cannot copy RE2::Set");
+}
+
 /*
  * Returns a new {RE2::Set} object, a collection of patterns that can be
  * searched for simultaneously.
@@ -2132,6 +2213,8 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
   rb_define_method(re2_cMatchData, "deconstruct_keys",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct_keys), 1);
+  rb_define_method(re2_cMatchData, "initialize_copy",
+      RUBY_METHOD_FUNC(re2_matchdata_initialize_copy), 1);
 
   rb_define_method(re2_cScanner, "string",
       RUBY_METHOD_FUNC(re2_scanner_string), 0);
@@ -2143,11 +2226,15 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_scanner_scan), 0);
   rb_define_method(re2_cScanner, "rewind",
       RUBY_METHOD_FUNC(re2_scanner_rewind), 0);
+  rb_define_method(re2_cScanner, "initialize_copy",
+      RUBY_METHOD_FUNC(re2_scanner_initialize_copy), 1);
 
   rb_define_singleton_method(re2_cRegexp, "match_has_endpos_argument?",
       RUBY_METHOD_FUNC(re2_regexp_match_has_endpos_argument_p), 0);
   rb_define_method(re2_cRegexp, "initialize",
       RUBY_METHOD_FUNC(re2_regexp_initialize), -1);
+  rb_define_method(re2_cRegexp, "initialize_copy",
+      RUBY_METHOD_FUNC(re2_regexp_initialize_copy), 1);
   rb_define_method(re2_cRegexp, "ok?", RUBY_METHOD_FUNC(re2_regexp_ok), 0);
   rb_define_method(re2_cRegexp, "error", RUBY_METHOD_FUNC(re2_regexp_error),
       0);
@@ -2215,6 +2302,8 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_set_size_p), 0);
   rb_define_method(re2_cSet, "initialize",
       RUBY_METHOD_FUNC(re2_set_initialize), -1);
+  rb_define_method(re2_cSet, "initialize_copy",
+      RUBY_METHOD_FUNC(re2_set_initialize_copy), 1);
   rb_define_method(re2_cSet, "add", RUBY_METHOD_FUNC(re2_set_add), 1);
   rb_define_method(re2_cSet, "compile", RUBY_METHOD_FUNC(re2_set_compile), 0);
   rb_define_method(re2_cSet, "match", RUBY_METHOD_FUNC(re2_set_match), -1);
