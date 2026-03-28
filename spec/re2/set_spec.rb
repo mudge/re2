@@ -51,6 +51,18 @@ RSpec.describe RE2::Set do
     end
   end
 
+  describe "#dup" do
+    it "raises a TypeError" do
+      expect { described_class.new.dup }.to raise_error(TypeError, /cannot copy RE2::Set/)
+    end
+  end
+
+  describe "#clone" do
+    it "raises a TypeError" do
+      expect { described_class.new.clone }.to raise_error(TypeError, /cannot copy RE2::Set/)
+    end
+  end
+
   describe "#add" do
     it "allows multiple patterns to be added", :aggregate_failures do
       set = RE2::Set.new
