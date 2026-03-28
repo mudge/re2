@@ -5,6 +5,21 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.24.0] - 2026-03-28
+### Changed
+- Upgrade the bundled version of Abseil to 20260107.1. Note this requires
+  Windows 7 or later for the native Windows gem.
+
+### Added
+- Add ability to clone RE2::Regexp, RE2::MatchData, and RE2::Scanner objects
+  with dup and clone (RE2::Set objects cannot be copied but will now raise an
+  error)
+
+## Fixed
+- Calling methods on uninitialized RE2::Regexp, RE2::MatchData, RE2::Set, and
+  RE2::Scanner objects will now raise a type error instead of crashing to match
+  Ruby's own Regexp's behaviour
+
 ## [2.23.0] - 2025-12-30
 ### Added
 - Add support for Ruby 4.0 in precompiled, native gems.
@@ -368,6 +383,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.24.0]: https://github.com/mudge/re2/releases/tag/v2.24.0
 [2.23.0]: https://github.com/mudge/re2/releases/tag/v2.23.0
 [2.22.0]: https://github.com/mudge/re2/releases/tag/v2.22.0
 [2.21.0]: https://github.com/mudge/re2/releases/tag/v2.21.0
