@@ -497,6 +497,30 @@ RSpec.describe RE2::MatchData do
     end
   end
 
+  describe "#named_captures" do
+    it "returns a hash of capturing group names to matched strings" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.named_captures).to eq("numbers" => "123", "letters" => "abc")
+    end
+
+    it "returns an empty hash if there are no named capturing groups" do
+      md = RE2::Regexp.new('(\d+)').match('123')
+
+      expect(md.named_captures).to be_empty
+    end
+
+    it "returns unmatched optional groups as nil" do
+      md = RE2::Regexp.new('(?P<a>\d+) (?P<b>\w+)?').match('123 ')
+
+      expect(md.named_captures).to eq("a" => "123", "b" => nil)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.named_captures }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
   describe "#deconstruct_keys" do
     it "returns all named captures if given nil" do
       md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')

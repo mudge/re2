@@ -885,6 +885,35 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
   return capturing_groups;
 }
 
+/*
+ * Returns a hash of capturing group names to matched strings, with string keys.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ *
+ * @return [Hash] a hash of capturing group names to matching strings
+ * @example
+ *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *   m.named_captures #=> {"numbers" => "123", "letters" => "abc"}
+ */
+static VALUE re2_matchdata_named_captures(const VALUE self) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
+
+  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+  VALUE result = rb_hash_new();
+
+  for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
+    rb_hash_aset(result,
+        encoded_str_new(it->first.data(), it->first.size(),
+          p->pattern->options().encoding()),
+        re2_matchdata_nth_match(it->second, self));
+  }
+
+  return result;
+}
+
 static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
   re2_matchdata *self_m;
   re2_matchdata *other_m = unwrap_re2_matchdata(other);
@@ -2221,6 +2250,8 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
   rb_define_method(re2_cMatchData, "captures",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
+  rb_define_method(re2_cMatchData, "named_captures",
+      RUBY_METHOD_FUNC(re2_matchdata_named_captures), 0);
   rb_define_method(re2_cMatchData, "deconstruct_keys",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct_keys), 1);
   rb_define_method(re2_cMatchData, "initialize_copy",
