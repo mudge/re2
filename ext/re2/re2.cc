@@ -1845,6 +1845,71 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
 }
 
 /*
+ * If `pattern` matches `text`, returns a copy of `rewrite` with substitutions
+ * using
+ * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L499-L510
+ * `Extract`}. Non-matching portions of `text` are ignored.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ *
+ * @param [String] text the string from which to extract
+ * @param [String, RE2::Regexp] pattern a regexp matching the text
+ * @param [String] rewrite the rewrite string with `\1`-style substitutions
+ * @return [String, nil] the extracted string on a successful match or nil if
+ *   there is no match
+ * @raise [TypeError] if the given rewrite or pattern (if not provided as a
+ *   {RE2::Regexp}) cannot be coerced to `String`s
+ * @example
+ *   RE2.Extract("alice@example.com", '(\w+)@(\w+)', '\2-\1')
+ *   #=> "example-alice"
+ *   RE2.Extract("no match", '(\d+)', '\1') #=> nil
+ */
+static VALUE re2_Extract(VALUE, VALUE text, VALUE pattern,
+    VALUE rewrite) {
+  /* Ensure rewrite and text are strings. */
+  StringValue(rewrite);
+  StringValue(text);
+
+  re2_pattern *p;
+  std::string out;
+  bool extracted;
+
+  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
+    p = unwrap_re2_regexp(pattern);
+    extracted = RE2::Extract(
+        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
+        *p->pattern,
+        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)),
+        &out);
+
+    if (extracted) {
+      return encoded_str_new(out.data(), out.size(),
+          p->pattern->options().encoding());
+    } else {
+      return Qnil;
+    }
+  } else {
+    /* Ensure pattern is a string. */
+    StringValue(pattern);
+
+    extracted = RE2::Extract(
+        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
+        RE2(re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern))),
+        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)),
+        &out);
+
+    if (extracted) {
+      return encoded_str_new(out.data(), out.size(),
+          RE2::Options::EncodingUTF8);
+    } else {
+      return Qnil;
+    }
+  }
+}
+
+/*
  * Returns a version of `str` with all potentially meaningful regexp characters
  * escaped using
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L512-L518
@@ -2355,6 +2420,8 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_Replace), 3);
   rb_define_module_function(re2_mRE2, "GlobalReplace",
       RUBY_METHOD_FUNC(re2_GlobalReplace), 3);
+  rb_define_module_function(re2_mRE2, "Extract",
+      RUBY_METHOD_FUNC(re2_Extract), 3);
   rb_define_module_function(re2_mRE2, "QuoteMeta",
       RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
   rb_define_singleton_method(re2_cRegexp, "escape",
