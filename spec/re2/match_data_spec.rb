@@ -461,6 +461,42 @@ RSpec.describe RE2::MatchData do
     end
   end
 
+  describe "#values_at" do
+    it "returns match values at the given indices" do
+      md = RE2::Regexp.new('(\d+) (\d+) (\d+)').match("123 456 789")
+
+      expect(md.values_at(1, 3)).to eq(["123", "789"])
+    end
+
+    it "returns match values by named groups" do
+      md = RE2::Regexp.new('(?P<a>\d+) (?P<b>\d+)').match("123 456")
+
+      expect(md.values_at(:a, :b)).to eq(["123", "456"])
+    end
+
+    it "supports a mix of indices and names" do
+      md = RE2::Regexp.new('(?P<a>\d+) (\d+)').match("123 456")
+
+      expect(md.values_at(2, :a)).to eq(["456", "123"])
+    end
+
+    it "returns nil for non-existent indices" do
+      md = RE2::Regexp.new('(\d+)').match("123")
+
+      expect(md.values_at(1, 5)).to eq(["123", nil])
+    end
+
+    it "returns nil for non-existent names" do
+      md = RE2::Regexp.new('(?P<a>\d+)').match("123")
+
+      expect(md.values_at(:a, :z)).to eq(["123", nil])
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.values_at(1) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
   describe "#deconstruct" do
     it "returns all capturing groups" do
       md = RE2::Regexp.new('w(o)(o)').match('woo')
