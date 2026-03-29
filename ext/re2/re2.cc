@@ -2219,6 +2219,8 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_inspect), 0);
   rb_define_method(re2_cMatchData, "deconstruct",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
+  rb_define_method(re2_cMatchData, "captures",
+      RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
   rb_define_method(re2_cMatchData, "deconstruct_keys",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct_keys), 1);
   rb_define_method(re2_cMatchData, "initialize_copy",
