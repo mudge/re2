@@ -181,6 +181,84 @@ RSpec.describe RE2 do
     end
   end
 
+  describe ".Extract" do
+    it "extracts a rewrite of the first match" do
+      expect(RE2.Extract("alice@example.com", '(\w+)@(\w+)', '\2-\1')).to eq("example-alice")
+    end
+
+    it "returns nil if there is no match" do
+      expect(RE2.Extract("no match", '(\d+)', '\1')).to be_nil
+    end
+
+    it "supports passing an RE2::Regexp as the pattern" do
+      re = RE2::Regexp.new('(\w+)@(\w+)')
+
+      expect(RE2.Extract("alice@example.com", re, '\2-\1')).to eq("example-alice")
+    end
+
+    it "respects any passed RE2::Regexp's flags" do
+      re = RE2::Regexp.new('(hello)', case_sensitive: false)
+
+      expect(RE2.Extract("Hello", re, '\1')).to eq("Hello")
+    end
+
+    it "returns UTF-8 strings if the pattern is UTF-8" do
+      re = RE2::Regexp.new('(foo)')
+      result = RE2.Extract("foo", re, '\1')
+
+      expect(result.encoding.name).to eq("UTF-8")
+    end
+
+    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
+      re = RE2::Regexp.new('(foo)', utf8: false)
+      result = RE2.Extract("foo", re, '\1')
+
+      expect(result.encoding.name).to eq("ISO-8859-1")
+    end
+
+    it "returns UTF-8 strings when given a String pattern" do
+      result = RE2.Extract("foo", '(foo)', '\1')
+
+      expect(result.encoding.name).to eq("UTF-8")
+    end
+
+    it "supports inputs with null bytes" do
+      expect(RE2.Extract("ab\0cd", '(a.*d)', '\1')).to eq("ab\0cd")
+    end
+
+    it "supports patterns with null bytes" do
+      expect(RE2.Extract("ab\0cd", "(b\0c)", '\1')).to eq("b\0c")
+    end
+
+    it "supports rewrites with null bytes" do
+      expect(RE2.Extract("abcd", '(bc)', "x\0\\1")).to eq("x\0bc")
+    end
+
+    it "supports passing something that can be coerced to a String as input" do
+      expect(RE2.Extract(StringLike.new("bob123"), '(\d+)', '\1')).to eq("123")
+    end
+
+    it "supports passing something that can be coerced to a String as a pattern" do
+      expect(RE2.Extract("bob123", StringLike.new('(\d+)'), '\1')).to eq("123")
+    end
+
+    it "supports passing something that can be coerced to a String as a rewrite" do
+      expect(RE2.Extract("bob123", '(\d+)', StringLike.new('\1'))).to eq("123")
+    end
+
+    it "raises a Type Error for input that can't be converted to String" do
+      expect { RE2.Extract(0, '(\d+)', '\1') }.to raise_error(TypeError)
+    end
+
+    it "raises a Type Error for a non-RE2::Regexp pattern that can't be converted to String" do
+      expect { RE2.Extract("woo", 0, '\1') }.to raise_error(TypeError)
+    end
+
+    it "raises a Type Error for a rewrite that can't be converted to String" do
+      expect { RE2.Extract("woo", '(\w+)', 0) }.to raise_error(TypeError)
+    end
+  end
+
   describe "#QuoteMeta" do
     it "escapes a string so it can be used as a regular expression" do
       expect(RE2.QuoteMeta("1.5-2.0?")).to eq('1\.5\-2\.0\?')
