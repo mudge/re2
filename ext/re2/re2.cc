@@ -128,6 +128,10 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 static void re2_matchdata_mark(void *ptr) {
   re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
   rb_gc_mark_movable(m->regexp);
+
+  /* Text must not be movable because StringPiece matches hold pointers into
+   * its underlying buffer; moving the string would invalidate them.
+   */
   rb_gc_mark(m->text);
 }
 
@@ -172,6 +176,10 @@ static const rb_data_type_t re2_matchdata_data_type = {
 static void re2_scanner_mark(void *ptr) {
   re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
   rb_gc_mark_movable(s->regexp);
+
+  /* Text must not be movable because the StringPiece input holds a pointer
+   * into its underlying buffer; moving the string would invalidate it.
+   */
   rb_gc_mark(s->text);
 }
 
