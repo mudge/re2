@@ -569,6 +569,36 @@ RSpec.describe RE2::MatchData do
     end
   end
 
+  describe "#names" do
+    it "returns an array of names of named capturing groups" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.names).to eq(["letters", "numbers"])
+    end
+
+    it "returns an empty array if there are no named capturing groups" do
+      md = RE2::Regexp.new('(\d+)').match('123')
+
+      expect(md.names).to be_empty
+    end
+
+    it "returns UTF-8 strings if the pattern is UTF-8" do
+      md = RE2::Regexp.new('(?P<numbers>\d+)').match('123')
+
+      expect(md.names.first.encoding).to eq(Encoding::UTF_8)
+    end
+
+    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
+      md = RE2::Regexp.new('(?P<numbers>\d+)', utf8: false).match('123')
+
+      expect(md.names.first.encoding).to eq(Encoding::ISO_8859_1)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.names }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
   describe "#deconstruct_keys" do
     it "returns all named captures if given nil" do
       md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
