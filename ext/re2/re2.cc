@@ -967,6 +967,44 @@ static VALUE re2_matchdata_names(const VALUE self) {
   return names;
 }
 
+/*
+ * Returns an array of match values at the given indices or names.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ *
+ * @param [Integer, String, Symbol] indexes the indices or names of
+ *   the matches to fetch
+ * @return [Array<String, nil>] the values at the given indices or names
+ * @example
+ *   m = RE2::Regexp.new('(?P<a>\d+) (?P<b>\d+)').match("123 456")
+ *   m.values_at(1, 2)   #=> ["123", "456"]
+ *   m.values_at(:a, :b) #=> ["123", "456"]
+ *   m.values_at(1, :b)  #=> ["123", "456"]
+ */
+static VALUE re2_matchdata_values_at(int argc, VALUE *argv, const VALUE self) {
+  unwrap_re2_matchdata(self);
+
+  VALUE result = rb_ary_new2(argc);
+
+  for (int i = 0; i < argc; ++i) {
+    VALUE idx = argv[i];
+
+    if (TYPE(idx) == T_STRING) {
+      rb_ary_push(result, re2_matchdata_named_match(
+            std::string(RSTRING_PTR(idx), RSTRING_LEN(idx)), self));
+    } else if (SYMBOL_P(idx)) {
+      rb_ary_push(result, re2_matchdata_named_match(
+            rb_id2name(SYM2ID(idx)), self));
+    } else {
+      rb_ary_push(result, re2_matchdata_nth_match(NUM2INT(idx), self));
+    }
+  }
+
+  return result;
+}
+
 static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
   re2_matchdata *self_m;
   re2_matchdata *other_m = unwrap_re2_matchdata(other);
@@ -2375,6 +2413,8 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_named_captures), -1);
   rb_define_method(re2_cMatchData, "names",
       RUBY_METHOD_FUNC(re2_matchdata_names), 0);
+  rb_define_method(re2_cMatchData, "values_at",
+      RUBY_METHOD_FUNC(re2_matchdata_values_at), -1);
   rb_define_method(re2_cMatchData, "deconstruct_keys",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct_keys), 1);
   rb_define_method(re2_cMatchData, "initialize_copy",
