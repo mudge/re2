@@ -1755,11 +1755,11 @@ static VALUE re2_regexp_match_has_endpos_argument_p(VALUE) {
  * @raise [TypeError] if the given rewrite or pattern (if not provided as a
  *   {RE2::Regexp}) cannot be coerced to `String`s
  * @example
- *   RE2.Replace("hello there", "hello", "howdy") #=> "howdy there"
+ *   RE2.replace("hello there", "hello", "howdy") #=> "howdy there"
  *   re2 = RE2::Regexp.new("hel+o")
- *   RE2.Replace("hello there", re2, "yo")        #=> "yo there"
+ *   RE2.replace("hello there", re2, "yo")        #=> "yo there"
  */
-static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
+static VALUE re2_replace(VALUE, VALUE str, VALUE pattern,
     VALUE rewrite) {
   /* Ensure rewrite is a string. */
   StringValue(rewrite);
@@ -1809,10 +1809,10 @@ static VALUE re2_Replace(VALUE, VALUE str, VALUE pattern,
  * @return [String] the resulting string
  * @example
  *   re2 = RE2::Regexp.new("oo?")
- *   RE2.GlobalReplace("whoops-doops", re2, "e") #=> "wheps-deps"
- *   RE2.GlobalReplace("hello there", "e", "i")  #=> "hillo thiri"
+ *   RE2.global_replace("whoops-doops", re2, "e") #=> "wheps-deps"
+ *   RE2.global_replace("hello there", "e", "i")  #=> "hillo thiri"
  */
-static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
+static VALUE re2_global_replace(VALUE, VALUE str, VALUE pattern,
                                VALUE rewrite) {
   /* Ensure rewrite is a string. */
   StringValue(rewrite);
@@ -1862,11 +1862,11 @@ static VALUE re2_GlobalReplace(VALUE, VALUE str, VALUE pattern,
  * @raise [TypeError] if the given rewrite or pattern (if not provided as a
  *   {RE2::Regexp}) cannot be coerced to `String`s
  * @example
- *   RE2.Extract("alice@example.com", '(\w+)@(\w+)', '\2-\1')
+ *   RE2.extract("alice@example.com", '(\w+)@(\w+)', '\2-\1')
  *   #=> "example-alice"
- *   RE2.Extract("no match", '(\d+)', '\1') #=> nil
+ *   RE2.extract("no match", '(\d+)', '\1') #=> nil
  */
-static VALUE re2_Extract(VALUE, VALUE text, VALUE pattern,
+static VALUE re2_extract(VALUE, VALUE text, VALUE pattern,
     VALUE rewrite) {
   /* Ensure rewrite and text are strings. */
   StringValue(rewrite);
@@ -1920,9 +1920,12 @@ static VALUE re2_Extract(VALUE, VALUE text, VALUE pattern,
  * @raise [TypeError] if the given unquoted string cannot be coerced to a `String`
  * @return [String] the escaped string
  * @example
+ *   RE2.escape("1.5-2.0?")         #=> "1\.5\-2\.0\?"
+ *   RE2.quote("1.5-2.0?")          #=> "1\.5\-2\.0\?"
  *   RE2::Regexp.escape("1.5-2.0?") #=> "1\.5\-2\.0\?"
+ *   RE2::Regexp.quote("1.5-2.0?")  #=> "1\.5\-2\.0\?"
  */
-static VALUE re2_QuoteMeta(VALUE, VALUE unquoted) {
+static VALUE re2_escape(VALUE, VALUE unquoted) {
   StringValue(unquoted);
 
   std::string quoted_string = RE2::QuoteMeta(
@@ -2416,18 +2419,26 @@ extern "C" void Init_re2(void) {
   rb_define_method(re2_cSet, "size", RUBY_METHOD_FUNC(re2_set_size), 0);
   rb_define_method(re2_cSet, "length", RUBY_METHOD_FUNC(re2_set_size), 0);
 
+  rb_define_module_function(re2_mRE2, "replace",
+      RUBY_METHOD_FUNC(re2_replace), 3);
   rb_define_module_function(re2_mRE2, "Replace",
-      RUBY_METHOD_FUNC(re2_Replace), 3);
+      RUBY_METHOD_FUNC(re2_replace), 3);
+  rb_define_module_function(re2_mRE2, "global_replace",
+      RUBY_METHOD_FUNC(re2_global_replace), 3);
   rb_define_module_function(re2_mRE2, "GlobalReplace",
-      RUBY_METHOD_FUNC(re2_GlobalReplace), 3);
-  rb_define_module_function(re2_mRE2, "Extract",
-      RUBY_METHOD_FUNC(re2_Extract), 3);
+      RUBY_METHOD_FUNC(re2_global_replace), 3);
+  rb_define_module_function(re2_mRE2, "extract",
+      RUBY_METHOD_FUNC(re2_extract), 3);
   rb_define_module_function(re2_mRE2, "QuoteMeta",
-      RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
+      RUBY_METHOD_FUNC(re2_escape), 1);
+  rb_define_module_function(re2_mRE2, "escape",
+      RUBY_METHOD_FUNC(re2_escape), 1);
+  rb_define_module_function(re2_mRE2, "quote",
+      RUBY_METHOD_FUNC(re2_escape), 1);
   rb_define_singleton_method(re2_cRegexp, "escape",
-      RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
+      RUBY_METHOD_FUNC(re2_escape), 1);
   rb_define_singleton_method(re2_cRegexp, "quote",
-      RUBY_METHOD_FUNC(re2_QuoteMeta), 1);
+      RUBY_METHOD_FUNC(re2_escape), 1);
 
   // (see RE2::Regexp#initialize)
   rb_define_singleton_method(re2_cRegexp, "compile",

@@ -27,6 +27,8 @@ RE2('(\w+):(\d+)').full_match("ruby:1234")
     * [Submatch extraction](#submatch-extraction)
     * [Scanning text incrementally](#scanning-text-incrementally)
     * [Searching simultaneously](#searching-simultaneously)
+    * [Replacing and extracting](#replacing-and-extracting)
+    * [Escaping](#escaping)
     * [Encoding](#encoding)
 * [Requirements](#requirements)
     * [Native gems](#native-gems)
@@ -165,7 +167,37 @@ m["word"]   #=> "ruby"
 m["number"] #=> "1234"
 ```
 
-They can also be used with Ruby's [pattern matching](https://docs.ruby-lang.org/en/3.2/syntax/pattern_matching_rdoc.html):
+Multiple submatches can be retrieved at the same time by numeric index or name:
+
+```ruby
+m = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)').full_match("ruby:1234:5678")
+#=> #<RE2::MatchData "ruby:1234" 1:"ruby" 2:"1234">
+
+m.values_at("word", :number, 3)
+#=> ["ruby", "1234", "5678"]
+```
+
+All captures can be returned as an array:
+
+```ruby
+m = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)').full_match("ruby:1234:5678")
+#=> #<RE2::MatchData "ruby:1234" 1:"ruby" 2:"1234">
+
+m.captures
+#=> ["ruby", "1234", "5678"]
+```
+
+And named captures can be returned as a hash:
+
+```ruby
+m = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)').full_match("ruby:1234:5678")
+#=> #<RE2::MatchData "ruby:1234" 1:"ruby" 2:"1234">
+
+m.named_captures
+=> {"number" => "1234", "word" => "ruby"}
+```
+
+`RE2::MatchData` objects can also be used with Ruby's [pattern matching](https://docs.ruby-lang.org/en/3.2/syntax/pattern_matching_rdoc.html):
 
 ```ruby
 case RE2('(\w+):(\d+)').full_match("ruby:1234")
@@ -236,6 +268,42 @@ set.size               #=> 3
 set.compile            #=> true
 set.match("abcdefghi") #=> [0, 1, 2]
 set.match("ghidefabc") #=> [2, 1, 0]
+```
+
+### Replacing and extracting
+
+[`RE2.replace`](https://mudge.name/re2/RE2.html#replace-class_method) returns a copy of a given string with the first occurrence of a pattern replaced with a given rewrite string:
+
+```ruby
+RE2.replace("hello there", "hello", "howdy") #=> "howdy there"
+```
+
+The pattern can be given as either a string or an `RE2::Regexp`:
+
+```ruby
+re = RE2('hel+o')
+RE2.replace("hello there", re, "yo") #=> "yo there"
+```
+
+To replace _all_ matches and not just the first, use [`RE2.global_replace`](https://mudge.name/re2/RE2.html#global_replace-class_method):
+
+```ruby
+RE2.global_replace("hallo thare", "a", "e")  #=> "hello there"
+```
+
+To extract matches with a given rewrite string including substitutions, use [`RE2.extract`](https://mudge.name/re2/RE2.html#extract-class_method):
+
+```ruby
+RE2.extract("alice@example.com", '(\w+)@(\w+)', '\2-\1')
+#=> "example-alice"
+```
+
+### Escaping
+
+To escape all potentially meaningful regexp characters in a string, use [`RE2.escape`](https://mudge.name/re2/RE2.html#escape-class_method):
+
+```ruby
+RE2.escape("1.5-2.0?") #=> "1\.5\-2\.0\?"
 ```
 
 ### Encoding
