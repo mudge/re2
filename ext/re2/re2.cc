@@ -51,7 +51,7 @@ static ID id_utf8, id_posix_syntax, id_longest_match, id_log_errors,
           id_max_mem, id_literal, id_never_nl, id_case_sensitive,
           id_perl_classes, id_word_boundary, id_one_line, id_unanchored,
           id_anchor, id_anchor_start, id_anchor_both, id_exception,
-          id_submatches, id_startpos, id_endpos;
+          id_submatches, id_startpos, id_endpos, id_symbolize_names;
 
 inline VALUE encoded_str_new(const char *str, long length, RE2::Options::Encoding encoding) {
   if (encoding == RE2::Options::EncodingUTF8) {
@@ -886,18 +886,39 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
 }
 
 /*
- * Returns a hash of capturing group names to matched strings, with string keys.
+ * Returns a hash of capturing group names to matched strings.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
  * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
  * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
- * @return [Hash] a hash of capturing group names to matching strings
- * @example
- *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
- *   m.named_captures #=> {"numbers" => "123", "letters" => "abc"}
+ * @overload named_captures()
+ *   Returns a hash with string keys.
+ *
+ *   @return [Hash] a hash of capturing group names to matching strings
+ *   @example
+ *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *     m.named_captures #=> {"numbers" => "123", "letters" => "abc"}
+ *
+ * @overload named_captures(symbolize_names: true)
+ *   Returns a hash with string or symbol keys.
+ *
+ *   @param [Boolean] symbolize_names whether to return group names as symbols or not
+ *   @return [Hash] a hash of capturing group names to matching strings
+ *   @example
+ *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *     m.named_captures(symbolize_names: true) #=> {numbers: "123", letters: "abc"}
  */
-static VALUE re2_matchdata_named_captures(const VALUE self) {
+static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE self) {
+  VALUE opts;
+  rb_scan_args(argc, argv, "0:", &opts);
+
+  bool symbolize = false;
+  if (!NIL_P(opts)) {
+    VALUE sym = rb_hash_aref(opts, ID2SYM(id_symbolize_names));
+    symbolize = RTEST(sym);
+  }
+
   re2_matchdata *m = unwrap_re2_matchdata(self);
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
@@ -905,10 +926,14 @@ static VALUE re2_matchdata_named_captures(const VALUE self) {
   VALUE result = rb_hash_new();
 
   for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
-    rb_hash_aset(result,
-        encoded_str_new(it->first.data(), it->first.size(),
-          p->pattern->options().encoding()),
-        re2_matchdata_nth_match(it->second, self));
+    VALUE key;
+    if (symbolize) {
+      key = ID2SYM(rb_intern(it->first.data()));
+    } else {
+      key = encoded_str_new(it->first.data(), it->first.size(),
+              p->pattern->options().encoding());
+    }
+    rb_hash_aset(result, key, re2_matchdata_nth_match(it->second, self));
   }
 
   return result;
@@ -2319,7 +2344,7 @@ extern "C" void Init_re2(void) {
   rb_define_method(re2_cMatchData, "captures",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct), 0);
   rb_define_method(re2_cMatchData, "named_captures",
-      RUBY_METHOD_FUNC(re2_matchdata_named_captures), 0);
+      RUBY_METHOD_FUNC(re2_matchdata_named_captures), -1);
   rb_define_method(re2_cMatchData, "deconstruct_keys",
       RUBY_METHOD_FUNC(re2_matchdata_deconstruct_keys), 1);
   rb_define_method(re2_cMatchData, "initialize_copy",
@@ -2466,4 +2491,5 @@ extern "C" void Init_re2(void) {
   id_submatches = rb_intern("submatches");
   id_startpos = rb_intern("startpos");
   id_endpos = rb_intern("endpos");
+  id_symbolize_names = rb_intern("symbolize_names");
 }

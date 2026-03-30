@@ -552,6 +552,18 @@ RSpec.describe RE2::MatchData do
       expect(md.named_captures).to eq("a" => "123", "b" => nil)
     end
 
+    it "returns symbol keys when symbolize_names: true" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.named_captures(symbolize_names: true)).to eq(numbers: "123", letters: "abc")
+    end
+
+    it "returns string keys when symbolize_names: false" do
+      md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+
+      expect(md.named_captures(symbolize_names: false)).to eq("numbers" => "123", "letters" => "abc")
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.named_captures }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
