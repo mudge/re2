@@ -167,34 +167,36 @@ m["word"]   #=> "ruby"
 m["number"] #=> "1234"
 ```
 
-Multiple submatches can be retrieved at the same time by numeric index or name:
+Multiple submatches can be retrieved at the same time by numeric index or name with [`values_at`](https://mudge.name/re2/RE2/MatchData.html#values_at-instance_method):
 
 ```ruby
 m = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)').full_match("ruby:1234:5678")
-#=> #<RE2::MatchData "ruby:1234" 1:"ruby" 2:"1234">
+#=> #<RE2::MatchData "ruby:1234:5678" 1:"ruby" 2:"1234" 3:"5678">
 
 m.values_at("word", :number, 3)
 #=> ["ruby", "1234", "5678"]
 ```
 
-All captures can be returned as an array:
+All captures and capturing group names can be returned as an array with [`captures`](https://mudge.name/re2/RE2/MatchData.html#captures-instance_method) and [`names`](https://mudge.name/re2/RE2/MatchData.html#names-instance_method):
 
 ```ruby
 m = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)').full_match("ruby:1234:5678")
-#=> #<RE2::MatchData "ruby:1234" 1:"ruby" 2:"1234">
+#=> #<RE2::MatchData "ruby:1234:5678" 1:"ruby" 2:"1234" 3:"5678">
 
-m.captures
-#=> ["ruby", "1234", "5678"]
+m.captures #=> ["ruby", "1234", "5678"]
+m.names    #=> ["number", "word"]
 ```
 
-And named captures can be returned as a hash:
+Named captures can be returned as a hash with [`named_captures`](https://mudge.name/re2/RE2/MatchData.html#named_captures-instance_method):
 
 ```ruby
 m = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)').full_match("ruby:1234:5678")
-#=> #<RE2::MatchData "ruby:1234" 1:"ruby" 2:"1234">
+#=> #<RE2::MatchData "ruby:1234:5678" 1:"ruby" 2:"1234" 3:"5678">
 
 m.named_captures
-=> {"number" => "1234", "word" => "ruby"}
+#=> {"number" => "1234", "word" => "ruby"}
+m.named_captures(symbolize_names: true)
+#=> {number: "1234", word: "ruby"}
 ```
 
 `RE2::MatchData` objects can also be used with Ruby's [pattern matching](https://docs.ruby-lang.org/en/3.2/syntax/pattern_matching_rdoc.html):
@@ -303,7 +305,7 @@ RE2.extract("alice@example.com", '(\w+)@(\w+)', '\2-\1')
 To escape all potentially meaningful regexp characters in a string, use [`RE2.escape`](https://mudge.name/re2/RE2.html#escape-class_method):
 
 ```ruby
-RE2.escape("1.5-2.0?") #=> "1\.5\-2\.0\?"
+RE2.escape("1.5-2.0?") #=> "1\\.5\\-2\\.0\\?"
 ```
 
 ### Encoding

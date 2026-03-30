@@ -892,7 +892,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
  * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
  * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
  *
- * @overload named_captures()
+ * @overload named_captures
  *   Returns a hash with string keys.
  *
  *   @return [Hash] a hash of capturing group names to matching strings
@@ -900,13 +900,15 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
  *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
  *     m.named_captures #=> {"numbers" => "123", "letters" => "abc"}
  *
- * @overload named_captures(symbolize_names: true)
+ * @overload named_captures(symbolize_names:)
  *   Returns a hash with string or symbol keys.
  *
- *   @param [Boolean] symbolize_names whether to return group names as symbols or not
+ *   @param [Boolean] symbolize_names whether to return group names as symbols
  *   @return [Hash] a hash of capturing group names to matching strings
  *   @example
  *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *     m.named_captures
+ *     #=> {"numbers" => "123", "letters" => "abc"}
  *     m.named_captures(symbolize_names: true) #=> {numbers: "123", letters: "abc"}
  */
 static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE self) {
@@ -2011,10 +2013,10 @@ static VALUE re2_extract(VALUE, VALUE text, VALUE pattern,
  * @raise [TypeError] if the given unquoted string cannot be coerced to a `String`
  * @return [String] the escaped string
  * @example
- *   RE2.escape("1.5-2.0?")         #=> "1\.5\-2\.0\?"
- *   RE2.quote("1.5-2.0?")          #=> "1\.5\-2\.0\?"
- *   RE2::Regexp.escape("1.5-2.0?") #=> "1\.5\-2\.0\?"
- *   RE2::Regexp.quote("1.5-2.0?")  #=> "1\.5\-2\.0\?"
+ *   RE2.escape("1.5-2.0?")         #=> "1\\.5\\-2\\.0\\?"
+ *   RE2.quote("1.5-2.0?")          #=> "1\\.5\\-2\\.0\\?"
+ *   RE2::Regexp.escape("1.5-2.0?") #=> "1\\.5\\-2\\.0\\?"
+ *   RE2::Regexp.quote("1.5-2.0?")  #=> "1\\.5\\-2\\.0\\?"
  */
 static VALUE re2_escape(VALUE, VALUE unquoted) {
   StringValue(unquoted);
