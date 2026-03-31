@@ -281,7 +281,9 @@ static re2_scanner *unwrap_re2_scanner(VALUE self) {
 }
 
 /*
- * Returns an array of names of all named capturing groups.
+ * Returns an array of names of all named capturing groups. Names are returned
+ * in alphabetical order rather than definition order, as RE2 stores named
+ * groups internally in a sorted map.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
  * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
@@ -968,7 +970,9 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
 }
 
 /*
- * Returns an array of names of named capturing groups.
+ * Returns an array of names of named capturing groups. Names are returned in
+ * alphabetical order rather than definition order, as RE2 stores named groups
+ * internally in a sorted map.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
  * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
