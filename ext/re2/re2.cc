@@ -599,6 +599,119 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
 }
 
 /*
+ * Returns the portion of the original string before the match.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ *
+ * @return [String] the portion of the original string before the match
+ * @example
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123 456")
+ *   m.pre_match #=> "bob "
+ */
+static VALUE re2_matchdata_pre_match(const VALUE self) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
+
+  re2::StringPiece *match = &m->matches[0];
+  if (match->empty()) {
+    return Qnil;
+  }
+
+  long offset = match->data() - RSTRING_PTR(m->text);
+
+  return encoded_str_new(RSTRING_PTR(m->text), offset,
+      p->pattern->options().encoding());
+}
+
+/*
+ * Returns the portion of the original string after the match.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ *
+ * @return [String] the portion of the original string after the match
+ * @example
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123 456")
+ *   m.post_match #=> " 456"
+ */
+static VALUE re2_matchdata_post_match(const VALUE self) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+  re2_pattern *p = unwrap_re2_regexp(m->regexp);
+
+  re2::StringPiece *match = &m->matches[0];
+  if (match->empty()) {
+    return Qnil;
+  }
+
+  long start = (match->data() - RSTRING_PTR(m->text)) + match->size();
+  long remaining = RSTRING_LEN(m->text) - start;
+
+  return encoded_str_new(RSTRING_PTR(m->text) + start, remaining,
+      p->pattern->options().encoding());
+}
+
+/*
+ * Returns a two-element array containing the beginning and ending offsets of
+ * the nth match.
+ *
+ * @param [Integer, String, Symbol] n the name or number of the match
+ * @return [Array<Integer>, nil] a two-element array with the beginning and
+ *   ending offsets of the match or `nil` if there is no such match
+ * @example
+ *   m = RE2::Regexp.new('ob (\d+)').partial_match("bob 123")
+ *   m.offset(0) #=> [1, 7]
+ *   m.offset(1) #=> [4, 7]
+ */
+static VALUE re2_matchdata_offset(const VALUE self, VALUE n) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+
+  re2::StringPiece *match = re2_matchdata_find_match(n, self);
+  if (match == NULL) {
+    return Qnil;
+  }
+
+  long start = match->data() - RSTRING_PTR(m->text);
+  long end_pos = start + match->size();
+
+  VALUE array = rb_ary_new2(2);
+  rb_ary_push(array, LONG2NUM(rb_str_sublen(m->text, start)));
+  rb_ary_push(array, LONG2NUM(rb_str_sublen(m->text, end_pos)));
+
+  return array;
+}
+
+/*
+ * Returns the length of the nth match in characters. This is equivalent to
+ * `m[n].length` but without allocating a new string.
+ *
+ * @param [Integer, String, Symbol] n the name or number of the match
+ * @return [Integer, nil] the length of the match or `nil` if there is no such
+ *   match
+ * @example
+ *   m = RE2::Regexp.new('(?P<word>\w+) (?P<number>\d+)').partial_match("alice 123")
+ *   m.match_length(0)       #=> 9
+ *   m.match_length(1)       #=> 5
+ *   m.match_length(:number) #=> 3
+ */
+static VALUE re2_matchdata_match_length(const VALUE self, VALUE n) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+
+  re2::StringPiece *match = re2_matchdata_find_match(n, self);
+  if (match == NULL) {
+    return Qnil;
+  }
+
+  long start = match->data() - RSTRING_PTR(m->text);
+  long end_pos = start + match->size();
+  long char_len = rb_str_sublen(m->text, end_pos) - rb_str_sublen(m->text, start);
+
+  return LONG2NUM(char_len);
+}
+
+/*
  * Returns the {RE2::Regexp} used in the match.
  *
  * @return [RE2::Regexp] the regular expression used in the match
@@ -2427,6 +2540,14 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_begin), 1);
   rb_define_method(re2_cMatchData, "end",
       RUBY_METHOD_FUNC(re2_matchdata_end), 1);
+  rb_define_method(re2_cMatchData, "pre_match",
+      RUBY_METHOD_FUNC(re2_matchdata_pre_match), 0);
+  rb_define_method(re2_cMatchData, "post_match",
+      RUBY_METHOD_FUNC(re2_matchdata_post_match), 0);
+  rb_define_method(re2_cMatchData, "offset",
+      RUBY_METHOD_FUNC(re2_matchdata_offset), 1);
+  rb_define_method(re2_cMatchData, "match_length",
+      RUBY_METHOD_FUNC(re2_matchdata_match_length), 1);
   rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
       -1);
   rb_define_method(re2_cMatchData, "to_s",

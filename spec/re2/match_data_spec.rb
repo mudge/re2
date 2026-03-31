@@ -461,6 +461,186 @@ RSpec.describe RE2::MatchData do
     end
   end
 
+  describe "#pre_match" do
+    it "returns the portion of the string before the match" do
+      md = RE2::Regexp.new('(\d+)').match("bob 123 456")
+
+      expect(md.pre_match).to eq("bob ")
+    end
+
+    it "returns an empty string when the match starts at the beginning" do
+      md = RE2::Regexp.new('(\w+)').match("bob 123")
+
+      expect(md.pre_match).to eq("")
+    end
+
+    it "supports multibyte characters" do
+      md = RE2::Regexp.new('(\d+)').match("I ♥ 123")
+
+      expect(md.pre_match).to eq("I ♥ ")
+    end
+
+    it "returns UTF-8 strings by default" do
+      md = RE2::Regexp.new('(\d+)').match("abc 123")
+
+      expect(md.pre_match.encoding).to eq(Encoding::UTF_8)
+    end
+
+    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
+      md = RE2::Regexp.new('(\d+)', utf8: false).match("abc 123")
+
+      expect(md.pre_match.encoding).to eq(Encoding::ISO_8859_1)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.pre_match }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
+  describe "#post_match" do
+    it "returns the portion of the string after the match" do
+      md = RE2::Regexp.new('(\d+)').match("bob 123 456")
+
+      expect(md.post_match).to eq(" 456")
+    end
+
+    it "returns an empty string when the match ends at the end" do
+      md = RE2::Regexp.new('(\d+)$').match("bob 123")
+
+      expect(md.post_match).to eq("")
+    end
+
+    it "supports multibyte characters" do
+      md = RE2::Regexp.new('(\d+)').match("123 ♥ world")
+
+      expect(md.post_match).to eq(" ♥ world")
+    end
+
+    it "returns UTF-8 strings by default" do
+      md = RE2::Regexp.new('(\d+)').match("abc 123 def")
+
+      expect(md.post_match.encoding).to eq(Encoding::UTF_8)
+    end
+
+    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
+      md = RE2::Regexp.new('(\d+)', utf8: false).match("abc 123 def")
+
+      expect(md.post_match.encoding).to eq(Encoding::ISO_8859_1)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.post_match }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
+  describe "#offset" do
+    it "returns the offset of a match by index" do
+      md = RE2::Regexp.new('ob (\d+)').match("bob 123")
+
+      expect(md.offset(0)).to eq([1, 7])
+    end
+
+    it "returns the offset of a submatch by index" do
+      md = RE2::Regexp.new('ob (\d+)').match("bob 123")
+
+      expect(md.offset(1)).to eq([4, 7])
+    end
+
+    it "returns the offset of a match by string name" do
+      md = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
+
+      expect(md.offset("number")).to eq([4, 7])
+    end
+
+    it "returns the offset of a match by symbol name" do
+      md = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
+
+      expect(md.offset(:number)).to eq([4, 7])
+    end
+
+    it "returns character offsets despite multibyte characters" do
+      md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
+
+      expect(md.offset(0)).to eq([4, 8])
+    end
+
+    it "returns nil for non-existent numerical matches" do
+      md = RE2::Regexp.new('(\d)').match("123")
+
+      expect(md.offset(10)).to be_nil
+    end
+
+    it "returns nil for non-existent named matches" do
+      md = RE2::Regexp.new('(\d)').match("123")
+
+      expect(md.offset("foo")).to be_nil
+    end
+
+    it "raises a type error if given an invalid name or number" do
+      md = RE2::Regexp.new('(\d)').match("123")
+
+      expect { md.offset(nil) }.to raise_error(TypeError)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.offset(0) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
+  describe "#match_length" do
+    it "returns the length of the overall match" do
+      md = RE2::Regexp.new('ob (\d+)').match("bob 123")
+
+      expect(md.match_length(0)).to eq(6)
+    end
+
+    it "returns the length of a submatch by index" do
+      md = RE2::Regexp.new('ob (\d+)').match("bob 123")
+
+      expect(md.match_length(1)).to eq(3)
+    end
+
+    it "returns the length of a match by string name" do
+      md = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
+
+      expect(md.match_length("number")).to eq(3)
+    end
+
+    it "returns the length of a match by symbol name" do
+      md = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
+
+      expect(md.match_length(:number)).to eq(3)
+    end
+
+    it "returns character length despite multibyte characters" do
+      md = RE2::Regexp.new('(♥ Ruby)').match("I ♥ Ruby!")
+
+      expect(md.match_length(0)).to eq(6)
+    end
+
+    it "returns nil for non-existent numerical matches" do
+      md = RE2::Regexp.new('(\d)').match("123")
+
+      expect(md.match_length(10)).to be_nil
+    end
+
+    it "returns nil for non-existent named matches" do
+      md = RE2::Regexp.new('(\d)').match("123")
+
+      expect(md.match_length("foo")).to be_nil
+    end
+
+    it "raises a type error if given an invalid name or number" do
+      md = RE2::Regexp.new('(\d)').match("123")
+
+      expect { md.match_length(nil) }.to raise_error(TypeError)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.match_length(0) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
   describe "#values_at" do
     it "returns match values at the given indices" do
       md = RE2::Regexp.new('(\d+) (\d+) (\d+)').match("123 456 789")

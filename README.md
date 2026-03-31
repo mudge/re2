@@ -216,6 +216,22 @@ re.named_captures
 #=> {"number" => 2, "word" => 1}
 ```
 
+The strings before and after a match can be returned with [`pre_match`](https://mudge.name/re2/RE2/MatchData.html#pre_match-instance_method) and [`post_match`](https://mudge.name/re2/RE2/MatchData.html#post_match-instance_method):
+
+```ruby
+m = RE2::Regexp.new('(\d+)').partial_match("bob 123 456")
+m.pre_match  #=> "bob "
+m.post_match #=> " 456"
+```
+
+The [`offset`](https://mudge.name/re2/RE2/MatchData.html#offset-instance_method) and [`match_length`](https://mudge.name/re2/RE2/MatchData.html#match_length-instance_method) of a match can be retrieved by index or name:
+
+```ruby
+m = RE2::Regexp.new('(\d+)').partial_match("bob 123 456")
+m.offset(1)       #=> [4, 7]
+m.match_length(1) #=> 3
+```
+
 `RE2::MatchData` objects can also be used with Ruby's [pattern matching](https://docs.ruby-lang.org/en/3.2/syntax/pattern_matching_rdoc.html):
 
 ```ruby
