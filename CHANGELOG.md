@@ -5,6 +5,33 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.25.0] - 2026-03-31
+### Added
+- Add RE2.extract to expose RE2's Extract API which returns a given rewrite
+  string with substitutions for a given text and matching pattern (non-matching
+  portions are ignored).
+- Add RE2::Regexp#names and RE2::MatchData#names to return an array of named
+  capturing group names
+- Add RE2::MatchData#captures to return an array of matches.
+- Add RE2::MatchData#named_captures to return a hash of named capturing group
+  names (either as strings or symbols) to matches.
+- Add RE2::Regexp#named_captures to return a hash of named capturing group
+  names to match indexes (this is an alias to the existing
+  RE2::Regexp#named_capturing_groups).
+- Add RE2::MatchData#values_at to retrieve multiple matches at once by name or
+  index.
+- Add RE2::MatchData#pre_match and RE2::MatchData#post_match for retrieving the
+  string before and after a match.
+- Add RE2::MatchData#offset for fetching the beginning and end offset for a
+  given match by name or index.
+- Add RE2::MatchData#match_length for fetching the length of a match by name or
+  index without allocating a new string.
+
+### Changed
+- Prefer the more idiomatic naming of RE2.replace, RE2.global_replace, and
+  RE2.escape (though the old API of RE2.Replace, RE2.GlobalReplace, and
+  RE2.QuoteMeta will continue to work).
+
 ## [2.24.0] - 2026-03-28
 ### Changed
 - Upgrade the bundled version of Abseil to 20260107.1. Note this requires
@@ -383,6 +410,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
 
+[2.25.0]: https://github.com/mudge/re2/releases/tag/v2.25.0
 [2.24.0]: https://github.com/mudge/re2/releases/tag/v2.24.0
 [2.23.0]: https://github.com/mudge/re2/releases/tag/v2.23.0
 [2.22.0]: https://github.com/mudge/re2/releases/tag/v2.22.0
