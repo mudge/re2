@@ -213,7 +213,7 @@ This is [also available](https://mudge.name/re2/RE2/Regexp.html#named_captures-i
 ```ruby
 re = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)')
 re.named_captures
-#=> => {"number" => 2, "word" => 1}
+#=> {"number" => 2, "word" => 1}
 ```
 
 `RE2::MatchData` objects can also be used with Ruby's [pattern matching](https://docs.ruby-lang.org/en/3.2/syntax/pattern_matching_rdoc.html):

@@ -729,7 +729,7 @@ static VALUE re2_matchdata_named_match(const std::string &name, const VALUE self
  *   @return [Array<String, nil>] the specified matches
  *   @example
  *     m = RE2::Regexp.new('(\d+)').match("bob 123")
- *     m[0..1] #=> "[123", "123"]
+ *     m[0..1] #=> ["123", "123"]
  *
  * @overload [](name)
  *   Access a particular match by name.
@@ -761,6 +761,9 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, const VALUE self) {
  * Returns the entire matched string.
  *
  * @return [String] the entire matched string
+ * @example
+ *   m = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
+ *   m.to_s #=> "123"
  */
 static VALUE re2_matchdata_to_s(const VALUE self) {
   return re2_matchdata_nth_match(0, self);
@@ -810,7 +813,7 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
 }
 
 /*
- * Returns the array of submatches for pattern matching.
+ * Returns the array of submatches.
  *
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
  * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
@@ -820,6 +823,7 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
  * @return [Array<String, nil>] the array of submatches
  * @example
  *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m.captures    #=> ["123"]
  *   m.deconstruct #=> ["123"]
  *
  * @example pattern matching
@@ -1760,6 +1764,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L413-L427
  * `PartialMatch`}.
  *
+ * @param [String] text the text to search
  * @return [Boolean] whether the match was successful
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
@@ -1778,6 +1783,7 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L376-L411
  * `FullMatch`}.
  *
+ * @param [String] text the text to search
  * @return [Boolean] whether the match was successful
  * @raise [TypeError] if text cannot be coerced to a `String`
  */

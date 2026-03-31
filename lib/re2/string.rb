@@ -13,14 +13,14 @@ require "re2"
 module RE2
   # @deprecated Use methods on {RE2} and {RE2::Regexp} instead.
   module String
-    # @deprecated Use {RE2.Replace} instead.
+    # @deprecated Use {RE2.replace} instead.
     def re2_sub(*args)
-      RE2.Replace(self, *args)
+      RE2.replace(self, *args)
     end
 
-    # @deprecated Use {RE2.GlobalReplace} instead.
+    # @deprecated Use {RE2.global_replace} instead.
     def re2_gsub(*args)
-      RE2.GlobalReplace(self, *args)
+      RE2.global_replace(self, *args)
     end
 
     # @deprecated Use {RE2::Regexp#match} instead.
@@ -28,9 +28,9 @@ module RE2
       RE2::Regexp.new(pattern).match(self, *args)
     end
 
-    # @deprecated Use {RE2.QuoteMeta} instead.
+    # @deprecated Use {RE2.escape} instead.
     def re2_escape
-      RE2.QuoteMeta(self)
+      RE2.escape(self)
     end
 
     alias_method :re2_quote, :re2_escape
