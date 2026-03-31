@@ -886,7 +886,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
   if (NIL_P(keys)) {
     for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
       rb_hash_aset(capturing_groups,
-          ID2SYM(rb_intern(it->first.data())),
+          ID2SYM(rb_intern2(it->first.data(), it->first.size())),
           re2_matchdata_nth_match(it->second, self));
     }
   } else {
@@ -956,7 +956,7 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
   for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
     VALUE key;
     if (symbolize) {
-      key = ID2SYM(rb_intern(it->first.data()));
+      key = ID2SYM(rb_intern2(it->first.data(), it->first.size()));
     } else {
       key = encoded_str_new(it->first.data(), it->first.size(),
               p->pattern->options().encoding());
