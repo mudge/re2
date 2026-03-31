@@ -723,7 +723,6 @@ RSpec.describe RE2::Regexp do
 
     it "raises an exception if given too large a number of submatches instead of options" do
       re = RE2::Regexp.new('(\w+) (\w+) (\w+)')
-      md = re.match("one two three", 2)
 
       expect { re.match("one two three", INT_MAX) }.to raise_error(RangeError, "number of matches should be < #{INT_MAX}")
     end
