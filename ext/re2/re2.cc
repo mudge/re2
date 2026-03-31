@@ -539,7 +539,7 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
  *
  * @return [Integer] the number of elements
  * @example
- *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *   m.size   #=> 2
  *   m.length #=> 2
  */
@@ -556,7 +556,7 @@ static VALUE re2_matchdata_size(const VALUE self) {
  * @return [Integer, nil] the offset of the start of the match or `nil` if
  *   there is no such submatch
  * @example
- *   m = RE2::Regexp.new('ob (\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('ob (\d+)').partial_match("bob 123")
  *   m.begin(0) #=> 1
  *   m.begin(1) #=> 4
  */
@@ -581,7 +581,7 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
  * @return [Integer, nil] the offset of the character following the end of the
  *   match or `nil` if there is no such match
  * @example
- *   m = RE2::Regexp.new('ob (\d+) b').match("bob 123 bob")
+ *   m = RE2::Regexp.new('ob (\d+) b').partial_match("bob 123 bob")
  *   m.end(0) #=> 9
  *   m.end(1) #=> 7
  */
@@ -603,7 +603,7 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
  *
  * @return [RE2::Regexp] the regular expression used in the match
  * @example
- *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *   m.regexp #=> #<RE2::Regexp /(\d+)/>
  */
 static VALUE re2_matchdata_regexp(const VALUE self) {
@@ -642,7 +642,7 @@ static VALUE re2_regexp_allocate(VALUE klass) {
  *
  * @return [Array<String, nil>] the array of matches
  * @example
- *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *   m.to_a #=> ["123", "123"]
  */
 static VALUE re2_matchdata_to_a(const VALUE self) {
@@ -709,7 +709,7 @@ static VALUE re2_matchdata_named_match(const std::string &name, const VALUE self
  *   @param [Integer] index the index of the match to fetch
  *   @return [String, nil] the specified match or `nil` if it isn't present
  *   @example
- *     m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *     m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *     m[0] #=> "123"
  *
  * @overload [](start, length)
@@ -719,7 +719,7 @@ static VALUE re2_matchdata_named_match(const std::string &name, const VALUE self
  *   @param [Integer] length the number of elements to fetch
  *   @return [Array<String, nil>] the specified matches
  *   @example
- *     m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *     m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *     m[0, 1] #=> ["123"]
  *
  * @overload [](range)
@@ -728,7 +728,7 @@ static VALUE re2_matchdata_named_match(const std::string &name, const VALUE self
  *   @param [Range] range the range of match indexes to fetch
  *   @return [Array<String, nil>] the specified matches
  *   @example
- *     m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *     m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *     m[0..1] #=> ["123", "123"]
  *
  * @overload [](name)
@@ -737,7 +737,7 @@ static VALUE re2_matchdata_named_match(const std::string &name, const VALUE self
  *   @param [String, Symbol] name the name of the match to fetch
  *   @return [String, nil] the specific match or `nil` if it isn't present
  *   @example
- *     m = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
+ *     m = RE2::Regexp.new('(?P<number>\d+)').partial_match("bob 123")
  *     m["number"] #=> "123"
  *     m[:number]  #=> "123"
  */
@@ -762,7 +762,7 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, const VALUE self) {
  *
  * @return [String] the entire matched string
  * @example
- *   m = RE2::Regexp.new('(?P<number>\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('(?P<number>\d+)').partial_match("bob 123")
  *   m.to_s #=> "123"
  */
 static VALUE re2_matchdata_to_s(const VALUE self) {
@@ -778,7 +778,7 @@ static VALUE re2_matchdata_to_s(const VALUE self) {
  *
  * @return [String] a printable version of the match
  * @example
- *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *   m.inspect #=> "#<RE2::MatchData \"123\" 1:\"123\">"
  */
 static VALUE re2_matchdata_inspect(const VALUE self) {
@@ -822,12 +822,12 @@ static VALUE re2_matchdata_inspect(const VALUE self) {
  *
  * @return [Array<String, nil>] the array of submatches
  * @example
- *   m = RE2::Regexp.new('(\d+)').match("bob 123")
+ *   m = RE2::Regexp.new('(\d+)').partial_match("bob 123")
  *   m.captures    #=> ["123"]
  *   m.deconstruct #=> ["123"]
  *
  * @example pattern matching
- *   case RE2::Regexp.new('(\d+) (\d+)').match("bob 123 456")
+ *   case RE2::Regexp.new('(\d+) (\d+)').partial_match("bob 123 456")
  *   in x, y
  *     puts "Matched #{x} #{y}"
  *   else
@@ -868,14 +868,14 @@ static VALUE re2_matchdata_deconstruct(const VALUE self) {
  * @param [Array<Symbol>, nil] keys an array of `Symbol` capturing group names
  *   or `nil` to return all names
  * @example
- *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').partial_match('123 abc')
  *   m.deconstruct_keys(nil)                #=> {numbers: "123", letters: "abc"}
  *   m.deconstruct_keys([:numbers])         #=> {numbers: "123"}
  *   m.deconstruct_keys([:fruit])           #=> {}
  *   m.deconstruct_keys([:letters, :fruit]) #=> {letters: "abc"}
  *
  * @example pattern matching
- *   case RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *   case RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').partial_match('123 abc')
  *   in numbers:, letters:
  *     puts "Numbers: #{numbers}, letters: #{letters}"
  *   else
@@ -929,7 +929,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
  *
  *   @return [Hash] a hash of capturing group names to matching strings
  *   @example
- *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').partial_match('123 abc')
  *     m.named_captures #=> {"numbers" => "123", "letters" => "abc"}
  *
  * @overload named_captures(symbolize_names:)
@@ -938,7 +938,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
  *   @param [Boolean] symbolize_names whether to return group names as symbols
  *   @return [Hash] a hash of capturing group names to matching strings
  *   @example
- *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *     m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').partial_match('123 abc')
  *     m.named_captures
  *     #=> {"numbers" => "123", "letters" => "abc"}
  *     m.named_captures(symbolize_names: true) #=> {numbers: "123", letters: "abc"}
@@ -984,7 +984,7 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
  *
  * @return [Array<String>] an array of names of named capturing groups
  * @example
- *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
+ *   m = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').partial_match('123 abc')
  *   m.names #=> ["letters", "numbers"]
  */
 static VALUE re2_matchdata_names(const VALUE self) {
@@ -1004,7 +1004,7 @@ static VALUE re2_matchdata_names(const VALUE self) {
  *   the matches to fetch
  * @return [Array<String, nil>] the values at the given indices or names
  * @example
- *   m = RE2::Regexp.new('(?P<a>\d+) (?P<b>\d+)').match("123 456")
+ *   m = RE2::Regexp.new('(?P<a>\d+) (?P<b>\d+)').partial_match("123 456")
  *   m.values_at(1, 2)   #=> ["123", "456"]
  *   m.values_at(:a, :b) #=> ["123", "456"]
  *   m.values_at(1, :b)  #=> ["123", "456"]

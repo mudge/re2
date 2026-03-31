@@ -337,10 +337,10 @@ the right encoding so this is the responsibility of the caller, e.g.
 
 ```ruby
 # By default, RE2 will process patterns and text as UTF-8
-RE2(non_utf8_pattern.encode("UTF-8")).match(non_utf8_text.encode("UTF-8"))
+RE2(non_utf8_pattern.encode("UTF-8")).partial_match(non_utf8_text.encode("UTF-8"))
 
 # If the :utf8 option is false, RE2 will process patterns and text as ISO-8859-1
-RE2(non_latin1_pattern.encode("ISO-8859-1"), utf8: false).match(non_latin1_text.encode("ISO-8859-1"))
+RE2(non_latin1_pattern.encode("ISO-8859-1"), utf8: false).partial_match(non_latin1_text.encode("ISO-8859-1"))
 ```
 
 ## Requirements
