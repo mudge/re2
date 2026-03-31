@@ -280,6 +280,32 @@ static re2_scanner *unwrap_re2_scanner(VALUE self) {
   return c;
 }
 
+/*
+ * Returns an array of names of all named capturing groups.
+ *
+ * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
+ * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
+ * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ *
+ * @return [Array<String>] an array of names of named capturing groups
+ * @example
+ *   RE2::Regexp.new('(?P<a>\d+) (?P<b>\w+)').names #=> ["a", "b"]
+ */
+static VALUE re2_regexp_names(const VALUE self) {
+  re2_pattern *p = unwrap_re2_regexp(self);
+
+  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+  VALUE names = rb_ary_new2(groups.size());
+
+  for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
+    rb_ary_push(names,
+        encoded_str_new(it->first.data(), it->first.size(),
+          p->pattern->options().encoding()));
+  }
+
+  return names;
+}
+
 static VALUE re2_matchdata_allocate(VALUE klass) {
   re2_matchdata *m;
 
@@ -955,18 +981,8 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
  */
 static VALUE re2_matchdata_names(const VALUE self) {
   re2_matchdata *m = unwrap_re2_matchdata(self);
-  re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
-  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
-  VALUE names = rb_ary_new2(groups.size());
-
-  for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
-    rb_ary_push(names,
-        encoded_str_new(it->first.data(), it->first.size(),
-          p->pattern->options().encoding()));
-  }
-
-  return names;
+  return re2_regexp_names(m->regexp);
 }
 
 /*
@@ -2454,6 +2470,10 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_regexp_number_of_capturing_groups), 0);
   rb_define_method(re2_cRegexp, "named_capturing_groups",
       RUBY_METHOD_FUNC(re2_regexp_named_capturing_groups), 0);
+  rb_define_method(re2_cRegexp, "named_captures",
+      RUBY_METHOD_FUNC(re2_regexp_named_capturing_groups), 0);
+  rb_define_method(re2_cRegexp, "names",
+      RUBY_METHOD_FUNC(re2_regexp_names), 0);
   rb_define_method(re2_cRegexp, "match", RUBY_METHOD_FUNC(re2_regexp_match),
       -1);
   rb_define_method(re2_cRegexp, "match?", RUBY_METHOD_FUNC(re2_regexp_match_p),

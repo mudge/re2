@@ -177,14 +177,23 @@ m.values_at("word", :number, 3)
 #=> ["ruby", "1234", "5678"]
 ```
 
-All captures and capturing group names can be returned as an array with [`captures`](https://mudge.name/re2/RE2/MatchData.html#captures-instance_method) and [`names`](https://mudge.name/re2/RE2/MatchData.html#names-instance_method):
+All captures can be returned as an array with [`captures`](https://mudge.name/re2/RE2/MatchData.html#captures-instance_method):
 
 ```ruby
 m = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)').full_match("ruby:1234:5678")
 #=> #<RE2::MatchData "ruby:1234:5678" 1:"ruby" 2:"1234" 3:"5678">
 
 m.captures #=> ["ruby", "1234", "5678"]
-m.names    #=> ["number", "word"]
+```
+
+Capturing group names are available on both `RE2::Regexp` and `RE2::MatchData`:
+
+```ruby
+re = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)')
+re.names           #=> ["number", "word"]
+
+m = re.full_match("ruby:1234:5678")
+m.names            #=> ["number", "word"]
 ```
 
 Named captures can be returned as a hash with [`named_captures`](https://mudge.name/re2/RE2/MatchData.html#named_captures-instance_method):
@@ -197,6 +206,14 @@ m.named_captures
 #=> {"number" => "1234", "word" => "ruby"}
 m.named_captures(symbolize_names: true)
 #=> {number: "1234", word: "ruby"}
+```
+
+This is [also available](https://mudge.name/re2/RE2/Regexp.html#named_captures-instance_method) on the original `RE2::Regexp` but will return the corresponding numerical index for each group:
+
+```ruby
+re = RE2('(?P<word>\w+):(?P<number>\d+):(\d+)')
+re.named_captures
+#=> => {"number" => 2, "word" => 1}
 ```
 
 `RE2::MatchData` objects can also be used with Ruby's [pattern matching](https://docs.ruby-lang.org/en/3.2/syntax/pattern_matching_rdoc.html):

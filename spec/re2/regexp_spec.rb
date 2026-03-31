@@ -963,6 +963,64 @@ RSpec.describe RE2::Regexp do
     end
   end
 
+  describe "#names" do
+    it "returns an array of names of named capturing groups" do
+      expect(RE2::Regexp.new('(?P<bob>a)(?P<rob>b)').names).to eq(["bob", "rob"])
+    end
+
+    it "returns an empty array if there are no named capturing groups" do
+      expect(RE2::Regexp.new('(a)(b)').names).to be_empty
+    end
+
+    it "returns an empty array for a pattern with no capturing groups" do
+      expect(RE2::Regexp.new('ab').names).to be_empty
+    end
+
+    it "returns an empty array for an invalid regexp" do
+      expect(RE2::Regexp.new('???', log_errors: false).names).to be_empty
+    end
+
+    it "returns UTF-8 strings if the pattern is UTF-8" do
+      names = RE2::Regexp.new('(?P<bob>a)').names
+
+      expect(names.first.encoding).to eq(Encoding::UTF_8)
+    end
+
+    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
+      names = RE2::Regexp.new('(?P<bob>a)', utf8: false).names
+
+      expect(names.first.encoding).to eq(Encoding::ISO_8859_1)
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.names }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+  end
+
+  describe "#named_captures" do
+    it "returns a hash of names to indices" do
+      expect(RE2::Regexp.new('(?P<bob>a)').named_captures).to eq("bob" => 1)
+    end
+
+    it "maps names to indices with several groups" do
+      groups = RE2::Regexp.new('(?P<bob>a)(o)(?P<rob>e)').named_captures
+
+      expect(groups).to eq("bob" => 1, "rob" => 3)
+    end
+
+    it "returns an empty hash for a pattern with no named groups" do
+      expect(RE2::Regexp.new('(a)(b)').named_captures).to be_empty
+    end
+
+    it "returns an empty hash for an invalid regexp" do
+      expect(RE2::Regexp.new('???', log_errors: false).named_captures).to be_empty
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.named_captures }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+  end
+
   describe "#scan" do
     it "returns a scanner" do
       r = RE2::Regexp.new('(\w+)')
