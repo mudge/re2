@@ -492,6 +492,18 @@ RSpec.describe RE2::MatchData do
       expect(md.values_at(:a, :z)).to eq(["123", nil])
     end
 
+    it "returns the full match when given index 0" do
+      md = RE2::Regexp.new('(\d+) (\d+)').match("123 456")
+
+      expect(md.values_at(0, 1)).to eq(["123 456", "123"])
+    end
+
+    it "returns an empty array if given no arguments" do
+      md = RE2::Regexp.new('(\d+) (\d+)').match("123 456")
+
+      expect(md.values_at).to be_empty
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.values_at(1) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
