@@ -139,7 +139,6 @@ module RE2
       compile_options = +"-x c++"
 
       have_library("stdc++")
-      have_header("stdint.h")
 
       minimal_program = <<~SRC
         #include <re2/re2.h>
@@ -153,7 +152,7 @@ module RE2
       if re2_requires_version_flag
         # Recent versions of RE2 depend directly on Abseil, which requires a
         # compiler with C++17 support.
-        abort "Cannot compile re2 with your compiler: recent versions require C++17 support." unless %w[c++20 c++17 c++11 c++0x].any? do |std|
+        abort "Cannot compile re2 with your compiler: recent versions require C++17 support." unless %w[c++20 c++17 c++11].any? do |std|
           checking_for("re2 that compiles with #{std} standard") do
             if try_compile(minimal_program, compile_options + " -std=#{std}")
               compile_options << " -std=#{std}"
@@ -268,8 +267,8 @@ module RE2
       message "Cross build is #{cross_build_p ? "enabled" : "disabled"}.\n"
 
       recipe.host = target_host
-      # Ensure x64-mingw-ucrt and x64-mingw32 use different library paths since the host
-      # is the same (x86_64-w64-mingw32).
+      # Ensure x64-mingw-ucrt uses different library paths since the host is
+      # the same (x86_64-w64-mingw32).
       recipe.target = File.join(recipe.target, target_arch) if cross_build_p
 
       yield recipe
