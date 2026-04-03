@@ -5,13 +5,26 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.26.0] - 2026-04-03
+### Changed
+- Return zero-length capturing groups (e.g. (a*)) as empty strings, not nil.
+  RE2 distinguishes between the two (one is a re2::StringPiece with NULL data
+  and the other a non-NULL re2::StringPiece with a size of 0) and aligns with
+  the behaviour of Ruby's own Regexp. Unmatched optional groups (e.g. (a)?) are
+  still nil. Note this may be a *breaking change* if you relied on zero-length
+  capturing groups being nil.
+
+### Fixed
+- RE2::MatchData#pre_match and RE2::MatchData#post_match correctly returns
+  strings when only matching a zero-length capturing group.
+
 ## [2.25.0] - 2026-03-31
 ### Added
 - Add RE2.extract to expose RE2's Extract API which returns a given rewrite
   string with substitutions for a given text and matching pattern (non-matching
   portions are ignored).
 - Add RE2::Regexp#names and RE2::MatchData#names to return an array of named
-  capturing group names
+  capturing group names.
 - Add RE2::MatchData#captures to return an array of matches.
 - Add RE2::MatchData#named_captures to return a hash of named capturing group
   names (either as strings or symbols) to matches.
@@ -40,12 +53,12 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Added
 - Add ability to clone RE2::Regexp, RE2::MatchData, and RE2::Scanner objects
   with dup and clone (RE2::Set objects cannot be copied but will now raise an
-  error)
+  error).
 
 ### Fixed
 - Calling methods on uninitialized RE2::Regexp, RE2::MatchData, RE2::Set, and
   RE2::Scanner objects will now raise a type error instead of crashing to match
-  Ruby's own Regexp's behaviour
+  Ruby's own Regexp's behaviour.
 
 ## [2.23.0] - 2025-12-30
 ### Added
@@ -79,7 +92,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 - Remove support and native gems for Ruby 2.6, 2.7, and 3.0 (as it accounts
   for less than 1% of downloads in the past 60 days).
 - Remove native gems for 32-bit platforms, specifically x86-linux-gnu,
-  x86-linux-musl, and x86-mingw32
+  x86-linux-musl, and x86-mingw32.
 
 ### Changed
 - Upgrade the bundled version of Abseil to 20250814.1. Note this now requires
@@ -116,7 +129,8 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ## [2.15.0] - 2025-01-06
 ### Added
 - Add support for Ruby 3.4 in precompiled, native gems.
-- Restored support for Ruby 2.6, 2.7, and 3.0 after dropping them in 2.15.0.rc1
+- Restored support for Ruby 2.6, 2.7, and 3.0 after dropping them in
+  2.15.0.rc1.
 
 ### Changed
 - Provide separate precompiled, native gems for GNU and Musl.
@@ -335,81 +349,82 @@ releases](https://github.com/mudge/re2/releases) for this project.
 
 ## [1.7.0] - 2023-07-04
 ### Added
-- Added support for libre2.11 (thanks to Stan Hu for contributing this)
+- Added support for libre2.11 (thanks to Stan Hu for contributing this).
 
 ## [1.6.0] - 2022-10-22
 ### Added
 - Added RE2::MatchData#deconstruct and RE2::MatchData#deconstruct_keys so they
-  can be used with Ruby pattern matching
+  can be used with Ruby pattern matching.
 
 ## [1.5.0] - 2022-10-16
 ### Added
-- Added RE2::Set for simultaneously searching a collection of patterns
+- Added RE2::Set for simultaneously searching a collection of patterns.
 
 ## [1.4.0] - 2021-03-29
 ### Fixed
 - Fixed a crash when using RE2::Scanner#scan with an invalid regular expression
-  (thanks to Sergio Medina for reporting this)
+  (thanks to Sergio Medina for reporting this).
 - Fixed RE2::Regexp#match raising a NoMemoryError instead of an ArgumentError
-  when given a negative number of matches
+  when given a negative number of matches.
 
 ## [1.3.0] - 2021-03-12
 ### Added
 - Add Homebrew's prefix on Apple Silicon and /usr as fallback locations
   searched when looking for the underlying re2 library if not found in
-  /usr/local
+  /usr/local.
 
 ## [1.2.0] - 2020-04-18
 ### Changed
 - Stop using the now-deprecated utf8 API and re-implement it in terms of the
-  encoding API in order to support both existing and upcoming releases of re2
+  encoding API in order to support both existing and upcoming releases of re2.
 
 ## [1.1.1] - 2017-07-24
 ### Fixed
 - Ensure that any compilers passed via the CC and CXX environment variables are
   used throughout the compilation process including both the final Makefile and
-  any preceding checks
+  any preceding checks.
 
 ## [1.1.0] - 2017-07-23
 ### Fixed
 - Fixed RE2::Scanner not advancing when calling scan with an empty pattern or
-  pattern with empty capturing groups (thanks to Stan Hu for reporting this)
+  pattern with empty capturing groups (thanks to Stan Hu for reporting this).
 
 ### Added
 - Added eof? to RE2::Scanner to detect when the input has been fully consumed by
-  matches (used internally by the fixed scan)
+  matches (used internally by the fixed scan).
 - Added support for specifying the C and C++ compiler using the standard CC and
-  CXX environment variables when installing the gem
+  CXX environment variables when installing the gem.
 
 ## [1.0.0] - 2016-11-14
 ### Added
 - Added support for versions of the underlying re2 library that require C++11
-  compiler support
+  compiler support.
 
 ## [0.7.0] - 2015-01-25
 ### Added
 - Added RE2::MatchData#begin and RE2::MatchData#end for finding the offset of
-  matches in your searches
+  matches in your searches.
 
 ## [0.6.1] - 2014-10-25
 ### Fixed
-- Fix crash when non-strings are passed to match
+- Fix crash when non-strings are passed to match.
 
 ## [0.6.0] - 2014-02-01
 ### Added
 - Added RE2::Regexp#scan which returns a new RE2::Scanner instance for
-  incrementally scanning a string for matches
+  incrementally scanning a string for matches.
 
 ### Removed
 - Methods that altered strings in place are gone: re2_sub! and re2_gsub!
 
 ### Changed
 - RE2.Replace and RE2.GlobalReplace now return new strings rather than modifying
-  their input
+  their input.
 
 ### Fixed
-- In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings
+- In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings.
 
+[2.26.0]: https://github.com/mudge/re2/releases/tag/v2.26.0
 [2.25.0]: https://github.com/mudge/re2/releases/tag/v2.25.0
 [2.24.0]: https://github.com/mudge/re2/releases/tag/v2.24.0
 [2.23.0]: https://github.com/mudge/re2/releases/tag/v2.23.0
