@@ -469,7 +469,7 @@ static VALUE re2_scanner_scan(VALUE self) {
     VALUE result = rb_ary_new2(c->number_of_capturing_groups);
 
     for (int i = 0; i < c->number_of_capturing_groups; ++i) {
-      if (matches[i].empty()) {
+      if (matches[i].data() == NULL) {
         rb_ary_push(result, Qnil);
       } else {
         rb_ary_push(result, encoded_str_new(matches[i].data(),
@@ -525,7 +525,7 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
   if (id >= 0 && id < m->number_of_matches) {
     re2::StringPiece *match = &m->matches[id];
 
-    if (!match->empty()) {
+    if (match->data() != NULL) {
       return match;
     }
   }
@@ -615,7 +615,7 @@ static VALUE re2_matchdata_pre_match(const VALUE self) {
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   re2::StringPiece *match = &m->matches[0];
-  if (match->empty()) {
+  if (match->data() == NULL) {
     return Qnil;
   }
 
@@ -642,7 +642,7 @@ static VALUE re2_matchdata_post_match(const VALUE self) {
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   re2::StringPiece *match = &m->matches[0];
-  if (match->empty()) {
+  if (match->data() == NULL) {
     return Qnil;
   }
 
@@ -766,7 +766,7 @@ static VALUE re2_matchdata_to_a(const VALUE self) {
   for (int i = 0; i < m->number_of_matches; ++i) {
     re2::StringPiece *match = &m->matches[i];
 
-    if (match->empty()) {
+    if (match->data() == NULL) {
       rb_ary_push(array, Qnil);
     } else {
       rb_ary_push(array, encoded_str_new(match->data(), match->size(),
@@ -786,7 +786,7 @@ static VALUE re2_matchdata_nth_match(int nth, const VALUE self) {
   } else {
     re2::StringPiece *match = &m->matches[nth];
 
-    if (match->empty()) {
+    if (match->data() == NULL) {
       return Qnil;
     } else {
       return encoded_str_new(match->data(), match->size(),
@@ -955,7 +955,7 @@ static VALUE re2_matchdata_deconstruct(const VALUE self) {
   for (int i = 1; i < m->number_of_matches; ++i) {
     re2::StringPiece *match = &m->matches[i];
 
-    if (match->empty()) {
+    if (match->data() == NULL) {
       rb_ary_push(array, Qnil);
     } else {
       rb_ary_push(array, encoded_str_new(match->data(), match->size(),

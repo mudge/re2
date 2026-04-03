@@ -185,11 +185,11 @@ RSpec.describe RE2::Scanner do
       expect(scanner.scan).to be_nil
     end
 
-    it "returns an array of nil with an empty input and capture", :aggregate_failures do
+    it "returns an array of empty strings with an empty input and capture", :aggregate_failures do
       r = RE2::Regexp.new("()")
       scanner = r.scan("")
 
-      expect(scanner.scan).to eq([nil])
+      expect(scanner.scan).to eq([""])
       expect(scanner.scan).to be_nil
     end
 
@@ -204,25 +204,34 @@ RSpec.describe RE2::Scanner do
       expect(scanner.scan).to be_nil
     end
 
-    it "returns an array of nil if the pattern is an empty capturing group", :aggregate_failures do
+    it "returns an array of empty strings if the pattern is an empty capturing group", :aggregate_failures do
       r = RE2::Regexp.new("()")
       scanner = r.scan("Foo")
 
-      expect(scanner.scan).to eq([nil])
-      expect(scanner.scan).to eq([nil])
-      expect(scanner.scan).to eq([nil])
-      expect(scanner.scan).to eq([nil])
+      expect(scanner.scan).to eq([""])
+      expect(scanner.scan).to eq([""])
+      expect(scanner.scan).to eq([""])
+      expect(scanner.scan).to eq([""])
       expect(scanner.scan).to be_nil
     end
 
-    it "returns array of nils with multiple empty capturing groups", :aggregate_failures do
+    it "returns array of empty strings with multiple empty capturing groups", :aggregate_failures do
       r = RE2::Regexp.new("()()()")
       scanner = r.scan("Foo")
 
-      expect(scanner.scan).to eq([nil, nil, nil])
-      expect(scanner.scan).to eq([nil, nil, nil])
-      expect(scanner.scan).to eq([nil, nil, nil])
-      expect(scanner.scan).to eq([nil, nil, nil])
+      expect(scanner.scan).to eq(["", "", ""])
+      expect(scanner.scan).to eq(["", "", ""])
+      expect(scanner.scan).to eq(["", "", ""])
+      expect(scanner.scan).to eq(["", "", ""])
+      expect(scanner.scan).to be_nil
+    end
+
+    it "distinguishes zero-length matches from unmatched groups", :aggregate_failures do
+      r = RE2::Regexp.new("()(a)?")
+      scanner = r.scan("b")
+
+      expect(scanner.scan).to eq(["", nil])
+      expect(scanner.scan).to eq(["", nil])
       expect(scanner.scan).to be_nil
     end
 
@@ -230,7 +239,7 @@ RSpec.describe RE2::Scanner do
       r = RE2::Regexp.new("()€")
       scanner = r.scan("€")
 
-      expect(scanner.scan).to eq([nil])
+      expect(scanner.scan).to eq([""])
       expect(scanner.scan).to be_nil
     end
 

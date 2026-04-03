@@ -66,10 +66,16 @@ RSpec.describe RE2::MatchData do
       expect(a).to eq(["woo", "o", "o"])
     end
 
-    it "populates optional capturing groups with nil if they are missing" do
+    it "populates optional capturing groups with empty strings if they match zero characters" do
       a = RE2::Regexp.new('(\d?)(a)(b)').match('ab').to_a
 
-      expect(a).to eq(["ab", nil, "a", "b"])
+      expect(a).to eq(["ab", "", "a", "b"])
+    end
+
+    it "distinguishes between zero-length matches and unmatched groups" do
+      a = RE2::Regexp.new('()(a)?').match('b').to_a
+
+      expect(a).to eq(["", "", nil])
     end
 
     it "returns UTF-8 strings if the pattern is UTF-8" do
@@ -156,6 +162,12 @@ RSpec.describe RE2::MatchData do
       expect(md[2]).to eq(" ")
       expect(md["numbers"]).to eq("123")
       expect(md[:numbers]).to eq("123")
+    end
+
+    it "returns an empty string for a zero-length capturing group" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md[1]).to eq("")
     end
 
     it "returns nil if no such named group exists", :aggregate_failures do
@@ -281,6 +293,12 @@ RSpec.describe RE2::MatchData do
       expect(md.inspect).to eq('#<RE2::MatchData "1234 " 1:"1234" 2:nil>')
     end
 
+    it "represents zero-length capturing groups as empty strings" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.inspect).to eq('#<RE2::MatchData "" 1:"">')
+    end
+
     it "supports matches with null bytes" do
       md = RE2::Regexp.new("(\\w\0\\w) (\\w\0\\w)").match("a\0b c\0d")
 
@@ -297,6 +315,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d{2,5})').match("one two 23456")
 
       expect(md.to_s).to eq("23456")
+    end
+
+    it "returns an empty string for a zero-length match" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.to_s).to eq("")
     end
 
     it "raises an error when called on an uninitialized object" do
@@ -344,6 +368,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(Ruby)').match('I ♥ Ruby')
 
       expect(md.string[md.begin(0)..-1]).to eq('Ruby')
+    end
+
+    it "returns the offset for a zero-length capturing group" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.begin(1)).to eq(0)
     end
 
     it "returns nil for non-existent numerical matches" do
@@ -419,6 +449,12 @@ RSpec.describe RE2::MatchData do
       expect(md.string[0...md.end(0)]).to eq('I ♥ Ruby')
     end
 
+    it "returns the offset for a zero-length capturing group" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.end(1)).to eq(0)
+    end
+
     it "returns nil for non-existent numerical matches" do
       md = RE2::Regexp.new('(\d)').match('123')
 
@@ -492,6 +528,12 @@ RSpec.describe RE2::MatchData do
       expect(md.pre_match.encoding).to eq(Encoding::ISO_8859_1)
     end
 
+    it "returns the text before a zero-length match" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.pre_match).to eq("")
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.pre_match }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
@@ -528,6 +570,12 @@ RSpec.describe RE2::MatchData do
       expect(md.post_match.encoding).to eq(Encoding::ISO_8859_1)
     end
 
+    it "returns the text after a zero-length match" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.post_match).to eq("bob")
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.post_match }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
@@ -562,6 +610,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
 
       expect(md.offset(0)).to eq([4, 8])
+    end
+
+    it "returns identical offsets for a zero-length capturing group" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.offset(1)).to eq([0, 0])
     end
 
     it "returns nil for non-existent numerical matches" do
@@ -618,6 +672,12 @@ RSpec.describe RE2::MatchData do
       expect(md.match_length(0)).to eq(6)
     end
 
+    it "returns zero for a zero-length capturing group" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.match_length(1)).to eq(0)
+    end
+
     it "returns nil for non-existent numerical matches" do
       md = RE2::Regexp.new('(\d)').match("123")
 
@@ -672,6 +732,12 @@ RSpec.describe RE2::MatchData do
       expect(md.values_at(:a, :z)).to eq(["123", nil])
     end
 
+    it "returns an empty string for a zero-length capturing group" do
+      md = RE2::Regexp.new('()(b)').match("bob")
+
+      expect(md.values_at(1, 2)).to eq(["", "b"])
+    end
+
     it "returns the full match when given index 0" do
       md = RE2::Regexp.new('(\d+) (\d+)').match("123 456")
 
@@ -700,6 +766,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('w(.)(.)(.)?').match('woo')
 
       expect(md.deconstruct).to eq(['o', 'o', nil])
+    end
+
+    it "includes zero-length capturing groups as empty strings" do
+      md = RE2::Regexp.new('()').match("bob")
+
+      expect(md.deconstruct).to eq([""])
     end
 
     it "raises an error when called on an uninitialized object" do
@@ -742,6 +814,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(?P<a>\d+) (?P<b>\w+)?').match('123 ')
 
       expect(md.named_captures).to eq("a" => "123", "b" => nil)
+    end
+
+    it "returns an empty string for a zero-length named capturing group" do
+      md = RE2::Regexp.new('(?P<empty>)(?P<word>\w+)').match("bob")
+
+      expect(md.named_captures).to eq("empty" => "", "word" => "bob")
     end
 
     it "returns symbol keys when symbolize_names: true" do
@@ -820,6 +898,12 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(\d+) ([a-zA-Z]+)').match('123 abc')
 
       expect(md.deconstruct_keys(nil)).to eq({})
+    end
+
+    it "returns an empty string for a zero-length named capturing group" do
+      md = RE2::Regexp.new('(?P<empty>)(?P<word>\w+)').match("bob")
+
+      expect(md.deconstruct_keys(nil)).to eq(empty: "", word: "bob")
     end
 
     it "raises an error if given a non-array of keys" do
