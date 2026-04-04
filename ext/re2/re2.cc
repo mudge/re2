@@ -8,7 +8,7 @@
  * Released under the BSD Licence, please see LICENSE.txt
  */
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <map>
 #include <sstream>
@@ -296,12 +296,12 @@ static re2_scanner *unwrap_re2_scanner(VALUE self) {
 static VALUE re2_regexp_names(const VALUE self) {
   re2_pattern *p = unwrap_re2_regexp(self);
 
-  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+  const auto& groups = p->pattern->NamedCapturingGroups();
   VALUE names = rb_ary_new2(groups.size());
 
-  for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
+  for (const auto& group : groups) {
     rb_ary_push(names,
-        encoded_str_new(it->first.data(), it->first.size(),
+        encoded_str_new(group.first.data(), group.first.size(),
           p->pattern->options().encoding()));
   }
 
@@ -385,7 +385,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
   delete c->input;
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(c->text), RSTRING_LEN(c->text));
-  if (c->input == 0) {
+  if (c->input == nullptr) {
     rb_raise(rb_eNoMemError,
              "not enough memory to allocate StringPiece for input");
   }
@@ -412,12 +412,12 @@ static VALUE re2_scanner_initialize_copy(VALUE self, VALUE other) {
 
   if (other_c->input) {
     self_c->input = new(std::nothrow) re2::StringPiece(*other_c->input);
-    if (self_c->input == 0) {
+    if (self_c->input == nullptr) {
       rb_raise(rb_eNoMemError,
                "not enough memory to allocate StringPiece for input");
     }
   } else {
-    self_c->input = NULL;
+    self_c->input = nullptr;
   }
 
   return self;
@@ -469,7 +469,7 @@ static VALUE re2_scanner_scan(VALUE self) {
     VALUE result = rb_ary_new2(c->number_of_capturing_groups);
 
     for (int i = 0; i < c->number_of_capturing_groups; ++i) {
-      if (matches[i].data() == NULL) {
+      if (matches[i].data() == nullptr) {
         rb_ary_push(result, Qnil);
       } else {
         rb_ary_push(result, encoded_str_new(matches[i].data(),
@@ -501,36 +501,36 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
   if (RB_INTEGER_TYPE_P(idx)) {
     id = NUM2INT(idx);
   } else if (SYMBOL_P(idx)) {
-    const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
-    std::map<std::string, int>::const_iterator search = groups.find(rb_id2name(SYM2ID(idx)));
+    const auto& groups = p->pattern->NamedCapturingGroups();
+    auto search = groups.find(rb_id2name(SYM2ID(idx)));
 
     if (search != groups.end()) {
       id = search->second;
     } else {
-      return NULL;
+      return nullptr;
     }
   } else {
     StringValue(idx);
 
-    const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
-    std::map<std::string, int>::const_iterator search = groups.find(std::string(RSTRING_PTR(idx), RSTRING_LEN(idx)));
+    const auto& groups = p->pattern->NamedCapturingGroups();
+    auto search = groups.find(std::string(RSTRING_PTR(idx), RSTRING_LEN(idx)));
 
     if (search != groups.end()) {
       id = search->second;
     } else {
-      return NULL;
+      return nullptr;
     }
   }
 
   if (id >= 0 && id < m->number_of_matches) {
     re2::StringPiece *match = &m->matches[id];
 
-    if (match->data() != NULL) {
+    if (match->data() != nullptr) {
       return match;
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 /*
@@ -564,7 +564,7 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
   re2_matchdata *m = unwrap_re2_matchdata(self);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
-  if (match == NULL) {
+  if (match == nullptr) {
     return Qnil;
   } else {
     long offset = match->data() - RSTRING_PTR(m->text);
@@ -589,7 +589,7 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
   re2_matchdata *m = unwrap_re2_matchdata(self);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
-  if (match == NULL) {
+  if (match == nullptr) {
     return Qnil;
   } else {
     long offset = (match->data() - RSTRING_PTR(m->text)) + match->size();
@@ -615,7 +615,7 @@ static VALUE re2_matchdata_pre_match(const VALUE self) {
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   re2::StringPiece *match = &m->matches[0];
-  if (match->data() == NULL) {
+  if (match->data() == nullptr) {
     return Qnil;
   }
 
@@ -642,7 +642,7 @@ static VALUE re2_matchdata_post_match(const VALUE self) {
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
   re2::StringPiece *match = &m->matches[0];
-  if (match->data() == NULL) {
+  if (match->data() == nullptr) {
     return Qnil;
   }
 
@@ -669,7 +669,7 @@ static VALUE re2_matchdata_offset(const VALUE self, VALUE n) {
   re2_matchdata *m = unwrap_re2_matchdata(self);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
-  if (match == NULL) {
+  if (match == nullptr) {
     return Qnil;
   }
 
@@ -700,7 +700,7 @@ static VALUE re2_matchdata_match_length(const VALUE self, VALUE n) {
   re2_matchdata *m = unwrap_re2_matchdata(self);
 
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
-  if (match == NULL) {
+  if (match == nullptr) {
     return Qnil;
   }
 
@@ -766,7 +766,7 @@ static VALUE re2_matchdata_to_a(const VALUE self) {
   for (int i = 0; i < m->number_of_matches; ++i) {
     re2::StringPiece *match = &m->matches[i];
 
-    if (match->data() == NULL) {
+    if (match->data() == nullptr) {
       rb_ary_push(array, Qnil);
     } else {
       rb_ary_push(array, encoded_str_new(match->data(), match->size(),
@@ -786,7 +786,7 @@ static VALUE re2_matchdata_nth_match(int nth, const VALUE self) {
   } else {
     re2::StringPiece *match = &m->matches[nth];
 
-    if (match->data() == NULL) {
+    if (match->data() == nullptr) {
       return Qnil;
     } else {
       return encoded_str_new(match->data(), match->size(),
@@ -799,8 +799,8 @@ static VALUE re2_matchdata_named_match(const std::string &name, const VALUE self
   re2_matchdata *m = unwrap_re2_matchdata(self);
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
-  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
-  std::map<std::string, int>::const_iterator search = groups.find(name);
+  const auto& groups = p->pattern->NamedCapturingGroups();
+  auto search = groups.find(name);
 
   if (search != groups.end()) {
     return re2_matchdata_nth_match(search->second, self);
@@ -955,7 +955,7 @@ static VALUE re2_matchdata_deconstruct(const VALUE self) {
   for (int i = 1; i < m->number_of_matches; ++i) {
     re2::StringPiece *match = &m->matches[i];
 
-    if (match->data() == NULL) {
+    if (match->data() == nullptr) {
       rb_ary_push(array, Qnil);
     } else {
       rb_ary_push(array, encoded_str_new(match->data(), match->size(),
@@ -999,14 +999,14 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
   re2_matchdata *m = unwrap_re2_matchdata(self);
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
-  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+  const auto& groups = p->pattern->NamedCapturingGroups();
   VALUE capturing_groups = rb_hash_new();
 
   if (NIL_P(keys)) {
-    for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
+    for (const auto& group : groups) {
       rb_hash_aset(capturing_groups,
-          ID2SYM(rb_intern2(it->first.data(), it->first.size())),
-          re2_matchdata_nth_match(it->second, self));
+          ID2SYM(rb_intern2(group.first.data(), group.first.size())),
+          re2_matchdata_nth_match(group.second, self));
     }
   } else {
     Check_Type(keys, T_ARRAY);
@@ -1016,7 +1016,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
         VALUE key = rb_ary_entry(keys, i);
         Check_Type(key, T_SYMBOL);
         const char *name = rb_id2name(SYM2ID(key));
-        std::map<std::string, int>::const_iterator search = groups.find(name);
+        auto search = groups.find(name);
 
         if (search != groups.end()) {
           rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(search->second, self));
@@ -1069,18 +1069,18 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
   re2_matchdata *m = unwrap_re2_matchdata(self);
   re2_pattern *p = unwrap_re2_regexp(m->regexp);
 
-  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+  const auto& groups = p->pattern->NamedCapturingGroups();
   VALUE result = rb_hash_new();
 
-  for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
+  for (const auto& group : groups) {
     VALUE key;
     if (symbolize) {
-      key = ID2SYM(rb_intern2(it->first.data(), it->first.size()));
+      key = ID2SYM(rb_intern2(group.first.data(), group.first.size()));
     } else {
-      key = encoded_str_new(it->first.data(), it->first.size(),
+      key = encoded_str_new(group.first.data(), group.first.size(),
               p->pattern->options().encoding());
     }
-    rb_hash_aset(result, key, re2_matchdata_nth_match(it->second, self));
+    rb_hash_aset(result, key, re2_matchdata_nth_match(group.second, self));
   }
 
   return result;
@@ -1160,7 +1160,7 @@ static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
 
   if (other_m->matches) {
     self_m->matches = new(std::nothrow) re2::StringPiece[other_m->number_of_matches];
-    if (self_m->matches == 0) {
+    if (self_m->matches == nullptr) {
       rb_raise(rb_eNoMemError,
                "not enough memory to allocate StringPiece for matches");
     }
@@ -1168,7 +1168,7 @@ static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
       self_m->matches[i] = other_m->matches[i];
     }
   } else {
-    self_m->matches = NULL;
+    self_m->matches = nullptr;
   }
 
   return self;
@@ -1244,7 +1244,7 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
         re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)));
   }
 
-  if (p->pattern == 0) {
+  if (p->pattern == nullptr) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
   }
 
@@ -1263,7 +1263,7 @@ static VALUE re2_regexp_initialize_copy(VALUE self, VALUE other) {
 
   self_p->pattern = new(std::nothrow) RE2(other_p->pattern->pattern(),
                                           other_p->pattern->options());
-  if (self_p->pattern == 0) {
+  if (self_p->pattern == nullptr) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
   }
 
@@ -1629,14 +1629,14 @@ static VALUE re2_regexp_number_of_capturing_groups(const VALUE self) {
  */
 static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
   re2_pattern *p = unwrap_re2_regexp(self);
-  const std::map<std::string, int>& groups = p->pattern->NamedCapturingGroups();
+  const auto& groups = p->pattern->NamedCapturingGroups();
   VALUE capturing_groups = rb_hash_new();
 
-  for (std::map<std::string, int>::const_iterator it = groups.begin(); it != groups.end(); ++it) {
+  for (const auto& group : groups) {
     rb_hash_aset(capturing_groups,
-        encoded_str_new(it->first.data(), it->first.size(),
+        encoded_str_new(group.first.data(), group.first.size(),
           p->pattern->options().encoding()),
-        INT2FIX(it->second));
+        INT2FIX(group.second));
   }
 
   return capturing_groups;
@@ -1838,7 +1838,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     n += 1;
 
     re2::StringPiece *matches = new(std::nothrow) re2::StringPiece[n];
-    if (matches == 0) {
+    if (matches == nullptr) {
       rb_raise(rb_eNoMemError,
                "not enough memory to allocate StringPieces for matches");
     }
@@ -1935,7 +1935,7 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   RB_OBJ_WRITE(scanner, &c->text, rb_str_new_frozen(text));
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(c->text), RSTRING_LEN(c->text));
-  if (c->input == 0) {
+  if (c->input == nullptr) {
     rb_raise(rb_eNoMemError,
              "not enough memory to allocate StringPiece for input");
   }
@@ -2293,7 +2293,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
   }
 
   s->set = new(std::nothrow) RE2::Set(re2_options, re2_anchor);
-  if (s->set == 0) {
+  if (s->set == nullptr) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2::Set object");
   }
 
@@ -2480,8 +2480,8 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
           rb_raise(re2_eSetMatchError, "Unknown RE2::Set::ErrorKind: %d", e.kind);
       }
     } else {
-      for (std::vector<int>::size_type i = 0; i < v.size(); ++i) {
-        rb_ary_push(result, INT2FIX(v[i]));
+      for (int index : v) {
+        rb_ary_push(result, INT2FIX(index));
       }
     }
 
@@ -2495,8 +2495,8 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     VALUE result = rb_ary_new2(v.size());
 
     if (matched) {
-      for (std::vector<int>::size_type i = 0; i < v.size(); ++i) {
-        rb_ary_push(result, INT2FIX(v[i]));
+      for (int index : v) {
+        rb_ary_push(result, INT2FIX(index));
       }
     }
 
