@@ -590,6 +590,24 @@ RSpec.describe RE2::Regexp do
       expect { re.match("one two three", endpos: 3) }.to raise_error(RE2::Regexp::UnsupportedError)
     end
 
+    it "does not truncate startpos to 32 bits" do
+      skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
+      skip "size_t is not larger than a 32-bit int" if RbConfig::SIZEOF.fetch("size_t") <= (32 / 8)
+
+      re = RE2::Regexp.new('(\w+)', log_errors: false)
+
+      expect(re.match("one two three", startpos: 2_147_483_648, endpos: 2_147_483_649)).to be_nil
+    end
+
+    it "does not truncate endpos to 32 bits" do
+      skip "Underlying RE2::Match does not have endpos argument" unless RE2::Regexp.match_has_endpos_argument?
+      skip "size_t is not larger than a 32-bit int" if RbConfig::SIZEOF.fetch("size_t") <= (32 / 8)
+
+      re = RE2::Regexp.new('(\w+)', log_errors: false)
+
+      expect(re.match("one two three", endpos: 2_147_483_648)).to be_nil
+    end
+
     it "does not anchor matches by default when extracting submatches" do
       re = RE2::Regexp.new('(two)')
 

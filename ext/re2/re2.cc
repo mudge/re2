@@ -1737,8 +1737,8 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   p = unwrap_re2_regexp(self);
 
   int n;
-  int startpos = 0;
-  int endpos = RSTRING_LEN(text);
+  size_t startpos = 0;
+  size_t endpos = RSTRING_LEN(text);
   RE2::Anchor anchor = RE2::UNANCHORED;
 
   if (RTEST(options)) {
@@ -1756,11 +1756,13 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
       VALUE endpos_option = rb_hash_aref(options, ID2SYM(id_endpos));
       if (!NIL_P(endpos_option)) {
 #ifdef HAVE_ENDPOS_ARGUMENT
-        endpos = NUM2INT(endpos_option);
+        ssize_t endpos_value = NUM2SSIZET(endpos_option);
 
-        if (endpos < 0) {
+        if (endpos_value < 0) {
           rb_raise(rb_eArgError, "endpos should be >= 0");
         }
+
+        endpos = static_cast<size_t>(endpos_value);
 #else
         rb_raise(re2_eRegexpUnsupportedError, "current version of RE2::Match() does not support endpos argument");
 #endif
@@ -1799,11 +1801,13 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
       VALUE startpos_option = rb_hash_aref(options, ID2SYM(id_startpos));
       if (!NIL_P(startpos_option)) {
-        startpos = NUM2INT(startpos_option);
+        ssize_t startpos_value = NUM2SSIZET(startpos_option);
 
-        if (startpos < 0) {
+        if (startpos_value < 0) {
           rb_raise(rb_eArgError, "startpos should be >= 0");
         }
+
+        startpos = static_cast<size_t>(startpos_value);
       }
     }
   } else {
