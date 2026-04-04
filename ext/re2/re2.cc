@@ -1737,8 +1737,8 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   p = unwrap_re2_regexp(self);
 
   int n;
-  int startpos = 0;
-  int endpos = RSTRING_LEN(text);
+  long startpos = 0;
+  long endpos = RSTRING_LEN(text);
   RE2::Anchor anchor = RE2::UNANCHORED;
 
   if (RTEST(options)) {
@@ -1756,7 +1756,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
       VALUE endpos_option = rb_hash_aref(options, ID2SYM(id_endpos));
       if (!NIL_P(endpos_option)) {
 #ifdef HAVE_ENDPOS_ARGUMENT
-        endpos = NUM2INT(endpos_option);
+        endpos = NUM2LONG(endpos_option);
 
         if (endpos < 0) {
           rb_raise(rb_eArgError, "endpos should be >= 0");
@@ -1799,7 +1799,7 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
       VALUE startpos_option = rb_hash_aref(options, ID2SYM(id_startpos));
       if (!NIL_P(startpos_option)) {
-        startpos = NUM2INT(startpos_option);
+        startpos = NUM2LONG(startpos_option);
 
         if (startpos < 0) {
           rb_raise(rb_eArgError, "startpos should be >= 0");
