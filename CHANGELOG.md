@@ -5,6 +5,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.26.1] - 2026-04-04
+### Fixed
+- Allow startpos and endpos options over INT_MAX on 64-bit platforms.
+
 ## [2.26.0] - 2026-04-03
 ### Changed
 - Return zero-length capturing groups (e.g. (a*)) as empty strings, not nil.
@@ -424,6 +428,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings.
 
+[2.26.1]: https://github.com/mudge/re2/releases/tag/v2.26.1
 [2.26.0]: https://github.com/mudge/re2/releases/tag/v2.26.0
 [2.25.0]: https://github.com/mudge/re2/releases/tag/v2.25.0
 [2.24.0]: https://github.com/mudge/re2/releases/tag/v2.24.0
