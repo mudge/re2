@@ -403,6 +403,7 @@ static VALUE re2_scanner_initialize_copy(VALUE self, VALUE other) {
 
   if (self_c->input) {
     delete self_c->input;
+    self_c->input = nullptr;
   }
 
   RB_OBJ_WRITE(self, &self_c->regexp, other_c->regexp);
@@ -1170,6 +1171,7 @@ static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
 
   if (self_m->matches) {
     delete[] self_m->matches;
+    self_m->matches = nullptr;
   }
 
   self_m->number_of_matches = other_m->number_of_matches;
@@ -1249,6 +1251,7 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 
   if (p->pattern) {
     delete p->pattern;
+    p->pattern = nullptr;
   }
 
   if (RTEST(options)) {
@@ -1277,6 +1280,7 @@ static VALUE re2_regexp_initialize_copy(VALUE self, VALUE other) {
 
   if (self_p->pattern) {
     delete self_p->pattern;
+    self_p->pattern = nullptr;
   }
 
   self_p->pattern = new(std::nothrow) RE2(other_p->pattern->pattern(),
@@ -2015,29 +2019,32 @@ static VALUE re2_regexp_match_has_endpos_argument_p(VALUE) {
  */
 static VALUE re2_replace(VALUE, VALUE str, VALUE pattern,
     VALUE rewrite) {
-  /* Ensure rewrite is a string. */
-  StringValue(rewrite);
+  re2_pattern *p = nullptr;
 
-  re2_pattern *p;
+  /* Coerce all arguments before any C++ allocations so that any Ruby
+   * exceptions (via longjmp) cannot bypass C++ destructors and leak memory.
+   */
+  StringValue(str);
+  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
+    p = unwrap_re2_regexp(pattern);
+  } else {
+    StringValue(pattern);
+  }
+  StringValue(rewrite);
 
   /* Take a copy of str so it can be modified in-place by
    * RE2::Replace.
    */
-  StringValue(str);
   std::string str_as_string(RSTRING_PTR(str), RSTRING_LEN(str));
 
   /* Do the replacement. */
-  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
-    p = unwrap_re2_regexp(pattern);
+  if (p) {
     RE2::Replace(&str_as_string, *p->pattern,
         re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
-    /* Ensure pattern is a string. */
-    StringValue(pattern);
-
     RE2::Replace(&str_as_string,
         re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)),
         re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
@@ -2068,28 +2075,32 @@ static VALUE re2_replace(VALUE, VALUE str, VALUE pattern,
  */
 static VALUE re2_global_replace(VALUE, VALUE str, VALUE pattern,
                                VALUE rewrite) {
-  /* Ensure rewrite is a string. */
+  re2_pattern *p = nullptr;
+
+  /* Coerce all arguments before any C++ allocations so that any Ruby
+   * exceptions (via longjmp) cannot bypass C++ destructors and leak memory.
+   */
+  StringValue(str);
+  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
+    p = unwrap_re2_regexp(pattern);
+  } else {
+    StringValue(pattern);
+  }
   StringValue(rewrite);
 
   /* Take a copy of str so it can be modified in-place by
    * RE2::GlobalReplace.
    */
-  re2_pattern *p;
-  StringValue(str);
   std::string str_as_string(RSTRING_PTR(str), RSTRING_LEN(str));
 
   /* Do the replacement. */
-  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
-    p = unwrap_re2_regexp(pattern);
+  if (p) {
     RE2::GlobalReplace(&str_as_string, *p->pattern,
         re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
 
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
-    /* Ensure pattern is a string. */
-    StringValue(pattern);
-
     RE2::GlobalReplace(&str_as_string,
         re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)),
         re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
@@ -2122,16 +2133,23 @@ static VALUE re2_global_replace(VALUE, VALUE str, VALUE pattern,
  */
 static VALUE re2_extract(VALUE, VALUE text, VALUE pattern,
     VALUE rewrite) {
-  /* Ensure rewrite and text are strings. */
-  StringValue(rewrite);
-  StringValue(text);
+  re2_pattern *p = nullptr;
 
-  re2_pattern *p;
+  /* Coerce all arguments before any C++ allocations so that any Ruby
+   * exceptions (via longjmp) cannot bypass C++ destructors and leak memory.
+   */
+  StringValue(text);
+  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
+    p = unwrap_re2_regexp(pattern);
+  } else {
+    StringValue(pattern);
+  }
+  StringValue(rewrite);
+
   std::string out;
   bool extracted;
 
-  if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
-    p = unwrap_re2_regexp(pattern);
+  if (p) {
     extracted = RE2::Extract(
         re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
         *p->pattern,
@@ -2145,9 +2163,6 @@ static VALUE re2_extract(VALUE, VALUE text, VALUE pattern,
       return Qnil;
     }
   } else {
-    /* Ensure pattern is a string. */
-    StringValue(pattern);
-
     extracted = RE2::Extract(
         re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
         RE2(re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern))),
@@ -2312,6 +2327,7 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
 
   if (s->set) {
     delete s->set;
+    s->set = nullptr;
   }
 
   s->set = new(std::nothrow) RE2::Set(re2_options, re2_anchor);

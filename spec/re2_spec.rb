@@ -86,6 +86,10 @@ RSpec.describe RE2 do
       expect { RE2.replace("woo", 0, "ah") }.to raise_error(TypeError)
     end
 
+    it "does not leak memory when given a non-String, non-RE2::Regexp pattern" do
+      expect { RE2.replace("a" * 128, 0, "ah") }.to raise_error(TypeError)
+    end
+
     it "raises a Type Error for a replacement that can't be converted to String" do
       expect { RE2.replace("woo", "oo", 0) }.to raise_error(TypeError)
     end
@@ -182,6 +186,10 @@ RSpec.describe RE2 do
       expect { RE2.global_replace("woo", 0, "a") }.to raise_error(TypeError)
     end
 
+    it "does not leak memory when given a non-String, non-RE2::Regexp pattern" do
+      expect { RE2.global_replace("a" * 128, 0, "a") }.to raise_error(TypeError)
+    end
+
     it "raises a Type Error for a replacement that can't be converted to String" do
       expect { RE2.global_replace("woo", "o", 0) }.to raise_error(TypeError)
     end
@@ -264,6 +272,10 @@ RSpec.describe RE2 do
 
     it "raises a Type Error for a non-RE2::Regexp pattern that can't be converted to String" do
       expect { RE2.extract("woo", 0, '\1') }.to raise_error(TypeError)
+    end
+
+    it "does not leak memory when given a non-String, non-RE2::Regexp pattern" do
+      expect { RE2.extract("a" * 128, 0, '\1') }.to raise_error(TypeError)
     end
 
     it "raises a Type Error for a rewrite that can't be converted to String" do
