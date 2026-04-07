@@ -777,6 +777,16 @@ RSpec.describe RE2::Regexp do
       expect(re.match("one two three", nil)).to be_a(RE2::MatchData)
     end
 
+    it "returns correct results when multiple threads match on the same regexp" do
+      re = RE2::Regexp.new('(\d+)')
+
+      results = 4.times.map { |i|
+        Thread.new(i) { |n| re.match("value#{n * 111}end")[1] }
+      }.map(&:value)
+
+      expect(results).to eq(4.times.map { |i| (i * 111).to_s })
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.match("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
@@ -800,6 +810,16 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
       expect { re.match?(0) }.to raise_error(TypeError)
+    end
+
+    it "returns correct results when multiple threads call match? on the same regexp" do
+      re = RE2::Regexp.new('(\d+)')
+
+      results = 4.times.map { |i|
+        Thread.new(i) { |n| re.match?("value#{n}end") }
+      }.map(&:value)
+
+      expect(results).to all(eq(true))
     end
 
     it "raises an error when called on an uninitialized object" do
@@ -832,6 +852,16 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
       expect { re.partial_match?(0) }.to raise_error(TypeError)
+    end
+
+    it "returns correct results when multiple threads call partial_match? on the same regexp" do
+      re = RE2::Regexp.new('(\d+)')
+
+      results = 4.times.map { |i|
+        Thread.new(i) { |n| re.partial_match?("value#{n}end") }
+      }.map(&:value)
+
+      expect(results).to all(eq(true))
     end
 
     it "raises an error when called on an uninitialized object" do
@@ -921,6 +951,16 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
       expect { re.full_match?(0) }.to raise_error(TypeError)
+    end
+
+    it "returns correct results when multiple threads call full_match? on the same regexp" do
+      re = RE2::Regexp.new('(\d+)')
+
+      results = 4.times.map { |i|
+        Thread.new(i) { |n| re.full_match?(n.to_s) }
+      }.map(&:value)
+
+      expect(results).to all(eq(true))
     end
 
     it "raises an error when called on an uninitialized object" do

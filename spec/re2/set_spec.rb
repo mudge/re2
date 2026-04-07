@@ -237,6 +237,20 @@ RSpec.describe RE2::Set do
       expect(set.match(StringLike.new("abcdef"), exception: false)).to contain_exactly(0)
     end
 
+    it "returns correct results when multiple threads match on the same set" do
+      set = RE2::Set.new
+      set.add("foo")
+      set.add("bar")
+      set.add("baz")
+      set.compile
+
+      results = 4.times.map {
+        Thread.new { set.match("foobar", exception: false) }
+      }.map(&:value)
+
+      expect(results).to all(eq([0, 1]))
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.match("foo") }.to raise_error(TypeError, /uninitialized RE2::Set/)
     end

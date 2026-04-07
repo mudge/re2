@@ -19,8 +19,62 @@
 #include <re2/set.h>
 #include <ruby.h>
 #include <ruby/encoding.h>
+#include <ruby/thread.h>
 
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
+
+/* Structs and callbacks for releasing the GVL during RE2 operations. */
+
+struct re2_match_args {
+  const RE2 *pattern;
+  re2::StringPiece text;
+  size_t startpos;
+  size_t endpos;
+  RE2::Anchor anchor;
+  re2::StringPiece *matches;
+  int n;
+  bool matched;
+};
+
+static void *re2_match_nogvl(void *args) {
+  auto *match_args = static_cast<re2_match_args *>(args);
+#ifdef HAVE_ENDPOS_ARGUMENT
+  match_args->matched = match_args->pattern->Match(
+      match_args->text, match_args->startpos, match_args->endpos,
+      match_args->anchor, match_args->matches, match_args->n);
+#else
+  match_args->matched = match_args->pattern->Match(
+      match_args->text, static_cast<int>(match_args->startpos),
+      match_args->anchor, match_args->matches, match_args->n);
+#endif
+  return nullptr;
+}
+
+struct re2_set_match_args {
+  const RE2::Set *set;
+  re2::StringPiece text;
+  std::vector<int> *v;
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+  RE2::Set::ErrorInfo *error_info;
+  bool use_error_info;
+#endif
+  bool matched;
+};
+
+static void *re2_set_match_nogvl(void *args) {
+  auto *set_args = static_cast<re2_set_match_args *>(args);
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+  if (set_args->use_error_info) {
+    set_args->matched = set_args->set->Match(set_args->text, set_args->v, set_args->error_info);
+  } else {
+    set_args->matched = set_args->set->Match(set_args->text, set_args->v);
+  }
+#else
+  set_args->matched = set_args->set->Match(set_args->text, set_args->v);
+#endif
+
+  return nullptr;
+}
 
 typedef struct {
   RE2 *pattern;
@@ -384,6 +438,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
 
   delete c->input;
   c->input = nullptr;
+
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(c->text), RSTRING_LEN(c->text));
   if (c->input == nullptr) {
@@ -463,8 +518,14 @@ static VALUE re2_scanner_scan(VALUE self) {
     args[i] = &argv[i];
   }
 
-  if (RE2::FindAndConsumeN(c->input, *p->pattern, args.data(),
-        c->number_of_capturing_groups)) {
+  /* Unlike RE2::Match which can scan a large range in a single call,
+   * FindAndConsumeN only finds the next match, so it is typically fast and
+   * does not need to release the GVL.
+   */
+  bool matched = RE2::FindAndConsumeN(
+      c->input, *p->pattern, args.data(), c->number_of_capturing_groups);
+
+  if (matched) {
     re2::StringPiece::size_type new_input_size = c->input->size();
     bool input_advanced = new_input_size < original_input_size;
 
@@ -1762,8 +1823,9 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
   rb_scan_args(argc, argv, "11", &text, &options);
 
-  /* Ensure text is a string. */
+  /* Coerce and freeze text to prevent mutation. */
   StringValue(text);
+  text = rb_str_new_frozen(text);
 
   p = unwrap_re2_regexp(self);
 
@@ -1854,16 +1916,22 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   }
 
   if (n == 0) {
-#ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, endpos, anchor, 0, 0);
-#else
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, anchor, 0, 0);
-#endif
-    return BOOL2RUBY(matched);
+    re2_match_args match_args;
+    match_args.pattern = p->pattern;
+    match_args.text = re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text));
+    match_args.startpos = startpos;
+    match_args.endpos = endpos;
+    match_args.anchor = anchor;
+    match_args.matches = 0;
+    match_args.n = 0;
+    match_args.matched = false;
+
+    rb_thread_call_without_gvl(re2_match_nogvl, &match_args,
+        nullptr, nullptr);
+
+    RB_GC_GUARD(text);
+
+    return BOOL2RUBY(match_args.matched);
   } else {
     if (n == INT_MAX) {
       rb_raise(rb_eRangeError, "number of matches should be < %d", INT_MAX);
@@ -1878,18 +1946,22 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
                "not enough memory to allocate StringPieces for matches");
     }
 
-    text = rb_str_new_frozen(text);
+    re2_match_args match_args;
+    match_args.pattern = p->pattern;
+    match_args.text = re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text));
+    match_args.startpos = startpos;
+    match_args.endpos = endpos;
+    match_args.anchor = anchor;
+    match_args.matches = matches;
+    match_args.n = n;
+    match_args.matched = false;
 
-#ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, endpos, anchor, matches, n);
-#else
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, anchor, matches, n);
-#endif
-    if (matched) {
+    rb_thread_call_without_gvl(re2_match_nogvl, &match_args,
+        nullptr, nullptr);
+
+    RB_GC_GUARD(text);
+
+    if (match_args.matched) {
       VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
       TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
 
@@ -1919,11 +1991,25 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
   /* Ensure text is a string. */
   StringValue(text);
+  text = rb_str_new_frozen(text);
 
   re2_pattern *p = unwrap_re2_regexp(self);
 
-  return BOOL2RUBY(RE2::PartialMatch(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)), *p->pattern));
+  re2_match_args match_args;
+  match_args.pattern = p->pattern;
+  match_args.text = re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text));
+  match_args.startpos = 0;
+  match_args.endpos = RSTRING_LEN(text);
+  match_args.anchor = RE2::UNANCHORED;
+  match_args.matches = 0;
+  match_args.n = 0;
+  match_args.matched = false;
+
+  rb_thread_call_without_gvl(re2_match_nogvl, &match_args, nullptr, nullptr);
+
+  RB_GC_GUARD(text);
+
+  return BOOL2RUBY(match_args.matched);
 }
 
 /*
@@ -1938,11 +2024,25 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
 static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
   /* Ensure text is a string. */
   StringValue(text);
+  text = rb_str_new_frozen(text);
 
   re2_pattern *p = unwrap_re2_regexp(self);
 
-  return BOOL2RUBY(RE2::FullMatch(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)), *p->pattern));
+  re2_match_args match_args;
+  match_args.pattern = p->pattern;
+  match_args.text = re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text));
+  match_args.startpos = 0;
+  match_args.endpos = RSTRING_LEN(text);
+  match_args.anchor = RE2::ANCHOR_BOTH;
+  match_args.matches = 0;
+  match_args.n = 0;
+  match_args.matched = false;
+
+  rb_thread_call_without_gvl(re2_match_nogvl, &match_args, nullptr, nullptr);
+
+  RB_GC_GUARD(text);
+
+  return BOOL2RUBY(match_args.matched);
 }
 
 /*
@@ -2152,8 +2252,8 @@ static VALUE re2_extract(VALUE, VALUE text, VALUE pattern,
 
   re2_pattern *p = nullptr;
 
-  /* Validate pattern before any C++ allocations so that any Ruby exceptions
-   * (via longjmp) cannot bypass C++ destructors and leak memory.
+  /* Coerce all arguments before any C++ allocations so that any Ruby
+   * exceptions (via longjmp) cannot bypass C++ destructors and leak memory.
    */
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     p = unwrap_re2_regexp(pattern);
@@ -2541,20 +2641,30 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   }
 
   std::vector<int> v;
+  re2_set_match_args set_match_args;
+  set_match_args.set = s->set;
+  set_match_args.text = re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str));
+  set_match_args.v = &v;
+  set_match_args.matched = false;
 
   if (raise_exception) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
     RE2::Set::ErrorInfo e;
-    bool match_failed = !s->set->Match(
-        re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str)), &v, &e);
+    set_match_args.error_info = &e;
+    set_match_args.use_error_info = true;
+
+    rb_thread_call_without_gvl(re2_set_match_nogvl,
+        &set_match_args, nullptr, nullptr);
+
+    RB_GC_GUARD(str);
+
+    bool match_failed = !set_match_args.matched;
     VALUE result = rb_ary_new2(v.size());
 
     if (match_failed) {
       switch (e.kind) {
         case RE2::Set::kNoError:
           break;
-        case RE2::Set::kNotCompiled:
-          rb_raise(re2_eSetMatchError, "#match must not be called before #compile");
         case RE2::Set::kOutOfMemory:
           rb_raise(re2_eSetMatchError, "The DFA ran out of memory");
         case RE2::Set::kInconsistent:
@@ -2571,11 +2681,18 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     return result;
 #endif
   } else {
-    bool matched = s->set->Match(
-        re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str)), &v);
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+    set_match_args.use_error_info = false;
+#endif
+
+    rb_thread_call_without_gvl(re2_set_match_nogvl,
+        &set_match_args, nullptr, nullptr);
+
+    RB_GC_GUARD(str);
+
     VALUE result = rb_ary_new2(v.size());
 
-    if (matched) {
+    if (set_match_args.matched) {
       for (int index : v) {
         rb_ary_push(result, INT2FIX(index));
       }
