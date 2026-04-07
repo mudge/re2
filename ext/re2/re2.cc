@@ -1915,6 +1915,13 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     rb_raise(rb_eArgError, "startpos should be <= endpos");
   }
 
+#ifndef HAVE_ENDPOS_ARGUMENT
+  /* Old RE2's Match() takes int startpos. Reject values that would overflow. */
+  if (startpos > INT_MAX) {
+    rb_raise(rb_eRangeError, "startpos should be <= %d", INT_MAX);
+  }
+#endif
+
   if (n == 0) {
     re2_match_args match_args;
     match_args.pattern = p->pattern;
