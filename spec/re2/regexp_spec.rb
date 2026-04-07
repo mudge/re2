@@ -757,6 +757,15 @@ RSpec.describe RE2::Regexp do
       expect(re.match("one two three", nil)).to be_a(RE2::MatchData)
     end
 
+    it "raises an error when startpos exceeds INT_MAX on old RE2 ABI" do
+      skip "Underlying RE2::Match does not take int startpos" if RE2::Regexp.match_has_endpos_argument?
+      skip "size_t is not larger than a 32-bit int" if RbConfig::SIZEOF.fetch("size_t") <= (32 / 8)
+
+      re = RE2::Regexp.new('(\w+)', log_errors: false)
+
+      expect { re.match("test", start_pos: 2_147_483_648) }.to raise_error(RangeError, /startpos should be <=/)
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.match("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
