@@ -5,6 +5,15 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.26.2] - 2026-04-07
+### Fixed
+- Fix RE2::Scanner splitting multi-byte UTF-8 characters when advancing past
+  zero-width matches.
+- Fix memory leak in RE2.replace, RE2.global_replace, and RE2.extract when
+  argument coercion raises an exception.
+- Raise RangeError when startpos exceeds INT_MAX on older RE2 versions where
+  Match() takes an int.
+
 ## [2.26.1] - 2026-04-04
 ### Fixed
 - Allow startpos and endpos options over INT_MAX on 64-bit platforms.
@@ -428,6 +437,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings.
 
+[2.26.2]: https://github.com/mudge/re2/releases/tag/v2.26.2
 [2.26.1]: https://github.com/mudge/re2/releases/tag/v2.26.1
 [2.26.0]: https://github.com/mudge/re2/releases/tag/v2.26.0
 [2.25.0]: https://github.com/mudge/re2/releases/tag/v2.25.0
