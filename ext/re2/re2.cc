@@ -481,9 +481,27 @@ static VALUE re2_scanner_scan(VALUE self) {
     /* Check whether we've exhausted the input yet. */
     c->eof = new_input_size == 0;
 
-    /* If the match didn't advance the input, we need to do this ourselves. */
+    /* If the match didn't advance the input, we need to do this ourselves,
+     * advancing by a whole character to avoid splitting multi-byte characters.
+     *
+     * The lookup table approach is taken from RE2's own Python extension: the
+     * high 4 bits of a UTF-8 lead byte determine the character's byte length.
+     *
+     * See https://github.com/google/re2/blob/972a15cedd008d846f1a39b2e88ce48d7f166cbd/python/_re2.cc#L46-L48
+     */
     if (!input_advanced && new_input_size > 0) {
-      c->input->remove_prefix(1);
+      size_t char_size = 1;
+
+      if (p->pattern->options().encoding() == RE2::Options::EncodingUTF8) {
+        char_size = "\1\1\1\1\1\1\1\1\1\1\1\1\2\2\3\4"
+            [((*c->input)[0] & 0xFF) >> 4];
+
+        if (char_size > new_input_size) {
+          char_size = new_input_size;
+        }
+      }
+
+      c->input->remove_prefix(char_size);
     }
 
     return result;

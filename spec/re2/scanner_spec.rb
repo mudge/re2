@@ -243,6 +243,52 @@ RSpec.describe RE2::Scanner do
       expect(scanner.scan).to be_nil
     end
 
+    it "advances by whole characters with zero-width matches on 2-byte UTF-8 input", :aggregate_failures do
+      r = RE2::Regexp.new("")
+      scanner = r.scan("à")
+
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to be_nil
+    end
+
+    it "advances by whole characters with zero-width matches on 3-byte UTF-8 input", :aggregate_failures do
+      r = RE2::Regexp.new("")
+      scanner = r.scan("\u20AC")
+
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to be_nil
+    end
+
+    it "advances by whole characters with zero-width matches on 4-byte UTF-8 input", :aggregate_failures do
+      r = RE2::Regexp.new("")
+      scanner = r.scan("\u{1F600}")
+
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to be_nil
+    end
+
+    it "advances by single bytes with zero-width matches on Latin-1 input", :aggregate_failures do
+      r = RE2::Regexp.new("", utf8: false)
+      scanner = r.scan("\xC3\xA0")
+
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to be_nil
+    end
+
+    it "handles truncated multi-byte sequences at the end of input", :aggregate_failures do
+      r = RE2::Regexp.new("")
+      scanner = r.scan("\xC3")
+
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to eq([])
+      expect(scanner.scan).to be_nil
+    end
+
     it "raises a Type Error if given input that can't be coerced to a String" do
       r = RE2::Regexp.new('(\w+)')
 
