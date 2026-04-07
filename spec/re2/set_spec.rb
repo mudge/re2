@@ -32,6 +32,12 @@ RSpec.describe RE2::Set do
       expect(set).to be_a(RE2::Set)
     end
 
+    it "is unfrozen before compilation" do
+      set = RE2::Set.new
+
+      expect(set).not_to be_frozen
+    end
+
     it "raises an error if given an inappropriate type" do
       expect { RE2::Set.new(0) }.to raise_error(TypeError)
     end
@@ -89,9 +95,7 @@ RSpec.describe RE2::Set do
       set.add("abc")
       set.compile
 
-      silence_stderr do
-        expect { set.add("def") }.to raise_error(ArgumentError)
-      end
+      expect { set.add("def") }.to raise_error(FrozenError)
     end
 
     it "raises an error if given a pattern that can't be coerced to a String" do
@@ -119,6 +123,22 @@ RSpec.describe RE2::Set do
       set.add("ghi")
 
       expect(set.compile).to be_truthy
+    end
+
+    it "freezes the set after a successful compile" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect(set).to be_frozen
+    end
+
+    it "raises an error if called after a successful compile" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect { set.compile }.to raise_error(FrozenError)
     end
 
     it "raises an error when called on an uninitialized object" do
@@ -168,9 +188,7 @@ RSpec.describe RE2::Set do
 
       set = RE2::Set.new(:unanchored, log_errors: false)
 
-      silence_stderr do
-        expect { set.match("") }.to raise_error(RE2::Set::MatchError)
-      end
+      expect { set.match("") }.to raise_error(RE2::Set::MatchError)
     end
 
     it "raises an error if called before #compile when :exception is true" do
@@ -178,17 +196,13 @@ RSpec.describe RE2::Set do
 
       set = RE2::Set.new(:unanchored, log_errors: false)
 
-      silence_stderr do
-        expect { set.match("", exception: true) }.to raise_error(RE2::Set::MatchError)
-      end
+      expect { set.match("", exception: true) }.to raise_error(RE2::Set::MatchError)
     end
 
     it "returns an empty array if called before #compile when :exception is false" do
       set = RE2::Set.new(:unanchored, log_errors: false)
 
-      silence_stderr do
-        expect(set.match("", exception: false)).to be_empty
-      end
+      expect(set.match("", exception: false)).to be_empty
     end
 
     it "raises an error if :exception is true and RE2 does not support it" do

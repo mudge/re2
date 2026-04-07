@@ -250,7 +250,7 @@ static const rb_data_type_t re2_regexp_data_type = {
   0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED | RUBY_TYPED_FROZEN_SHAREABLE
 };
 
 static re2_pattern *unwrap_re2_regexp(VALUE self) {
@@ -383,6 +383,7 @@ static VALUE re2_scanner_rewind(VALUE self) {
   re2_scanner *c = unwrap_re2_scanner(self);
 
   delete c->input;
+  c->input = nullptr;
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(c->text), RSTRING_LEN(c->text));
   if (c->input == nullptr) {
@@ -403,6 +404,7 @@ static VALUE re2_scanner_initialize_copy(VALUE self, VALUE other) {
 
   if (self_c->input) {
     delete self_c->input;
+    self_c->input = nullptr;
   }
 
   RB_OBJ_WRITE(self, &self_c->regexp, other_c->regexp);
@@ -1170,6 +1172,7 @@ static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
 
   if (self_m->matches) {
     delete[] self_m->matches;
+    self_m->matches = nullptr;
   }
 
   self_m->number_of_matches = other_m->number_of_matches;
@@ -1247,8 +1250,11 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
 
+  rb_check_frozen(self);
+
   if (p->pattern) {
     delete p->pattern;
+    p->pattern = nullptr;
   }
 
   if (RTEST(options)) {
@@ -1266,6 +1272,8 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
   }
 
+  rb_obj_freeze(self);
+
   return self;
 }
 
@@ -1275,8 +1283,11 @@ static VALUE re2_regexp_initialize_copy(VALUE self, VALUE other) {
 
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, self_p);
 
+  rb_check_frozen(self);
+
   if (self_p->pattern) {
     delete self_p->pattern;
+    self_p->pattern = nullptr;
   }
 
   self_p->pattern = new(std::nothrow) RE2(other_p->pattern->pattern(),
@@ -1284,6 +1295,8 @@ static VALUE re2_regexp_initialize_copy(VALUE self, VALUE other) {
   if (self_p->pattern == nullptr) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
   }
+
+  rb_obj_freeze(self);
 
   return self;
 }
@@ -2234,7 +2247,7 @@ static const rb_data_type_t re2_set_data_type = {
   0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED | RUBY_TYPED_FROZEN_SHAREABLE
 };
 
 static re2_set *unwrap_re2_set(VALUE self) {
@@ -2327,8 +2340,11 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
     parse_re2_options(&re2_options, options);
   }
 
+  rb_check_frozen(self);
+
   if (s->set) {
     delete s->set;
+    s->set = nullptr;
   }
 
   s->set = new(std::nothrow) RE2::Set(re2_options, re2_anchor);
@@ -2356,6 +2372,7 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
   StringValue(pattern);
 
   re2_set *s = unwrap_re2_set(self);
+  rb_check_frozen(self);
 
   int index;
   VALUE msg;
@@ -2387,8 +2404,15 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
  */
 static VALUE re2_set_compile(VALUE self) {
   re2_set *s = unwrap_re2_set(self);
+  rb_check_frozen(self);
 
-  return BOOL2RUBY(s->set->Compile());
+  bool compiled = s->set->Compile();
+
+  if (compiled) {
+    rb_obj_freeze(self);
+  }
+
+  return BOOL2RUBY(compiled);
 }
 
 /*
@@ -2485,6 +2509,8 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   rb_scan_args(argc, argv, "11", &str, &options);
 
   StringValue(str);
+  str = rb_str_new_frozen(str);
+
   re2_set *s = unwrap_re2_set(self);
 
   if (RTEST(options)) {
@@ -2494,6 +2520,24 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     if (!NIL_P(exception_option)) {
       raise_exception = RTEST(exception_option);
     }
+  }
+
+#ifndef HAVE_ERROR_INFO_ARGUMENT
+  if (raise_exception) {
+    rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match() does not output error information, :exception option can only be set to false");
+  }
+#endif
+
+  /* The set is frozen after compile, so an unfrozen set has not been
+   * compiled and cannot be matched against.
+   */
+  if (!OBJ_FROZEN(self)) {
+    if (raise_exception) {
+      rb_raise(re2_eSetMatchError,
+               "#match requires a successfully compiled set");
+    }
+
+    return rb_ary_new();
   }
 
   std::vector<int> v;
@@ -2525,8 +2569,6 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     }
 
     return result;
-#else
-    rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match() does not output error information, :exception option can only be set to false");
 #endif
   } else {
     bool matched = s->set->Match(
@@ -2555,6 +2597,8 @@ extern "C" void Init_re2(void) {
       rb_const_get(rb_cObject, rb_intern("StandardError")));
   re2_eSetUnsupportedError = rb_define_class_under(re2_cSet, "UnsupportedError",
       rb_const_get(rb_cObject, rb_intern("StandardError")));
+
+  rb_ext_ractor_safe(true);
 
   rb_define_alloc_func(re2_cRegexp,
       reinterpret_cast<VALUE (*)(VALUE)>(re2_regexp_allocate));

@@ -34,6 +34,19 @@ RSpec.describe RE2::Regexp do
       expect(re).to be_a(RE2::Regexp)
     end
 
+    it "is frozen after construction" do
+      re = RE2::Regexp.new('test')
+
+      expect(re).to be_frozen
+    end
+
+    it "raises FrozenError if re-initialized after construction", :aggregate_failures do
+      re = RE2::Regexp.new('test')
+
+      expect { re.send(:initialize, 'test') }.to raise_error(FrozenError)
+      expect(re).to be_ok
+    end
+
     it "supports passing something that can be coerced to a String as input" do
       re = RE2::Regexp.new(StringLike.new('w(o)(o)'))
 
@@ -68,6 +81,13 @@ RSpec.describe RE2::Regexp do
       copy = re.dup
 
       expect(copy).to_not be_case_sensitive
+    end
+
+    it "returns a frozen copy" do
+      re = described_class.new('(\d+)')
+      copy = re.dup
+
+      expect(copy).to be_frozen
     end
 
     it "raises an error when called on an uninitialized object" do
