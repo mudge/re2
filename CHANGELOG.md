@@ -5,6 +5,20 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.27.0] - 2026-04-09
+### Changed
+- The Ruby Global VM Lock (GVL) will now be released while matching with an
+  RE2::Regexp, compiled RE2::Set, and when replacing or extracting with
+  RE2.replace, RE2.global_replace, and RE2.extract. This means work on other
+  threads can continue while performing potentially expensive matches. Note
+  this is not available on Windows due to Abseil's mutexes conflicting with
+  Ruby's own mutexes for the GVL.
+- To accommodate this, RE2::Regexp objects are now frozen on initialization and
+  RE2::Set objects are frozen when compiled. Similarly, input strings and
+  patterns are now frozen to prevent mutation during matching.
+- The extension, RE2::Regexp, and RE2::Set are now marked as safe for use with
+  Ractors.
+
 ## [2.26.2] - 2026-04-07
 ### Fixed
 - Fix RE2::Scanner splitting multi-byte UTF-8 characters when advancing past
@@ -437,6 +451,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings.
 
+[2.27.0]: https://github.com/mudge/re2/releases/tag/v2.27.0
 [2.26.2]: https://github.com/mudge/re2/releases/tag/v2.26.2
 [2.26.1]: https://github.com/mudge/re2/releases/tag/v2.26.1
 [2.26.0]: https://github.com/mudge/re2/releases/tag/v2.26.0
