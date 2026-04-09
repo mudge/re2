@@ -1329,6 +1329,8 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
 
+  rb_check_frozen(self);
+
   if (p->pattern) {
     delete p->pattern;
     p->pattern = nullptr;
@@ -1349,6 +1351,8 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
   }
 
+  rb_obj_freeze(self);
+
   return self;
 }
 
@@ -1357,6 +1361,8 @@ static VALUE re2_regexp_initialize_copy(VALUE self, VALUE other) {
   re2_pattern *other_p = unwrap_re2_regexp(other);
 
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, self_p);
+
+  rb_check_frozen(self);
 
   if (self_p->pattern) {
     delete self_p->pattern;
@@ -1368,6 +1374,8 @@ static VALUE re2_regexp_initialize_copy(VALUE self, VALUE other) {
   if (self_p->pattern == nullptr) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
   }
+
+  rb_obj_freeze(self);
 
   return self;
 }
@@ -1833,8 +1841,9 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
   rb_scan_args(argc, argv, "11", &text, &options);
 
-  /* Ensure text is a string. */
+  /* Coerce and freeze text to prevent mutation. */
   StringValue(text);
+  text = rb_str_new_frozen(text);
 
   p = unwrap_re2_regexp(self);
 
@@ -1932,7 +1941,6 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 #endif
 
   if (n == 0) {
-    text = rb_str_new_frozen(text);
     bool matched = re2_match_without_gvl(
         p->pattern, text, startpos, endpos, anchor, 0, 0);
     RB_GC_GUARD(text);
@@ -1945,8 +1953,6 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 
     /* Because match returns the whole match as well. */
     n += 1;
-
-    text = rb_str_new_frozen(text);
 
     re2::StringPiece *matches = new(std::nothrow) re2::StringPiece[n];
     if (matches == nullptr) {
@@ -1986,12 +1992,10 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
-  /* Ensure text is a string. */
   StringValue(text);
+  text = rb_str_new_frozen(text);
 
   re2_pattern *p = unwrap_re2_regexp(self);
-
-  text = rb_str_new_frozen(text);
   bool matched = re2_match_without_gvl(
       p->pattern, text, 0, RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
   RB_GC_GUARD(text);
@@ -2009,12 +2013,10 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
-  /* Ensure text is a string. */
   StringValue(text);
+  text = rb_str_new_frozen(text);
 
   re2_pattern *p = unwrap_re2_regexp(self);
-
-  text = rb_str_new_frozen(text);
   bool matched = re2_match_without_gvl(
       p->pattern, text, 0, RSTRING_LEN(text), RE2::ANCHOR_BOTH, 0, 0);
   RB_GC_GUARD(text);
@@ -2035,8 +2037,8 @@ static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
  *   #=> #<RE2::Scanner:0x0000000000000001>
  */
 static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
-  /* Ensure text is a string. */
   StringValue(text);
+  text = rb_str_new_frozen(text);
 
   re2_pattern *p = unwrap_re2_regexp(self);
   re2_scanner *c;
@@ -2044,7 +2046,7 @@ static VALUE re2_regexp_scan(const VALUE self, VALUE text) {
   TypedData_Get_Struct(scanner, re2_scanner, &re2_scanner_data_type, c);
 
   RB_OBJ_WRITE(scanner, &c->regexp, self);
-  RB_OBJ_WRITE(scanner, &c->text, rb_str_new_frozen(text));
+  RB_OBJ_WRITE(scanner, &c->text, text);
   c->input = new(std::nothrow) re2::StringPiece(
       RSTRING_PTR(c->text), RSTRING_LEN(c->text));
   if (c->input == nullptr) {
@@ -2107,16 +2109,20 @@ static VALUE re2_replace(VALUE, VALUE str, VALUE pattern,
     VALUE rewrite) {
   re2_pattern *p = nullptr;
 
-  /* Coerce all arguments before any C++ allocations so that any Ruby
-   * exceptions (via longjmp) cannot bypass C++ destructors and leak memory.
+  /* Coerce and freeze all arguments before any C++ allocations so that any
+   * Ruby exceptions (via longjmp) cannot bypass C++ destructors and leak
+   * memory, and later coercions cannot mutate earlier strings.
    */
   StringValue(str);
+  str = rb_str_new_frozen(str);
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     p = unwrap_re2_regexp(pattern);
   } else {
     StringValue(pattern);
+    pattern = rb_str_new_frozen(pattern);
   }
   StringValue(rewrite);
+  rewrite = rb_str_new_frozen(rewrite);
 
   /* Take a copy of str so it can be modified in-place by
    * RE2::Replace.
@@ -2163,16 +2169,20 @@ static VALUE re2_global_replace(VALUE, VALUE str, VALUE pattern,
                                VALUE rewrite) {
   re2_pattern *p = nullptr;
 
-  /* Coerce all arguments before any C++ allocations so that any Ruby
-   * exceptions (via longjmp) cannot bypass C++ destructors and leak memory.
+  /* Coerce and freeze all arguments before any C++ allocations so that any
+   * Ruby exceptions (via longjmp) cannot bypass C++ destructors and leak
+   * memory, and later coercions cannot mutate earlier strings.
    */
   StringValue(str);
+  str = rb_str_new_frozen(str);
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     p = unwrap_re2_regexp(pattern);
   } else {
     StringValue(pattern);
+    pattern = rb_str_new_frozen(pattern);
   }
   StringValue(rewrite);
+  rewrite = rb_str_new_frozen(rewrite);
 
   /* Take a copy of str so it can be modified in-place by
    * RE2::GlobalReplace.
@@ -2221,16 +2231,20 @@ static VALUE re2_extract(VALUE, VALUE text, VALUE pattern,
     VALUE rewrite) {
   re2_pattern *p = nullptr;
 
-  /* Coerce all arguments before any C++ allocations so that any Ruby
-   * exceptions (via longjmp) cannot bypass C++ destructors and leak memory.
+  /* Coerce and freeze all arguments before any C++ allocations so that any
+   * Ruby exceptions (via longjmp) cannot bypass C++ destructors and leak
+   * memory, and later coercions cannot mutate earlier strings.
    */
   StringValue(text);
+  text = rb_str_new_frozen(text);
   if (rb_obj_is_kind_of(pattern, re2_cRegexp)) {
     p = unwrap_re2_regexp(pattern);
   } else {
     StringValue(pattern);
+    pattern = rb_str_new_frozen(pattern);
   }
   StringValue(rewrite);
+  rewrite = rb_str_new_frozen(rewrite);
 
   std::string out;
   bool extracted;
@@ -2411,6 +2425,8 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
     parse_re2_options(&re2_options, options);
   }
 
+  rb_check_frozen(self);
+
   if (s->set) {
     delete s->set;
     s->set = nullptr;
@@ -2441,6 +2457,7 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
   StringValue(pattern);
 
   re2_set *s = unwrap_re2_set(self);
+  rb_check_frozen(self);
 
   int index;
   VALUE msg;
@@ -2472,8 +2489,15 @@ static VALUE re2_set_add(VALUE self, VALUE pattern) {
  */
 static VALUE re2_set_compile(VALUE self) {
   re2_set *s = unwrap_re2_set(self);
+  rb_check_frozen(self);
 
-  return BOOL2RUBY(s->set->Compile());
+  bool compiled = s->set->Compile();
+
+  if (compiled) {
+    rb_obj_freeze(self);
+  }
+
+  return BOOL2RUBY(compiled);
 }
 
 /*
@@ -2570,6 +2594,8 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   rb_scan_args(argc, argv, "11", &str, &options);
 
   StringValue(str);
+  str = rb_str_new_frozen(str);
+
   re2_set *s = unwrap_re2_set(self);
 
   if (RTEST(options)) {
@@ -2582,8 +2608,6 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
   }
 
   std::vector<int> v;
-
-  str = rb_str_new_frozen(str);
 
   if (raise_exception) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT

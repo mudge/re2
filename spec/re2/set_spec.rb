@@ -84,14 +84,12 @@ RSpec.describe RE2::Set do
       expect { set.add("(?P<#{'o' * 200}") }.to raise_error(ArgumentError, "str rejected by RE2::Set->Add(): invalid named capture group: (?P<oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
     end
 
-    it "raises an error if called after #compile" do
+    it "raises a FrozenError if called after #compile" do
       set = RE2::Set.new(:unanchored, log_errors: false)
       set.add("abc")
       set.compile
 
-      silence_stderr do
-        expect { set.add("def") }.to raise_error(ArgumentError)
-      end
+      expect { set.add("def") }.to raise_error(FrozenError)
     end
 
     it "raises an error if given a pattern that can't be coerced to a String" do
@@ -119,6 +117,29 @@ RSpec.describe RE2::Set do
       set.add("ghi")
 
       expect(set.compile).to be_truthy
+    end
+
+    it "freezes the set on successful compilation" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect(set).to be_frozen
+    end
+
+    it "is not frozen before compilation" do
+      set = RE2::Set.new
+      set.add("abc")
+
+      expect(set).to_not be_frozen
+    end
+
+    it "cannot be re-initialized after compilation" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.compile
+
+      expect { set.send(:initialize) }.to raise_error(FrozenError)
     end
 
     it "raises an error when called on an uninitialized object" do

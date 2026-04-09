@@ -39,6 +39,16 @@ RSpec.describe RE2::Regexp do
 
       expect(re).to be_a(RE2::Regexp)
     end
+
+    it "returns a frozen object" do
+      expect(RE2::Regexp.new('woo')).to be_frozen
+    end
+
+    it "cannot be re-initialized" do
+      re = RE2::Regexp.new('woo')
+
+      expect { re.send(:initialize, 'bar') }.to raise_error(FrozenError)
+    end
   end
 
   describe "#dup" do
@@ -70,6 +80,13 @@ RSpec.describe RE2::Regexp do
       expect(copy).to_not be_case_sensitive
     end
 
+    it "returns a frozen copy" do
+      re = described_class.new('(\d+)')
+      copy = re.dup
+
+      expect(copy).to be_frozen
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.dup }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
@@ -81,6 +98,13 @@ RSpec.describe RE2::Regexp do
       copy = re.clone
 
       expect(copy.to_s).to eq('woo')
+    end
+
+    it "returns a frozen copy" do
+      re = described_class.new('woo')
+      copy = re.clone
+
+      expect(copy).to be_frozen
     end
 
     it "raises an error when called on an uninitialized object" do
