@@ -253,7 +253,7 @@ static void parse_re2_options(RE2::Options* re2_options, const VALUE options) {
 }
 
 static void re2_matchdata_mark(void *ptr) {
-  re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
+  re2_matchdata *m = static_cast<re2_matchdata *>(ptr);
   rb_gc_mark_movable(m->regexp);
 
   /* Text must not be movable because StringPiece matches hold pointers into
@@ -263,12 +263,12 @@ static void re2_matchdata_mark(void *ptr) {
 }
 
 static void re2_matchdata_compact(void *ptr) {
-  re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
+  re2_matchdata *m = static_cast<re2_matchdata *>(ptr);
   m->regexp = rb_gc_location(m->regexp);
 }
 
 static void re2_matchdata_free(void *ptr) {
-  re2_matchdata *m = reinterpret_cast<re2_matchdata *>(ptr);
+  re2_matchdata *m = static_cast<re2_matchdata *>(ptr);
   if (m->matches) {
     delete[] m->matches;
   }
@@ -276,7 +276,7 @@ static void re2_matchdata_free(void *ptr) {
 }
 
 static size_t re2_matchdata_memsize(const void *ptr) {
-  const re2_matchdata *m = reinterpret_cast<const re2_matchdata *>(ptr);
+  const re2_matchdata *m = static_cast<const re2_matchdata *>(ptr);
   size_t size = sizeof(*m);
   if (m->matches) {
     size += sizeof(*m->matches) * m->number_of_matches;
@@ -301,7 +301,7 @@ static const rb_data_type_t re2_matchdata_data_type = {
 };
 
 static void re2_scanner_mark(void *ptr) {
-  re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
+  re2_scanner *s = static_cast<re2_scanner *>(ptr);
   rb_gc_mark_movable(s->regexp);
 
   /* Text must not be movable because the StringPiece input holds a pointer
@@ -311,12 +311,12 @@ static void re2_scanner_mark(void *ptr) {
 }
 
 static void re2_scanner_compact(void *ptr) {
-  re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
+  re2_scanner *s = static_cast<re2_scanner *>(ptr);
   s->regexp = rb_gc_location(s->regexp);
 }
 
 static void re2_scanner_free(void *ptr) {
-  re2_scanner *s = reinterpret_cast<re2_scanner *>(ptr);
+  re2_scanner *s = static_cast<re2_scanner *>(ptr);
   if (s->input) {
     delete s->input;
   }
@@ -324,7 +324,7 @@ static void re2_scanner_free(void *ptr) {
 }
 
 static size_t re2_scanner_memsize(const void *ptr) {
-  const re2_scanner *s = reinterpret_cast<const re2_scanner *>(ptr);
+  const re2_scanner *s = static_cast<const re2_scanner *>(ptr);
   size_t size = sizeof(*s);
   if (s->input) {
     size += sizeof(*s->input);
@@ -349,7 +349,7 @@ static const rb_data_type_t re2_scanner_data_type = {
 };
 
 static void re2_regexp_free(void *ptr) {
-  re2_pattern *p = reinterpret_cast<re2_pattern *>(ptr);
+  re2_pattern *p = static_cast<re2_pattern *>(ptr);
   if (p->pattern) {
     delete p->pattern;
   }
@@ -357,7 +357,7 @@ static void re2_regexp_free(void *ptr) {
 }
 
 static size_t re2_regexp_memsize(const void *ptr) {
-  const re2_pattern *p = reinterpret_cast<const re2_pattern *>(ptr);
+  const re2_pattern *p = static_cast<const re2_pattern *>(ptr);
   size_t size = sizeof(*p);
   if (p->pattern) {
     size += sizeof(*p->pattern);
@@ -2380,7 +2380,7 @@ static VALUE re2_escape(VALUE, VALUE unquoted) {
 }
 
 static void re2_set_free(void *ptr) {
-  re2_set *s = reinterpret_cast<re2_set *>(ptr);
+  re2_set *s = static_cast<re2_set *>(ptr);
   if (s->set) {
     delete s->set;
   }
@@ -2388,7 +2388,7 @@ static void re2_set_free(void *ptr) {
 }
 
 static size_t re2_set_memsize(const void *ptr) {
-  const re2_set *s = reinterpret_cast<const re2_set *>(ptr);
+  const re2_set *s = static_cast<const re2_set *>(ptr);
   size_t size = sizeof(*s);
   if (s->set) {
     size += sizeof(*s->set);
