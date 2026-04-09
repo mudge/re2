@@ -98,6 +98,31 @@ static bool re2_match_without_gvl(
   return arg.matched;
 }
 
+struct nogvl_set_match_arg {
+  const RE2::Set *set;
+  re2::StringPiece text;
+  std::vector<int> *v;
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+  RE2::Set::ErrorInfo *error_info;
+#endif
+  bool matched;
+};
+
+static void *nogvl_set_match(void *ptr) {
+  auto *arg = static_cast<nogvl_set_match_arg *>(ptr);
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+  if (arg->error_info) {
+    arg->matched = arg->set->Match(arg->text, arg->v, arg->error_info);
+  } else {
+    arg->matched = arg->set->Match(arg->text, arg->v);
+  }
+#else
+  arg->matched = arg->set->Match(arg->text, arg->v);
+#endif
+  return nullptr;
+}
+
+
 VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
       re2_eSetMatchError, re2_eSetUnsupportedError, re2_eRegexpUnsupportedError;
 
@@ -2558,11 +2583,26 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
 
   std::vector<int> v;
 
+  str = rb_str_new_frozen(str);
+
   if (raise_exception) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
     RE2::Set::ErrorInfo e;
-    bool match_failed = !s->set->Match(
-        re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str)), &v, &e);
+    nogvl_set_match_arg arg;
+    arg.set = s->set;
+    arg.text = re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str));
+    arg.v = &v;
+    arg.error_info = &e;
+    arg.matched = false;
+
+#ifdef _WIN32
+    nogvl_set_match(&arg);
+#else
+    rb_thread_call_without_gvl(nogvl_set_match, &arg, NULL, NULL);
+#endif
+    RB_GC_GUARD(str);
+
+    bool match_failed = !arg.matched;
     VALUE result = rb_ary_new2(v.size());
 
     if (match_failed) {
@@ -2589,11 +2629,25 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match() does not output error information, :exception option can only be set to false");
 #endif
   } else {
-    bool matched = s->set->Match(
-        re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str)), &v);
+    nogvl_set_match_arg arg;
+    arg.set = s->set;
+    arg.text = re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str));
+    arg.v = &v;
+#ifdef HAVE_ERROR_INFO_ARGUMENT
+    arg.error_info = nullptr;
+#endif
+    arg.matched = false;
+
+#ifdef _WIN32
+    nogvl_set_match(&arg);
+#else
+    rb_thread_call_without_gvl(nogvl_set_match, &arg, NULL, NULL);
+#endif
+    RB_GC_GUARD(str);
+
     VALUE result = rb_ary_new2(v.size());
 
-    if (matched) {
+    if (arg.matched) {
       for (int index : v) {
         rb_ary_push(result, INT2FIX(index));
       }

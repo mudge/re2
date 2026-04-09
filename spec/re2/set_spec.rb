@@ -226,6 +226,20 @@ RSpec.describe RE2::Set do
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.match("foo") }.to raise_error(TypeError, /uninitialized RE2::Set/)
     end
+
+    it "can be run concurrently" do
+      set = RE2::Set.new
+      set.add("abc")
+      set.add("def")
+      set.add("ghi")
+      set.compile
+
+      threads = 10.times.map do
+        Thread.new { set.match("abcdefghi", exception: false) }
+      end
+
+      expect(threads.map(&:value)).to all(eq([0, 1, 2]))
+    end
   end
 
   describe "#size" do
