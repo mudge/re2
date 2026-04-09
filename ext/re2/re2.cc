@@ -377,7 +377,7 @@ static const rb_data_type_t re2_regexp_data_type = {
   0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED | RUBY_TYPED_FROZEN_SHAREABLE
 };
 
 static re2_pattern *unwrap_re2_regexp(VALUE self) {
@@ -2408,7 +2408,7 @@ static const rb_data_type_t re2_set_data_type = {
   0,
   // IMPORTANT: WB_PROTECTED objects must only use the RB_OBJ_WRITE()
   // macro to update VALUE references, as to trigger write barriers.
-  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+  RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED | RUBY_TYPED_FROZEN_SHAREABLE
 };
 
 static re2_set *unwrap_re2_set(VALUE self) {
@@ -2758,6 +2758,8 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
 }
 
 extern "C" void Init_re2(void) {
+  rb_ext_ractor_safe(true);
+
   re2_mRE2 = rb_define_module("RE2");
   re2_cRegexp = rb_define_class_under(re2_mRE2, "Regexp", rb_cObject);
   re2_eRegexpUnsupportedError = rb_define_class_under(re2_cRegexp,
