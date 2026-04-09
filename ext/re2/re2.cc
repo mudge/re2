@@ -19,6 +19,7 @@
 #include <re2/set.h>
 #include <ruby.h>
 #include <ruby/encoding.h>
+#include <ruby/thread.h>
 
 #define BOOL2RUBY(v) (v ? Qtrue : Qfalse)
 
@@ -42,6 +43,60 @@ typedef struct {
 typedef struct {
   RE2::Set *set;
 } re2_set;
+
+struct nogvl_match_arg {
+  const RE2 *pattern;
+  re2::StringPiece text;
+  size_t startpos;
+  size_t endpos;
+  RE2::Anchor anchor;
+  re2::StringPiece *matches;
+  int n;
+  bool matched;
+};
+
+static void *nogvl_match(void *ptr) {
+  auto *arg = static_cast<nogvl_match_arg *>(ptr);
+#ifdef HAVE_ENDPOS_ARGUMENT
+  arg->matched = arg->pattern->Match(
+      arg->text, arg->startpos, arg->endpos,
+      arg->anchor, arg->matches, arg->n);
+#else
+  arg->matched = arg->pattern->Match(
+      arg->text, arg->startpos,
+      arg->anchor, arg->matches, arg->n);
+#endif
+  return nullptr;
+}
+
+static bool re2_match_without_gvl(
+    const RE2 *pattern, VALUE text, size_t startpos, size_t endpos,
+    RE2::Anchor anchor, re2::StringPiece *matches, int n) {
+  nogvl_match_arg arg;
+  arg.pattern = pattern;
+  arg.text = re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text));
+  arg.startpos = startpos;
+  arg.endpos = endpos;
+  arg.anchor = anchor;
+  arg.matches = matches;
+  arg.n = n;
+  arg.matched = false;
+
+  /* Abseil's synchronization primitives (SRWLOCK, SleepConditionVariableSRW)
+   * are incompatible with Ruby's Win32 Mutex-based GVL, causing
+   * WAIT_ABANDONED crashes when multiple threads match concurrently.
+   */
+#ifdef _WIN32
+  nogvl_match(&arg);
+#else
+  /* No unblocking function is needed: RE2 matching is CPU-bound computation,
+   * not a blocking system call, so a signal cannot safely interrupt it.
+   */
+  rb_thread_call_without_gvl(nogvl_match, &arg, NULL, NULL);
+#endif
+
+  return arg.matched;
+}
 
 VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
       re2_eSetMatchError, re2_eSetUnsupportedError, re2_eRegexpUnsupportedError;
@@ -1852,15 +1907,11 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
 #endif
 
   if (n == 0) {
-#ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, endpos, anchor, 0, 0);
-#else
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, anchor, 0, 0);
-#endif
+    text = rb_str_new_frozen(text);
+    bool matched = re2_match_without_gvl(
+        p->pattern, text, startpos, endpos, anchor, 0, 0);
+    RB_GC_GUARD(text);
+
     return BOOL2RUBY(matched);
   } else {
     if (n == INT_MAX) {
@@ -1870,23 +1921,18 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
     /* Because match returns the whole match as well. */
     n += 1;
 
+    text = rb_str_new_frozen(text);
+
     re2::StringPiece *matches = new(std::nothrow) re2::StringPiece[n];
     if (matches == nullptr) {
       rb_raise(rb_eNoMemError,
                "not enough memory to allocate StringPieces for matches");
     }
 
-    text = rb_str_new_frozen(text);
+    bool matched = re2_match_without_gvl(
+        p->pattern, text, startpos, endpos, anchor, matches, n);
+    RB_GC_GUARD(text);
 
-#ifdef HAVE_ENDPOS_ARGUMENT
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, endpos, anchor, matches, n);
-#else
-    bool matched = p->pattern->Match(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        startpos, anchor, matches, n);
-#endif
     if (matched) {
       VALUE matchdata = rb_class_new_instance(0, 0, re2_cMatchData);
       TypedData_Get_Struct(matchdata, re2_matchdata, &re2_matchdata_data_type, m);
@@ -1920,8 +1966,12 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
 
   re2_pattern *p = unwrap_re2_regexp(self);
 
-  return BOOL2RUBY(RE2::PartialMatch(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)), *p->pattern));
+  text = rb_str_new_frozen(text);
+  bool matched = re2_match_without_gvl(
+      p->pattern, text, 0, RSTRING_LEN(text), RE2::UNANCHORED, 0, 0);
+  RB_GC_GUARD(text);
+
+  return BOOL2RUBY(matched);
 }
 
 /*
@@ -1939,8 +1989,12 @@ static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
 
   re2_pattern *p = unwrap_re2_regexp(self);
 
-  return BOOL2RUBY(RE2::FullMatch(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)), *p->pattern));
+  text = rb_str_new_frozen(text);
+  bool matched = re2_match_without_gvl(
+      p->pattern, text, 0, RSTRING_LEN(text), RE2::ANCHOR_BOTH, 0, 0);
+  RB_GC_GUARD(text);
+
+  return BOOL2RUBY(matched);
 }
 
 /*

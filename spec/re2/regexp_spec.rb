@@ -769,6 +769,16 @@ RSpec.describe RE2::Regexp do
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.match("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
+
+    it "can be run concurrently" do
+      re = RE2::Regexp.new('(\w+)\s(\w+)')
+
+      threads = 10.times.map do
+        Thread.new { re.match("one two").values_at(1, 2) }
+      end
+
+      expect(threads.map(&:value)).to all(eq(["one", "two"]))
+    end
   end
 
   describe "#match?" do
@@ -793,6 +803,16 @@ RSpec.describe RE2::Regexp do
 
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.match?("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+
+    it "can be run concurrently" do
+      re = RE2::Regexp.new('(\w+)\s(\w+)')
+
+      threads = 10.times.map do
+        Thread.new { re.match?("one two") }
+      end
+
+      expect(threads.map(&:value)).to all(eq(true))
     end
   end
 
@@ -825,6 +845,16 @@ RSpec.describe RE2::Regexp do
 
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.partial_match?("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+
+    it "can be run concurrently" do
+      re = RE2::Regexp.new('(\d+)')
+
+      threads = 10.times.map do
+        Thread.new { re.partial_match?("alice 123") }
+      end
+
+      expect(threads.map(&:value)).to all(eq(true))
     end
   end
 
@@ -914,6 +944,16 @@ RSpec.describe RE2::Regexp do
 
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.full_match?("test") }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+
+    it "can be run concurrently" do
+      re = RE2::Regexp.new('(\w+) (\d+)')
+
+      threads = 10.times.map do
+        Thread.new { re.full_match?("alice 123") }
+      end
+
+      expect(threads.map(&:value)).to all(eq(true))
     end
   end
 
