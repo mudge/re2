@@ -93,6 +93,26 @@ RSpec.describe RE2 do
     it "raises a Type Error for a replacement that can't be converted to String" do
       expect { RE2.replace("woo", "oo", 0) }.to raise_error(TypeError)
     end
+
+    it "can be run concurrently with the same RE2::Regexp pattern" do
+      re = RE2::Regexp.new('(\w+)\s(\w+)')
+
+      threads = 10.times.map do
+        Thread.new { RE2.replace("one two", re, '\2 \1') }
+      end
+
+      expect(threads.map(&:value)).to all(eq("two one"))
+    end
+
+    it "can be run concurrently with the same string pattern" do
+      re = '(\w+)\s(\w+)'
+
+      threads = 10.times.map do
+        Thread.new { RE2.replace("one two", re, '\2 \1') }
+      end
+
+      expect(threads.map(&:value)).to all(eq("two one"))
+    end
   end
 
   describe ".Replace" do
@@ -193,6 +213,26 @@ RSpec.describe RE2 do
     it "raises a Type Error for a replacement that can't be converted to String" do
       expect { RE2.global_replace("woo", "o", 0) }.to raise_error(TypeError)
     end
+
+    it "can be run concurrently with the same RE2::Regexp pattern" do
+      re = RE2::Regexp.new('(\w+)\s(\w+)')
+
+      threads = 10.times.map do
+        Thread.new { RE2.global_replace("one two three four", re, '\2 \1') }
+      end
+
+      expect(threads.map(&:value)).to all(eq("two one four three"))
+    end
+
+    it "can be run concurrently with the same string pattern" do
+      re = '(\w+)\s(\w+)'
+
+      threads = 10.times.map do
+        Thread.new { RE2.global_replace("one two three four", re, '\2 \1') }
+      end
+
+      expect(threads.map(&:value)).to all(eq("two one four three"))
+    end
   end
 
   describe ".GlobalReplace" do
@@ -280,6 +320,26 @@ RSpec.describe RE2 do
 
     it "raises a Type Error for a rewrite that can't be converted to String" do
       expect { RE2.extract("woo", '(\w+)', 0) }.to raise_error(TypeError)
+    end
+
+    it "can be run concurrently with the same RE2::Regexp pattern" do
+      re = RE2::Regexp.new('(\w+)@(\w+)')
+
+      threads = 10.times.map do
+        Thread.new { RE2.extract("alice@example", re, '\2-\1') }
+      end
+
+      expect(threads.map(&:value)).to all(eq("example-alice"))
+    end
+
+    it "can be run concurrently with the same string pattern" do
+      re = '(\w+)@(\w+)'
+
+      threads = 10.times.map do
+        Thread.new { RE2.extract("alice@example", re, '\2-\1') }
+      end
+
+      expect(threads.map(&:value)).to all(eq("example-alice"))
     end
   end
 

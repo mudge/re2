@@ -122,6 +122,53 @@ static void *nogvl_set_match(void *ptr) {
   return nullptr;
 }
 
+struct nogvl_replace_arg {
+  std::string *str;
+  const RE2 *pattern;
+  re2::StringPiece string_pattern;
+  re2::StringPiece rewrite;
+};
+
+static void *nogvl_replace(void *ptr) {
+  auto *arg = static_cast<nogvl_replace_arg *>(ptr);
+  if (arg->pattern) {
+    RE2::Replace(arg->str, *arg->pattern, arg->rewrite);
+  } else {
+    RE2::Replace(arg->str, arg->string_pattern, arg->rewrite);
+  }
+  return nullptr;
+}
+
+static void *nogvl_global_replace(void *ptr) {
+  auto *arg = static_cast<nogvl_replace_arg *>(ptr);
+  if (arg->pattern) {
+    RE2::GlobalReplace(arg->str, *arg->pattern, arg->rewrite);
+  } else {
+    RE2::GlobalReplace(arg->str, arg->string_pattern, arg->rewrite);
+  }
+  return nullptr;
+}
+
+struct nogvl_extract_arg {
+  re2::StringPiece text;
+  const RE2 *pattern;
+  re2::StringPiece string_pattern;
+  re2::StringPiece rewrite;
+  std::string *out;
+  bool extracted;
+};
+
+static void *nogvl_extract(void *ptr) {
+  auto *arg = static_cast<nogvl_extract_arg *>(ptr);
+  if (arg->pattern) {
+    arg->extracted = RE2::Extract(arg->text, *arg->pattern,
+        arg->rewrite, arg->out);
+  } else {
+    arg->extracted = RE2::Extract(arg->text, RE2(arg->string_pattern),
+        arg->rewrite, arg->out);
+  }
+  return nullptr;
+}
 
 VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
       re2_eSetMatchError, re2_eSetUnsupportedError, re2_eRegexpUnsupportedError;
@@ -2124,24 +2171,36 @@ static VALUE re2_replace(VALUE, VALUE str, VALUE pattern,
   StringValue(rewrite);
   rewrite = rb_str_new_frozen(rewrite);
 
-  /* Take a copy of str so it can be modified in-place by
-   * RE2::Replace.
-   */
+  /* Take a copy of str so it can be modified in-place by RE2::Replace. */
   std::string str_as_string(RSTRING_PTR(str), RSTRING_LEN(str));
 
-  /* Do the replacement. */
+  nogvl_replace_arg arg;
+  arg.str = &str_as_string;
   if (p) {
-    RE2::Replace(&str_as_string, *p->pattern,
-        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
+    arg.pattern = p->pattern;
+  } else {
+    arg.pattern = nullptr;
+    arg.string_pattern = re2::StringPiece(
+        RSTRING_PTR(pattern), RSTRING_LEN(pattern));
+  }
+  arg.rewrite = re2::StringPiece(
+      RSTRING_PTR(rewrite), RSTRING_LEN(rewrite));
 
+#ifdef _WIN32
+  nogvl_replace(&arg);
+#else
+  rb_thread_call_without_gvl(nogvl_replace, &arg, NULL, NULL);
+#endif
+
+  RB_GC_GUARD(rewrite);
+  RB_GC_GUARD(pattern);
+
+  if (p) {
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
-    RE2::Replace(&str_as_string,
-        re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)),
-        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
-
-    return encoded_str_new(str_as_string.data(), str_as_string.size(), RE2::Options::EncodingUTF8);
+    return encoded_str_new(str_as_string.data(), str_as_string.size(),
+        RE2::Options::EncodingUTF8);
   }
 }
 
@@ -2189,19 +2248,33 @@ static VALUE re2_global_replace(VALUE, VALUE str, VALUE pattern,
    */
   std::string str_as_string(RSTRING_PTR(str), RSTRING_LEN(str));
 
-  /* Do the replacement. */
+  nogvl_replace_arg arg;
+  arg.str = &str_as_string;
   if (p) {
-    RE2::GlobalReplace(&str_as_string, *p->pattern,
-        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
+    arg.pattern = p->pattern;
+  } else {
+    arg.pattern = nullptr;
+    arg.string_pattern = re2::StringPiece(
+        RSTRING_PTR(pattern), RSTRING_LEN(pattern));
+  }
+  arg.rewrite = re2::StringPiece(
+      RSTRING_PTR(rewrite), RSTRING_LEN(rewrite));
 
+#ifdef _WIN32
+  nogvl_global_replace(&arg);
+#else
+  rb_thread_call_without_gvl(nogvl_global_replace, &arg, NULL, NULL);
+#endif
+
+  RB_GC_GUARD(rewrite);
+  RB_GC_GUARD(pattern);
+
+  if (p) {
     return encoded_str_new(str_as_string.data(), str_as_string.size(),
         p->pattern->options().encoding());
   } else {
-    RE2::GlobalReplace(&str_as_string,
-        re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)),
-        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)));
-
-    return encoded_str_new(str_as_string.data(), str_as_string.size(), RE2::Options::EncodingUTF8);
+    return encoded_str_new(str_as_string.data(), str_as_string.size(),
+        RE2::Options::EncodingUTF8);
   }
 }
 
@@ -2247,34 +2320,37 @@ static VALUE re2_extract(VALUE, VALUE text, VALUE pattern,
   rewrite = rb_str_new_frozen(rewrite);
 
   std::string out;
-  bool extracted;
 
+  nogvl_extract_arg arg;
+  arg.text = re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text));
   if (p) {
-    extracted = RE2::Extract(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        *p->pattern,
-        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)),
-        &out);
-
-    if (extracted) {
-      return encoded_str_new(out.data(), out.size(),
-          p->pattern->options().encoding());
-    } else {
-      return Qnil;
-    }
+    arg.pattern = p->pattern;
   } else {
-    extracted = RE2::Extract(
-        re2::StringPiece(RSTRING_PTR(text), RSTRING_LEN(text)),
-        RE2(re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern))),
-        re2::StringPiece(RSTRING_PTR(rewrite), RSTRING_LEN(rewrite)),
-        &out);
+    arg.pattern = nullptr;
+    arg.string_pattern = re2::StringPiece(
+        RSTRING_PTR(pattern), RSTRING_LEN(pattern));
+  }
+  arg.rewrite = re2::StringPiece(
+      RSTRING_PTR(rewrite), RSTRING_LEN(rewrite));
+  arg.out = &out;
+  arg.extracted = false;
 
-    if (extracted) {
-      return encoded_str_new(out.data(), out.size(),
-          RE2::Options::EncodingUTF8);
-    } else {
-      return Qnil;
-    }
+#ifdef _WIN32
+  nogvl_extract(&arg);
+#else
+  rb_thread_call_without_gvl(nogvl_extract, &arg, NULL, NULL);
+#endif
+
+  RB_GC_GUARD(text);
+  RB_GC_GUARD(rewrite);
+  RB_GC_GUARD(pattern);
+
+  if (arg.extracted) {
+    return encoded_str_new(out.data(), out.size(),
+        p ? p->pattern->options().encoding()
+          : RE2::Options::EncodingUTF8);
+  } else {
+    return Qnil;
   }
 }
 
