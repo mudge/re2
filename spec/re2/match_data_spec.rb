@@ -59,6 +59,15 @@ RSpec.describe RE2::MatchData do
     end
   end
 
+  describe "#initialize_copy" do
+    it "is a no-op when the source is the same object" do
+      md = RE2::Regexp.new('(\d+)').match("123")
+      md.send(:initialize_copy, md)
+
+      expect(md.to_a).to eq(["123", "123"])
+    end
+  end
+
   describe "#to_a" do
     it "is populated with the match and capturing groups" do
       a = RE2::Regexp.new('w(o)(o)').match('woo').to_a

@@ -523,6 +523,8 @@ static VALUE re2_scanner_rewind(VALUE self) {
 }
 
 static VALUE re2_scanner_initialize_copy(VALUE self, VALUE other) {
+  if (self == other) return self;
+
   re2_scanner *self_c;
   re2_scanner *other_c = unwrap_re2_scanner(other);
 
@@ -1291,6 +1293,8 @@ static VALUE re2_matchdata_values_at(int argc, VALUE *argv, const VALUE self) {
 }
 
 static VALUE re2_matchdata_initialize_copy(VALUE self, VALUE other) {
+  if (self == other) return self;
+
   re2_matchdata *self_m;
   re2_matchdata *other_m = unwrap_re2_matchdata(other);
 

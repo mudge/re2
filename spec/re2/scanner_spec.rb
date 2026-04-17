@@ -106,6 +106,15 @@ RSpec.describe RE2::Scanner do
     end
   end
 
+  describe "#initialize_copy" do
+    it "is a no-op when the source is the same object" do
+      scanner = RE2::Regexp.new('(\w+)').scan("foo bar")
+      scanner.send(:initialize_copy, scanner)
+
+      expect(scanner.scan).to eq(["foo"])
+    end
+  end
+
   describe "#scan" do
     it "returns the next array of matches", :aggregate_failures do
       r = RE2::Regexp.new('(\w+)')
