@@ -2503,9 +2503,12 @@ static VALUE re2_set_initialize(int argc, VALUE *argv, VALUE self) {
 
   rb_check_frozen(self);
 
+  /* Prevent re-initialisation: #match releases the GVL while holding a
+   * pointer to s->set, so replacing s->set from another thread would free
+   * the object out from under a concurrent match.
+   */
   if (s->set) {
-    delete s->set;
-    s->set = nullptr;
+    rb_raise(rb_eTypeError, "already initialized RE2::Set");
   }
 
   s->set = new(std::nothrow) RE2::Set(re2_options, re2_anchor);

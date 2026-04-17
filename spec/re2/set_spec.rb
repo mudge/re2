@@ -49,6 +49,13 @@ RSpec.describe RE2::Set do
         "anchor should be one of: :unanchored, :anchor_start, :anchor_both"
       )
     end
+
+    it "cannot be re-initialized before compilation" do
+      set = RE2::Set.new
+      set.add("abc")
+
+      expect { set.send(:initialize) }.to raise_error(TypeError, /already initialized RE2::Set/)
+    end
   end
 
   describe "#dup" do
