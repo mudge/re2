@@ -132,37 +132,13 @@ module RE2
 
     def build_extension
       $CFLAGS << " -Wall -Wextra -funroll-loops"
-      $CXXFLAGS << " -Wall -Wextra -funroll-loops"
+      $CXXFLAGS << " -Wall -Wextra -funroll-loops -std=c++17"
 
       # Pass -x c++ to force gcc to compile the test program
       # as C++ (as it will end in .c by default).
-      compile_options = +"-x c++"
+      compile_options = +"-x c++ -std=c++17"
 
       have_library("stdc++")
-
-      minimal_program = <<~SRC
-        #include <re2/re2.h>
-        int main() { return 0; }
-      SRC
-
-      re2_requires_version_flag = checking_for("re2 that requires explicit C++ version flag") do
-        !try_compile(minimal_program, compile_options)
-      end
-
-      if re2_requires_version_flag
-        # Recent versions of RE2 depend directly on Abseil, which requires a
-        # compiler with C++17 support.
-        abort "Cannot compile re2 with your compiler: recent versions require C++17 support." unless %w[c++20 c++17 c++11].any? do |std|
-          checking_for("re2 that compiles with #{std} standard") do
-            if try_compile(minimal_program, compile_options + " -std=#{std}")
-              compile_options << " -std=#{std}"
-              $CPPFLAGS << " -std=#{std}"
-
-              true
-            end
-          end
-        end
-      end
 
       # Determine which version of re2 the user has installed.
       # Revision d9f8806c004d added an `endpos` argument to the
