@@ -42,6 +42,7 @@ typedef struct {
 
 typedef struct {
   RE2::Set *set;
+  bool compiled;
 } re2_set;
 
 struct nogvl_match_arg {
@@ -2577,6 +2578,7 @@ static VALUE re2_set_compile(VALUE self) {
   bool compiled = s->set->Compile();
 
   if (compiled) {
+    s->compiled = true;
     rb_obj_freeze(self);
   }
 
@@ -2694,6 +2696,11 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
 
   if (raise_exception) {
 #ifdef HAVE_ERROR_INFO_ARGUMENT
+    /* RE2::Set::Match dereferences a null program after a failed Compile. */
+    if (!s->compiled) {
+      rb_raise(re2_eSetMatchError, "#match must not be called before #compile");
+    }
+
     RE2::Set::ErrorInfo e;
     nogvl_set_match_arg arg;
     arg.set = s->set;
@@ -2736,6 +2743,10 @@ static VALUE re2_set_match(int argc, VALUE *argv, const VALUE self) {
     rb_raise(re2_eSetUnsupportedError, "current version of RE2::Set::Match() does not output error information, :exception option can only be set to false");
 #endif
   } else {
+    if (!s->compiled) {
+      return rb_ary_new();
+    }
+
     nogvl_set_match_arg arg;
     arg.set = s->set;
     arg.text = re2::StringPiece(RSTRING_PTR(str), RSTRING_LEN(str));
