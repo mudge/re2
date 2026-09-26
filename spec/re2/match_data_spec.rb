@@ -837,6 +837,20 @@ RSpec.describe RE2::MatchData do
       expect(md.named_captures(symbolize_names: true)).to eq(numbers: "123", letters: "abc")
     end
 
+    it "returns garbage-collectable symbol keys when symbolize_names: true" do
+      md = RE2::Regexp.new('(?P<collectable_named_capture>\d+)').match('123')
+      key = md.named_captures(symbolize_names: true).keys.first
+
+      expect(ObjectSpace.each_object(Symbol)).to include(key)
+    end
+
+    it "correctly encodes non-ASCII capturing group names as symbols" do
+      re = RE2::Regexp.new('(?P<café>\d+)', log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
+
+      expect(re.match('123').named_captures(symbolize_names: true)).to eq(café: "123")
+    end
+
     it "returns string keys when symbolize_names: false" do
       md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
 
@@ -883,6 +897,13 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
 
       expect(md.deconstruct_keys(nil)).to eq(numbers: '123', letters: 'abc')
+    end
+
+    it "returns garbage-collectable symbol keys if given nil" do
+      md = RE2::Regexp.new('(?P<collectable_deconstructed_key>\d+)').match('123')
+      key = md.deconstruct_keys(nil).keys.first
+
+      expect(ObjectSpace.each_object(Symbol)).to include(key)
     end
 
     it "returns only named captures if given names" do
