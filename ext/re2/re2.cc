@@ -1380,23 +1380,16 @@ static VALUE re2_regexp_initialize(int argc, VALUE *argv, VALUE self) {
 
   TypedData_Get_Struct(self, re2_pattern, &re2_regexp_data_type, p);
 
-  rb_check_frozen(self);
-
-  if (p->pattern) {
-    delete p->pattern;
-    p->pattern = nullptr;
-  }
+  RE2::Options re2_options;
 
   if (RTEST(options)) {
-    RE2::Options re2_options;
     parse_re2_options(&re2_options, options);
-
-    p->pattern = new(std::nothrow) RE2(
-        re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)), re2_options);
-  } else {
-    p->pattern = new(std::nothrow) RE2(
-        re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)));
   }
+
+  rb_check_frozen(self);
+
+  p->pattern = new(std::nothrow) RE2(
+      re2::StringPiece(RSTRING_PTR(pattern), RSTRING_LEN(pattern)), re2_options);
 
   if (p->pattern == nullptr) {
     rb_raise(rb_eNoMemError, "not enough memory to allocate RE2 object");
