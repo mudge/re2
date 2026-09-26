@@ -49,6 +49,13 @@ RSpec.describe RE2::Regexp do
 
       expect { re.send(:initialize, 'bar') }.to raise_error(FrozenError)
     end
+
+    it "cannot be re-initialized while parsing options" do
+      re = described_class.allocate
+      options = Hash.new { |_, key| re.send(:initialize, 'bar') if key == :utf8 }
+
+      expect { re.send(:initialize, 'woo', options) }.to raise_error(FrozenError)
+    end
   end
 
   describe "#dup" do
