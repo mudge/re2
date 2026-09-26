@@ -219,6 +219,30 @@ RSpec.describe RE2::Set do
       end
     end
 
+    it "raises an error if called after a failed #compile" do
+      skip "Underlying RE2::Set::Match does not output error information" unless RE2::Set.match_raises_errors?
+
+      set = RE2::Set.new(:unanchored, max_mem: 1, log_errors: false)
+      set.add("a{1000}b{1000}c{1000}")
+
+      silence_stderr do
+        set.compile
+
+        expect { set.match("abc") }.to raise_error(RE2::Set::MatchError, "#match must not be called before #compile")
+      end
+    end
+
+    it "returns an empty array if called after a failed #compile when :exception is false" do
+      set = RE2::Set.new(:unanchored, max_mem: 1, log_errors: false)
+      set.add("a{1000}b{1000}c{1000}")
+
+      silence_stderr do
+        set.compile
+
+        expect(set.match("abc", exception: false)).to be_empty
+      end
+    end
+
     it "raises an error if :exception is true and RE2 does not support it" do
       skip "Underlying RE2::Set::Match outputs error information" if RE2::Set.match_raises_errors?
 
