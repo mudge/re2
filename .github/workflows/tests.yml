@@ -16,67 +16,72 @@ on:
 env:
   RUBYOPT: "--enable-frozen-string-literal --debug-frozen-string-literal"
 
+permissions:
+  contents: read
+
 jobs:
   build-cruby-gem:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ports/archives
           key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         with:
           ruby-version: "4.0"
           bundler-cache: true
       - run: bundle exec rake gem
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: cruby-gem
           path: pkg/*.gem
 
   precompile-aarch64-linux-gnu:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: aarch64-linux-gnu
 
   precompile-aarch64-linux-musl:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: aarch64-linux-musl
 
   precompile-arm-linux-gnu:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: arm-linux-gnu
 
   precompile-arm-linux-musl:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: arm-linux-musl
 
   precompile-x86_64-linux-gnu:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: x86_64-linux-gnu
 
   precompile-x86_64-linux-musl:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: x86_64-linux-musl
 
   precompile-arm64-darwin:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: arm64-darwin
 
   precompile-x86_64-darwin:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: x86_64-darwin
 
   precompile-x64-mingw-ucrt:
-    uses: ./.github/workflows/precompile-gem.yml
+    uses: $/.github/workflows/precompile-gem.yml
     with:
       platform: x64-mingw-ucrt
 
@@ -104,18 +109,20 @@ jobs:
           - version: "20230701"
             soname: 11
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Remove any existing libre2 installation
         run: sudo apt-get remove -y libre2-dev libre2-9
       - name: Download and install specific release of libre2
         run: |
           curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v22.04/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
           sudo apt -f install ./libre2-dev.deb
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-gem
           path: pkg
@@ -132,13 +139,17 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby-pkgs@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
+        with:
+          bundler: Gemfile.lock
+          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
           ruby-version: ${{ matrix.ruby }}
           apt-get: libre2-dev
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-gem
           path: pkg
@@ -155,13 +166,17 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "macos-14"
     steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby-pkgs@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
+        with:
+          bundler: Gemfile.lock
+          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
           ruby-version: ${{ matrix.ruby }}
           brew: re2
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-gem
           path: pkg
@@ -178,13 +193,17 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "windows-2022"
     steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby-pkgs@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
+        with:
+          bundler: Gemfile.lock
+          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
           ruby-version: ${{ matrix.ruby }}
           mingw: re2
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-gem
           path: pkg
@@ -202,13 +221,17 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: "windows-2025"
     steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby-pkgs@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
+        with:
+          bundler: Gemfile.lock
+          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
           ruby-version: ${{ matrix.ruby }}
           mingw: re2
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-gem
           path: pkg
@@ -225,12 +248,14 @@ jobs:
         sys: ["enable", "disable"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-gem
           path: pkg
-      - uses: vmactions/freebsd-vm@v1
+      - uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1.5.7
         with:
           usesh: true
           copyback: false
@@ -241,20 +266,24 @@ jobs:
     needs: "build-cruby-gem"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install RE2
         run: sudo apt-get install -y libre2-dev
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         id: setup-ruby
         with:
           ruby-version: "4.0"
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-gem
           path: pkg
       - name: "Link libre2 into Ruby's lib directory"
-        run: ln -s /usr/lib/x86_64-linux-gnu/libre2.so ${{ steps.setup-ruby.outputs.ruby-prefix }}/lib/libre2.so
+        run: ln -s /usr/lib/x86_64-linux-gnu/libre2.so "${RUBY_PREFIX}/lib/libre2.so"
+        env:
+          RUBY_PREFIX: ${{ steps.setup-ruby.outputs.ruby-prefix }}
       - run: ./scripts/test-gem-install
         env:
           BUNDLE_PATH: ${{ github.workspace }}/vendor/bundle
@@ -267,8 +296,10 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-aarch64-linux-gnu-gem
           path: pkg
@@ -288,8 +319,10 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-aarch64-linux-musl-gem
           path: pkg
@@ -309,8 +342,10 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-arm-linux-gnu-gem
           path: pkg
@@ -330,8 +365,10 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-arm-linux-musl-gem
           path: pkg
@@ -351,12 +388,14 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-x86_64-linux-gnu-gem
           path: pkg
@@ -374,8 +413,10 @@ jobs:
     container:
       image: "ruby:${{ matrix.ruby }}-alpine"
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-x86_64-linux-musl-gem
           path: pkg
@@ -390,12 +431,14 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: "macos-14"
     steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-arm64-darwin-gem
           path: pkg
@@ -411,12 +454,14 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: "macos-15-intel"
     steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-x86_64-darwin-gem
           path: pkg
@@ -432,12 +477,16 @@ jobs:
         ruby: ["3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v6
-      - uses: MSP-Greg/setup-ruby-pkgs@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
+      - uses: MSP-Greg/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
+        with:
+          bundler: Gemfile.lock
+          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: cruby-x64-mingw-ucrt-gem
           path: pkg
@@ -451,13 +500,17 @@ jobs:
     env:
       BUNDLE_WITH: memcheck
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ports/archives
           key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
-      - uses: ruby/setup-ruby-pkgs@v1
+      - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
         with:
+          bundler: Gemfile.lock
+          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
           ruby-version: "3.4"
           apt-get: valgrind
           bundler-cache: true

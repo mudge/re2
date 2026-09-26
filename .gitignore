@@ -8,6 +8,5 @@ tmp
 *.gem
 .yardoc
 doc
-Gemfile.lock
 ports/
 pkg/

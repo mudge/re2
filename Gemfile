@@ -9,3 +9,8 @@ gem "rake", "> 12.3.2"
 group :memcheck, optional: true do
   gem "ruby_memcheck"
 end
+
+group :docs, optional: true do
+  gem "redcarpet"
+  gem "yard"
+end
