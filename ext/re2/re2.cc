@@ -1154,7 +1154,8 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
   if (NIL_P(keys)) {
     for (const auto& group : groups) {
       rb_hash_aset(capturing_groups,
-          ID2SYM(rb_intern2(group.first.data(), group.first.size())),
+          rb_str_intern(encoded_str_new(group.first.data(), group.first.size(),
+              p->pattern->options().encoding())),
           re2_matchdata_nth_match(group.second, self));
     }
   } else {
@@ -1222,12 +1223,10 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
   VALUE result = rb_hash_new();
 
   for (const auto& group : groups) {
-    VALUE key;
+    VALUE key = encoded_str_new(group.first.data(), group.first.size(),
+        p->pattern->options().encoding());
     if (symbolize) {
-      key = ID2SYM(rb_intern2(group.first.data(), group.first.size()));
-    } else {
-      key = encoded_str_new(group.first.data(), group.first.size(),
-              p->pattern->options().encoding());
+      key = rb_str_intern(key);
     }
     rb_hash_aset(result, key, re2_matchdata_nth_match(group.second, self));
   }
