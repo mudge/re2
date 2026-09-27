@@ -163,6 +163,24 @@ RSpec.describe RE2::MatchData do
       expect(md[:numbers]).to eq("123")
     end
 
+    it "allows access using a UTF-8 name and a UTF-8 pattern" do
+      re = RE2::Regexp.new('(?P<café>\d+)', log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
+
+      md = re.match('bob 123')
+
+      expect(md[:café]).to eq("123")
+    end
+
+    it "allows access using a Latin-1 name and a Latin-1 pattern" do
+      re = RE2::Regexp.new('(?P<café>\d+)'.encode("ISO-8859-1"), utf8: false, log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
+
+      md = re.match('bob 123')
+
+      expect(md["café".encode("ISO-8859-1")]).to eq("123")
+    end
+
     it "allows access by names and indices with mixed groups", :aggregate_failures do
       md = RE2::Regexp.new('(?P<name>\w+)(\s*)(?P<numbers>\d+)').match("bob 123")
 
@@ -206,6 +224,12 @@ RSpec.describe RE2::MatchData do
       expect(md[0].encoding.name).to eq("ISO-8859-1")
       expect(md["name"].encoding.name).to eq("ISO-8859-1")
       expect(md[:name].encoding.name).to eq("ISO-8859-1")
+    end
+
+    it "handles null bytes in symbol names" do
+      md = RE2::Regexp.new('(?P<name>\S+)').match("bob")
+
+      expect(md[:"name\0b"]).to be_nil
     end
 
     it "supports GC compaction" do
@@ -365,6 +389,24 @@ RSpec.describe RE2::MatchData do
       md = RE2::Regexp.new('(?P<foo>fo{2})').match('a foobar')
 
       expect(md.string[md.begin(:foo)..-1]).to eq('foobar')
+    end
+
+    it "returns the offset of the start of a match by non-ASCII symbol name" do
+      re = RE2::Regexp.new('(?P<café>fo{2})', log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
+
+      md = re.match('a foobar')
+
+      expect(md.string[md.begin(:café)..-1]).to eq('foobar')
+    end
+
+    it "returns the offset of the start of a match by Latin-1 string name" do
+      re = RE2::Regexp.new('(?P<café>fo{2})'.encode("ISO-8859-1"), utf8: false, log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
+
+      md = re.match('a foobar')
+
+      expect(md.string[md.begin("café".encode("ISO-8859-1"))..-1]).to eq('foobar')
     end
 
     it "returns the offset of the start of a match by something that can be coerced to a String" do
@@ -831,6 +873,13 @@ RSpec.describe RE2::MatchData do
       expect(md.named_captures).to eq("empty" => "", "word" => "bob")
     end
 
+    it "returns UTF-8 names even for Latin-1 patterns" do
+      md = RE2::Regexp.new('(?P<numbers>\d+)', utf8: false).match('123')
+      key = md.named_captures.keys.first
+
+      expect(key.encoding).to eq(Encoding::UTF_8)
+    end
+
     it "returns symbol keys when symbolize_names: true" do
       md = RE2::Regexp.new('(?P<numbers>\d+) (?P<letters>[a-zA-Z]+)').match('123 abc')
 
@@ -881,10 +930,10 @@ RSpec.describe RE2::MatchData do
       expect(md.names.first.encoding).to eq(Encoding::UTF_8)
     end
 
-    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
+    it "returns UTF-8 strings if the pattern is not UTF-8" do
       md = RE2::Regexp.new('(?P<numbers>\d+)', utf8: false).match('123')
 
-      expect(md.names.first.encoding).to eq(Encoding::ISO_8859_1)
+      expect(md.names.first.encoding).to eq(Encoding::UTF_8)
     end
 
     it "raises an error when called on an uninitialized object" do
@@ -904,6 +953,15 @@ RSpec.describe RE2::MatchData do
       key = md.deconstruct_keys(nil).keys.first
 
       expect(ObjectSpace.each_object(Symbol)).to include(key)
+    end
+
+    it "returns UTF-8 named captures for a Latin-1 pattern if given nil" do
+      re = RE2::Regexp.new('(?P<café>\d+) (?P<letters>[a-zA-Z]+)'.encode("ISO-8859-1"), utf8: false, log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
+
+      md = re.match('123 abc')
+
+      expect(md.deconstruct_keys(nil)).to eq(café: '123', letters: 'abc')
     end
 
     it "returns only named captures if given names" do

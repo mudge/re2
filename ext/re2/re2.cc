@@ -171,6 +171,13 @@ static void *nogvl_extract(void *ptr) {
   return nullptr;
 }
 
+static std::string group_name(VALUE key) {
+  VALUE str = SYMBOL_P(key) ? rb_sym2str(key) : key;
+  str = rb_str_conv_enc(str, rb_enc_get(str), rb_utf8_encoding());
+
+  return std::string(RSTRING_PTR(str), RSTRING_LEN(str));
+}
+
 VALUE re2_mRE2, re2_cRegexp, re2_cMatchData, re2_cScanner, re2_cSet,
       re2_eSetMatchError, re2_eSetUnsupportedError, re2_eRegexpUnsupportedError;
 
@@ -413,9 +420,9 @@ static re2_scanner *unwrap_re2_scanner(VALUE self) {
  * in alphabetical order rather than definition order, as RE2 stores named
  * groups internally in a sorted map.
  *
- * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
- * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ * Note RE2 stores capturing group names as UTF-8, even if the {RE2::Regexp}
+ * sets the `:utf8` option to false so strings will always be returned in
+ * UTF-8.
  *
  * @return [Array<String>] an array of names of named capturing groups
  * @example
@@ -428,9 +435,7 @@ static VALUE re2_regexp_names(const VALUE self) {
   VALUE names = rb_ary_new2(groups.size());
 
   for (const auto& group : groups) {
-    rb_ary_push(names,
-        encoded_str_new(group.first.data(), group.first.size(),
-          p->pattern->options().encoding()));
+    rb_ary_push(names, rb_utf8_str_new(group.first.data(), group.first.size()));
   }
 
   return names;
@@ -649,20 +654,13 @@ static re2::StringPiece *re2_matchdata_find_match(VALUE idx, const VALUE self) {
 
   if (RB_INTEGER_TYPE_P(idx)) {
     id = NUM2INT(idx);
-  } else if (SYMBOL_P(idx)) {
-    const auto& groups = p->pattern->NamedCapturingGroups();
-    auto search = groups.find(rb_id2name(SYM2ID(idx)));
-
-    if (search != groups.end()) {
-      id = search->second;
-    } else {
-      return nullptr;
-    }
   } else {
-    StringValue(idx);
+    if (!SYMBOL_P(idx)) {
+      StringValue(idx);
+    }
 
     const auto& groups = p->pattern->NamedCapturingGroups();
-    auto search = groups.find(std::string(RSTRING_PTR(idx), RSTRING_LEN(idx)));
+    auto search = groups.find(group_name(idx));
 
     if (search != groups.end()) {
       id = search->second;
@@ -1007,11 +1005,8 @@ static VALUE re2_matchdata_aref(int argc, VALUE *argv, const VALUE self) {
   VALUE idx, rest;
   rb_scan_args(argc, argv, "11", &idx, &rest);
 
-  if (TYPE(idx) == T_STRING) {
-    return re2_matchdata_named_match(
-        std::string(RSTRING_PTR(idx), RSTRING_LEN(idx)), self);
-  } else if (SYMBOL_P(idx)) {
-    return re2_matchdata_named_match(rb_id2name(SYM2ID(idx)), self);
+  if (TYPE(idx) == T_STRING || SYMBOL_P(idx)) {
+    return re2_matchdata_named_match(group_name(idx), self);
   } else if (!NIL_P(rest) || !RB_INTEGER_TYPE_P(idx) || NUM2INT(idx) < 0) {
     return rb_ary_aref(argc, argv, re2_matchdata_to_a(self));
   } else {
@@ -1125,6 +1120,7 @@ static VALUE re2_matchdata_deconstruct(const VALUE self) {
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
  * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
  * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ * Capturing group names will always be returned in UTF-8.
  *
  * @return [Hash] a hash of capturing group names to submatches
  * @param [Array<Symbol>, nil] keys an array of `Symbol` capturing group names
@@ -1154,8 +1150,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
   if (NIL_P(keys)) {
     for (const auto& group : groups) {
       rb_hash_aset(capturing_groups,
-          rb_str_intern(encoded_str_new(group.first.data(), group.first.size(),
-              p->pattern->options().encoding())),
+          rb_str_intern(rb_utf8_str_new(group.first.data(), group.first.size())),
           re2_matchdata_nth_match(group.second, self));
     }
   } else {
@@ -1165,8 +1160,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
       for (int i = 0; i < RARRAY_LEN(keys); ++i) {
         VALUE key = rb_ary_entry(keys, i);
         Check_Type(key, T_SYMBOL);
-        const char *name = rb_id2name(SYM2ID(key));
-        auto search = groups.find(name);
+        auto search = groups.find(group_name(key));
 
         if (search != groups.end()) {
           rb_hash_aset(capturing_groups, key, re2_matchdata_nth_match(search->second, self));
@@ -1186,6 +1180,7 @@ static VALUE re2_matchdata_deconstruct_keys(const VALUE self, const VALUE keys) 
  * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
  * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
  * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ * Capturing group names will always be returned in UTF-8.
  *
  * @overload named_captures
  *   Returns a hash with string keys.
@@ -1223,8 +1218,7 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
   VALUE result = rb_hash_new();
 
   for (const auto& group : groups) {
-    VALUE key = encoded_str_new(group.first.data(), group.first.size(),
-        p->pattern->options().encoding());
+    VALUE key = rb_utf8_str_new(group.first.data(), group.first.size());
     if (symbolize) {
       key = rb_str_intern(key);
     }
@@ -1239,9 +1233,9 @@ static VALUE re2_matchdata_named_captures(int argc, VALUE *argv, const VALUE sel
  * alphabetical order rather than definition order, as RE2 stores named groups
  * internally in a sorted map.
  *
- * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
- * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ * Note RE2 stores capturing group names as UTF-8, even if the {RE2::Regexp}
+ * sets the `:utf8` option to false so strings will always be returned in
+ * UTF-8.
  *
  * @return [Array<String>] an array of names of named capturing groups
  * @example
@@ -1278,12 +1272,8 @@ static VALUE re2_matchdata_values_at(int argc, VALUE *argv, const VALUE self) {
   for (int i = 0; i < argc; ++i) {
     VALUE idx = argv[i];
 
-    if (TYPE(idx) == T_STRING) {
-      rb_ary_push(result, re2_matchdata_named_match(
-            std::string(RSTRING_PTR(idx), RSTRING_LEN(idx)), self));
-    } else if (SYMBOL_P(idx)) {
-      rb_ary_push(result, re2_matchdata_named_match(
-            rb_id2name(SYM2ID(idx)), self));
+    if (TYPE(idx) == T_STRING || SYMBOL_P(idx)) {
+      rb_ary_push(result, re2_matchdata_named_match(group_name(idx), self));
     } else {
       rb_ary_push(result, re2_matchdata_nth_match(NUM2INT(idx), self));
     }
@@ -1775,9 +1765,9 @@ static VALUE re2_regexp_number_of_capturing_groups(const VALUE self) {
 /*
  * Returns a hash of names to capturing indices of groups.
  *
- * Note RE2 only supports UTF-8 and ISO-8859-1 encoding so strings will be
- * returned in UTF-8 by default or ISO-8859-1 if the `:utf8` option for the
- * {RE2::Regexp} is set to `false` (any other encoding's behaviour is undefined).
+ * Note RE2 stores capturing group names as UTF-8, even if the {RE2::Regexp}
+ * sets the `:utf8` option to false so strings will always be returned in
+ * UTF-8.
  *
  * @return [Hash] a hash of names to capturing indices
  */
@@ -1788,8 +1778,7 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
 
   for (const auto& group : groups) {
     rb_hash_aset(capturing_groups,
-        encoded_str_new(group.first.data(), group.first.size(),
-          p->pattern->options().encoding()),
+        rb_utf8_str_new(group.first.data(), group.first.size()),
         INT2FIX(group.second));
   }
 

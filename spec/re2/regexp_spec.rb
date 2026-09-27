@@ -1055,6 +1055,13 @@ RSpec.describe RE2::Regexp do
       expect(RE2::Regexp.new('???', log_errors: false).named_capturing_groups).to be_empty
     end
 
+    it "returns names as UTF-8 even if the pattern is Latin-1" do
+      groups = RE2::Regexp.new('(?P<bob>a)', utf8: false).named_capturing_groups
+      key = groups.keys.first
+
+      expect(key.encoding).to eq(Encoding::UTF_8)
+    end
+
     it "raises an error when called on an uninitialized object" do
       expect { described_class.allocate.named_capturing_groups }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
     end
@@ -1078,15 +1085,17 @@ RSpec.describe RE2::Regexp do
     end
 
     it "returns UTF-8 strings if the pattern is UTF-8" do
-      names = RE2::Regexp.new('(?P<bob>a)').names
+      re = RE2::Regexp.new('(?P<café>\d+)', log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
 
-      expect(names.first.encoding).to eq(Encoding::UTF_8)
+      expect(re.names.first.encoding).to eq(Encoding::UTF_8)
     end
 
-    it "returns ISO-8859-1 strings if the pattern is not UTF-8" do
-      names = RE2::Regexp.new('(?P<bob>a)', utf8: false).names
+    it "returns UTF-8 strings if the pattern is not UTF-8" do
+      re = RE2::Regexp.new('(?P<café>a)'.encode("ISO-8859-1"), utf8: false, log_errors: false)
+      skip "Underlying RE2 does not support non-ASCII capturing group names" unless re.ok?
 
-      expect(names.first.encoding).to eq(Encoding::ISO_8859_1)
+      expect(re.names).to contain_exactly("café")
     end
 
     it "raises an error when called on an uninitialized object" do
