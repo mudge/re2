@@ -5,6 +5,31 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.28.0] - 2026-09-28
+### Changed
+- Capturing group names are now always returned as UTF-8 strings (and symbols),
+  even if the RE2::Regexp sets the utf8 option to false, as RE2 stores them
+  internally as UTF-8.
+
+### Fixed
+- Fix a segmentation fault when calling RE2::Set#match after RE2::Set#compile
+  has failed, e.g. if the patterns exceed max_mem. This now raises an
+  RE2::Set::MatchError (or returns an empty array if the exception option is
+  false) as if the set had not been compiled.
+- Fix a use-after-free when re-initializing an RE2::Set while matching against
+  it. RE2::Set objects can no longer be re-initialized.
+- Fix a use-after-free when calling initialize_copy on an RE2::MatchData or
+  RE2::Scanner with itself.
+- Prevent an RE2::Regexp being re-initialized while its options are being
+  parsed, which could replace the pattern of a frozen RE2::Regexp and leak
+  memory.
+- Symbol keys returned by RE2::MatchData#named_captures (with symbolize_names)
+  and RE2::MatchData#deconstruct_keys can now be garbage collected, preventing
+  unbounded memory growth when matching many different patterns. Non-ASCII
+  capturing group names are also now returned as correctly encoded symbols.
+- Always compile the extension with C++17, fixing builds with RubyInstaller
+  4.0.5-1's ucrt64 toolchain.
+
 ## [2.27.0] - 2026-04-09
 ### Changed
 - The Ruby Global VM Lock (GVL) will now be released while matching with an
@@ -451,6 +476,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings.
 
+[2.28.0]: https://github.com/mudge/re2/releases/tag/v2.28.0
 [2.27.0]: https://github.com/mudge/re2/releases/tag/v2.27.0
 [2.26.2]: https://github.com/mudge/re2/releases/tag/v2.26.2
 [2.26.1]: https://github.com/mudge/re2/releases/tag/v2.26.1
