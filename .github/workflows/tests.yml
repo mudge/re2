@@ -30,7 +30,7 @@ jobs:
         with:
           path: ports/archives
           key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
-      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: "4.0"
           bundler-cache: true
@@ -118,7 +118,7 @@ jobs:
         run: |
           curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v22.04/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
           sudo apt -f install ./libre2-dev.deb
-      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
@@ -145,7 +145,7 @@ jobs:
       - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
         with:
           bundler: Gemfile.lock
-          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+          setup-ruby-ref: ruby/setup-ruby/14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
           ruby-version: ${{ matrix.ruby }}
           apt-get: libre2-dev
           bundler-cache: true
@@ -172,7 +172,7 @@ jobs:
       - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
         with:
           bundler: Gemfile.lock
-          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+          setup-ruby-ref: ruby/setup-ruby/14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
           ruby-version: ${{ matrix.ruby }}
           brew: re2
           bundler-cache: true
@@ -199,7 +199,7 @@ jobs:
       - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
         with:
           bundler: Gemfile.lock
-          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+          setup-ruby-ref: ruby/setup-ruby/14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
           ruby-version: ${{ matrix.ruby }}
           mingw: re2
           bundler-cache: true
@@ -227,7 +227,7 @@ jobs:
       - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
         with:
           bundler: Gemfile.lock
-          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+          setup-ruby-ref: ruby/setup-ruby/14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
           ruby-version: ${{ matrix.ruby }}
           mingw: re2
           bundler-cache: true
@@ -271,7 +271,7 @@ jobs:
           persist-credentials: false
       - name: Install RE2
         run: sudo apt-get install -y libre2-dev
-      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         id: setup-ruby
         with:
           ruby-version: "4.0"
@@ -391,7 +391,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
@@ -434,7 +434,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
@@ -457,7 +457,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
@@ -483,7 +483,7 @@ jobs:
       - uses: MSP-Greg/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
         with:
           bundler: Gemfile.lock
-          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+          setup-ruby-ref: ruby/setup-ruby/14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -510,7 +510,7 @@ jobs:
       - uses: ruby/setup-ruby-pkgs@2233d39c1315c667a2970436418b520a6300124e # v1.33.5
         with:
           bundler: Gemfile.lock
-          setup-ruby-ref: ruby/setup-ruby/a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+          setup-ruby-ref: ruby/setup-ruby/14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
           ruby-version: "3.4"
           apt-get: valgrind
           bundler-cache: true
