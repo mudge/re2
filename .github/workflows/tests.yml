@@ -30,7 +30,7 @@ jobs:
         with:
           path: ports/archives
           key: archives-ubuntu-${{ hashFiles('dependencies.yml') }}
-      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1.329.0
         with:
           ruby-version: "4.0"
           bundler-cache: true
@@ -118,7 +118,7 @@ jobs:
         run: |
           curl -Lo libre2-dev.deb https://github.com/mudge/re2-ci/releases/download/v22.04/libre2-dev_${{ matrix.libre2.version }}_amd64.deb
           sudo apt -f install ./libre2-dev.deb
-      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1.329.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
@@ -271,7 +271,7 @@ jobs:
           persist-credentials: false
       - name: Install RE2
         run: sudo apt-get install -y libre2-dev
-      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1.329.0
         id: setup-ruby
         with:
           ruby-version: "4.0"
@@ -391,7 +391,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1.329.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
@@ -434,7 +434,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1.329.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
@@ -457,7 +457,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1.329.0
         with:
           ruby-version: "${{ matrix.ruby }}"
           bundler-cache: true
