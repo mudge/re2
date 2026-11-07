@@ -5,6 +5,20 @@ project adheres to [Semantic Versioning](http://semver.org/).
 Older versions are detailed as [GitHub
 releases](https://github.com/mudge/re2/releases) for this project.
 
+## [2.29.0] - 2026-11-07
+### Fixed
+- RE2::Regexp#=== now returns false if given anything other than a string or
+  symbol rather than raising a TypeError, so an RE2::Regexp can be used in a
+  case statement with mixed values like Ruby's own Regexp.
+
+### Removed
+- Remove RE2::Regexp#to_str as a compiled regular expression is not
+  substitutable for a String and Ruby's own Regexp does not implement it. This
+  stops Ruby's String#match?, String#gsub, Regexp.new, etc. silently
+  converting an RE2::Regexp to its pattern and lets String.try_convert return
+  nil for an RE2::Regexp. Use RE2::Regexp#source if you need the pattern as a
+  String. Thanks to @rkh for reporting this.
+
 ## [2.28.0] - 2026-09-28
 ### Changed
 - Capturing group names are now always returned as UTF-8 strings (and symbols),
@@ -476,6 +490,7 @@ releases](https://github.com/mudge/re2/releases) for this project.
 ### Fixed
 - In Ruby 1.9.2 and later, re2 will now set the correct encoding for strings.
 
+[2.29.0]: https://github.com/mudge/re2/releases/tag/v2.29.0
 [2.28.0]: https://github.com/mudge/re2/releases/tag/v2.28.0
 [2.27.0]: https://github.com/mudge/re2/releases/tag/v2.27.0
 [2.26.2]: https://github.com/mudge/re2/releases/tag/v2.26.2
