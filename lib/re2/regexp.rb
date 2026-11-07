@@ -68,5 +68,26 @@ module RE2
     def full_match(text, options = {})
       match(text, Hash(options).merge(anchor: :anchor_both))
     end
+
+    # Match the pattern against any substring of the given `text`, returning
+    # `false` if it is not a `String`, `Symbol`, or object responding to
+    # `to_str` so that an {RE2::Regexp} can be used in a `case` statement like
+    # Ruby's own `Regexp#===`.
+    #
+    # @param [Object] text the text to search; anything other than a `String`,
+    #   `Symbol`, or object responding to `to_str` returns `false`
+    # @return [Boolean] whether the match was successful
+    # @example
+    #   case "bob 123"
+    #   when RE2::Regexp.new('\d+')
+    #     "numbers"
+    #   end
+    def ===(text)
+      text = text.to_s if text.is_a?(Symbol)
+      text = ::String.try_convert(text)
+      return false unless text
+
+      match?(text)
+    end
   end
 end

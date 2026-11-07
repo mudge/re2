@@ -2866,7 +2866,6 @@ extern "C" void Init_re2(void) {
   rb_define_method(re2_cRegexp, "partial_match?",
       RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
   rb_define_method(re2_cRegexp, "=~", RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
-  rb_define_method(re2_cRegexp, "===", RUBY_METHOD_FUNC(re2_regexp_match_p), 1);
   rb_define_method(re2_cRegexp, "full_match?",
       RUBY_METHOD_FUNC(re2_regexp_full_match_p), 1);
   rb_define_method(re2_cRegexp, "scan",

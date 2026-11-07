@@ -935,10 +935,31 @@ RSpec.describe RE2::Regexp do
       expect(re === "My name is Alice Bloggs").to eq(false)
     end
 
-    it "raises an exception if text cannot be coerced to a string" do
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\d+')
+
+      expect(re === :abc123).to eq(true)
+    end
+
+    it "returns false if text cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
-      expect { re === 0 }.to raise_error(TypeError)
+      expect(re === 0).to eq(false)
+    end
+
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re === nil).to eq(false)
+    end
+
+    it "can be used in a case statement" do
+      result = case 123
+               when RE2::Regexp.new('\d+') then :matched
+               else :not_matched
+               end
+
+      expect(result).to eq(:not_matched)
     end
 
     it "raises an error when called on an uninitialized object" do
