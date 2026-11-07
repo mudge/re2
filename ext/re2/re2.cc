@@ -2871,8 +2871,6 @@ extern "C" void Init_re2(void) {
   rb_define_method(re2_cRegexp, "scan",
       RUBY_METHOD_FUNC(re2_regexp_scan), 1);
   rb_define_method(re2_cRegexp, "to_s", RUBY_METHOD_FUNC(re2_regexp_to_s), 0);
-  rb_define_method(re2_cRegexp, "to_str", RUBY_METHOD_FUNC(re2_regexp_to_s),
-      0);
   rb_define_method(re2_cRegexp, "pattern", RUBY_METHOD_FUNC(re2_regexp_to_s),
       0);
   rb_define_method(re2_cRegexp, "source", RUBY_METHOD_FUNC(re2_regexp_to_s),

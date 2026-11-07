@@ -241,24 +241,6 @@ RSpec.describe RE2::Regexp do
     end
   end
 
-  describe "#to_str" do
-    it "returns the original pattern" do
-      string = RE2::Regexp.new('w(o)(o)').to_str
-
-      expect(string).to eq("w(o)(o)")
-    end
-
-    it "returns the pattern even if invalid" do
-      string = RE2::Regexp.new('???', log_errors: false).to_str
-
-      expect(string).to eq("???")
-    end
-
-    it "raises an error when called on an uninitialized object" do
-      expect { described_class.allocate.to_str }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
-    end
-  end
-
   describe "#pattern" do
     it "returns the original pattern" do
       pattern = RE2::Regexp.new('w(o)(o)').pattern
