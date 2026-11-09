@@ -1883,7 +1883,7 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *   Returns either `true` or `false` indicating whether a successful match was
  *   made if the pattern contains no capturing groups.
  *
- *   @param [String] text the text to search
+ *   @param [String, Symbol, nil] text the text to search; `nil` returns `nil`
  *   @return [RE2::MatchData, nil] if the pattern contains capturing groups
  *   @return [Boolean] if the pattern does not contain capturing groups
  *   @raise [NoMemoryError] if there was not enough memory to allocate the submatches
@@ -1901,7 +1901,7 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *   specific number of submatches to extract (padded with `nil`s if
  *   necessary).
  *
- *   @param [String] text the text to search
+ *   @param [String, Symbol, nil] text the text to search; `nil` returns `nil`
  *   @param [Hash] options the options with which to perform the match
  *   @option options [Integer] :startpos (0) offset at which to start matching
  *   @option options [Integer] :endpos offset at which to stop matching, defaults to the text length
@@ -1934,7 +1934,7 @@ static VALUE re2_regexp_named_capturing_groups(const VALUE self) {
  *   @deprecated Legacy syntax for matching against `text` with a specific
  *     number of submatches to extract. Use `match(text, submatches: n)` instead.
  *
- *   @param [String] text the text to search
+ *   @param [String, Symbol, nil] text the text to search; `nil` returns `nil`
  *   @param [Integer] submatches the number of submatches to extract
  *   @return [RE2::MatchData, nil] if extracting any submatches
  *   @return [Boolean] if not extracting any submatches
@@ -1952,6 +1952,13 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
   VALUE text, options;
 
   rb_scan_args(argc, argv, "11", &text, &options);
+
+  if (NIL_P(text)) {
+    return Qnil;
+  }
+  if (SYMBOL_P(text)) {
+    text = rb_sym2str(text);
+  }
 
   /* Coerce and freeze text to prevent mutation. */
   StringValue(text);
@@ -2099,11 +2106,17 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L413-L427
  * `PartialMatch`}.
  *
- * @param [String] text the text to search
+ * @param [String, Symbol, nil] text the text to search; `nil` returns `false`
  * @return [Boolean] whether the match was successful
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
+  if (NIL_P(text)) {
+    return Qfalse;
+  }
+  if (SYMBOL_P(text)) {
+    text = rb_sym2str(text);
+  }
   StringValue(text);
   text = rb_str_new_frozen(text);
 
@@ -2120,11 +2133,17 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L376-L411
  * `FullMatch`}.
  *
- * @param [String] text the text to search
+ * @param [String, Symbol, nil] text the text to search; `nil` returns `false`
  * @return [Boolean] whether the match was successful
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
+  if (NIL_P(text)) {
+    return Qfalse;
+  }
+  if (SYMBOL_P(text)) {
+    text = rb_sym2str(text);
+  }
   StringValue(text);
   text = rb_str_new_frozen(text);
 

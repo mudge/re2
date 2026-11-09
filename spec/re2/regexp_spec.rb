@@ -497,6 +497,18 @@ RSpec.describe RE2::Regexp do
       expect(re.match("My name is Alice Bloggs")).to eq(true)
     end
 
+    it "returns nil for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.match(nil)).to be_nil
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match(:abc123)).to be_a(RE2::MatchData)
+    end
+
     it "supports matching against text containing null bytes" do
       re = RE2::Regexp.new("a\0b")
 
@@ -518,7 +530,7 @@ RSpec.describe RE2::Regexp do
     it "raises an exception when given text that cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\w+) (\w+)')
 
-      expect { re.match(nil) }.to raise_error(TypeError)
+      expect { re.match(0) }.to raise_error(TypeError)
     end
 
     it "returns nil with an invalid pattern" do
@@ -808,6 +820,18 @@ RSpec.describe RE2::Regexp do
       expect(re.match?("My name is Alice Bloggs")).to eq(false)
     end
 
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.match?(nil)).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\d+')
+
+      expect(re.match?(:abc123)).to eq(true)
+    end
+
     it "raises an exception if text cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
@@ -850,6 +874,18 @@ RSpec.describe RE2::Regexp do
       expect(re.partial_match?("My name is Alice Bloggs")).to eq(false)
     end
 
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.partial_match?(nil)).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\d+')
+
+      expect(re.partial_match?(:abc123)).to eq(true)
+    end
+
     it "raises an exception if text cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
@@ -890,6 +926,18 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('???', log_errors: false)
 
       expect(re =~ "My name is Alice Bloggs").to eq(false)
+    end
+
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re =~ nil).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\d+')
+
+      expect(re =~ :abc123).to eq(true)
     end
 
     it "raises an exception if text cannot be coerced to a string" do
@@ -1014,6 +1062,18 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('???', log_errors: false)
 
       expect(re.full_match?("My name is Alice Bloggs")).to eq(false)
+    end
+
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.full_match?(nil)).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\w+')
+
+      expect(re.full_match?(:abc123)).to eq(true)
     end
 
     it "raises an exception if text cannot be coerced to a string" do
@@ -1208,6 +1268,18 @@ RSpec.describe RE2::Regexp do
       expect(r.partial_match("foo bar")).to eq(true)
     end
 
+    it "returns nil for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.partial_match(nil)).to be_nil
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.partial_match(:abc123)).to be_a(RE2::MatchData)
+    end
+
     it "can set the number of submatches to extract", :aggregate_failures do
       r = RE2::Regexp.new('f(o+)(a+)')
       m = r.partial_match("fooaa bar", submatches: 1)
@@ -1266,6 +1338,18 @@ RSpec.describe RE2::Regexp do
       r = RE2::Regexp.new('fo+')
 
       expect(r.full_match("foo")).to eq(true)
+    end
+
+    it "returns nil for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.full_match(nil)).to be_nil
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('(\w+)')
+
+      expect(re.full_match(:abc123)).to be_a(RE2::MatchData)
     end
 
     it "can set the number of submatches to extract", :aggregate_failures do
