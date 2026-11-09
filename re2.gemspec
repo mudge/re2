@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
     "spec/spec_helper.rb",
     "spec/re2_spec.rb",
     "spec/kernel_spec.rb",
+    "spec/gc_compaction_spec.rb",
     "spec/re2/regexp_spec.rb",
     "spec/re2/match_data_spec.rb",
     "spec/re2/string_spec.rb",
