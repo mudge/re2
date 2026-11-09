@@ -89,5 +89,27 @@ module RE2
 
       match?(text)
     end
+
+    # Return whether this regular expression has the same pattern and options
+    # as another {RE2::Regexp}.
+    #
+    # @param [Object] other the object to compare against
+    # @return [Boolean] whether the two regular expressions are equal
+    # @example
+    #   RE2::Regexp.new('abc') == RE2::Regexp.new('abc')                        #=> true
+    #   RE2::Regexp.new('abc') == RE2::Regexp.new('abc', case_sensitive: false) #=> false
+    def ==(other)
+      other.is_a?(RE2::Regexp) && source == other.source && options == other.options
+    end
+
+    alias_method :eql?, :==
+
+    # Return a hash based on the pattern and options so that equal
+    # {RE2::Regexp}s can be used as Hash keys.
+    #
+    # @return [Integer] the hash of the regular expression
+    def hash
+      [source, options].hash
+    end
   end
 end

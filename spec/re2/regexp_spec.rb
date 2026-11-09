@@ -903,6 +903,52 @@ RSpec.describe RE2::Regexp do
     end
   end
 
+  describe "#==" do
+    it "returns true for regexps with the same pattern and options" do
+      expect(RE2::Regexp.new('a(b)', case_sensitive: false)).to eq(RE2::Regexp.new('a(b)', case_sensitive: false))
+    end
+
+    it "returns false for regexps with different patterns" do
+      expect(RE2::Regexp.new('a(b)')).not_to eq(RE2::Regexp.new('a(c)'))
+    end
+
+    it "returns false for regexps with different options" do
+      expect(RE2::Regexp.new('a(b)')).not_to eq(RE2::Regexp.new('a(b)', case_sensitive: false))
+    end
+
+    it "returns false for a String with the same pattern" do
+      expect(RE2::Regexp.new('a(b)')).not_to eq('a(b)')
+    end
+
+    it "is aliased to eql?" do
+      expect(RE2::Regexp.new('a(b)')).to eql(RE2::Regexp.new('a(b)'))
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate == RE2::Regexp.new('a') }.to raise_error(TypeError, /uninitialized RE2::Regexp/)
+    end
+  end
+
+  describe "#hash" do
+    it "is the same for equal regexps" do
+      expect(RE2::Regexp.new('a(b)').hash).to eq(RE2::Regexp.new('a(b)').hash)
+    end
+
+    it "differs for regexps with different options" do
+      expect(RE2::Regexp.new('a(b)').hash).not_to eq(RE2::Regexp.new('a(b)', case_sensitive: false).hash)
+    end
+
+    it "allows regexps to be used as Hash keys" do
+      hash = { RE2::Regexp.new('a(b)') => :found }
+
+      expect(hash[RE2::Regexp.new('a(b)')]).to eq(:found)
+    end
+
+    it "allows regexps to be deduplicated" do
+      expect([RE2::Regexp.new('a'), RE2::Regexp.new('a')].uniq.size).to eq(1)
+    end
+  end
+
   describe "#===" do
     it "returns only true or false even if there are capturing groups", :aggregate_failures do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
