@@ -232,6 +232,14 @@ m.offset(1)       #=> [4, 7]
 m.match_length(1) #=> 3
 ```
 
+As RE2 works in bytes, the [`byteoffset`](https://mudge.name/re2/RE2/MatchData.html#byteoffset-instance_method), [`bytebegin`](https://mudge.name/re2/RE2/MatchData.html#bytebegin-instance_method) and [`byteend`](https://mudge.name/re2/RE2/MatchData.html#byteend-instance_method) of a match are cheaper to retrieve than their character equivalents:
+
+```ruby
+m = RE2::Regexp.new('(Ruby)').partial_match("I ♥ Ruby")
+m.offset(1)     #=> [4, 8]
+m.byteoffset(1) #=> [6, 10]
+```
+
 `RE2::MatchData` objects can also be used with Ruby's [pattern matching](https://docs.ruby-lang.org/en/3.2/syntax/pattern_matching_rdoc.html):
 
 ```ruby

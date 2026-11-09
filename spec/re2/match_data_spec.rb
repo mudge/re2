@@ -632,6 +632,108 @@ RSpec.describe RE2::MatchData do
     end
   end
 
+  describe "#bytebegin" do
+    it "returns the byte offset of the start of a match by index" do
+      md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
+
+      expect(md.bytebegin(0)).to eq(6)
+    end
+
+    it "returns the byte offset of the start of a submatch by string name" do
+      md = RE2::Regexp.new('(?P<word>Ruby)').match("I ♥ Ruby")
+
+      expect(md.bytebegin("word")).to eq(6)
+    end
+
+    it "returns the byte offset of the start of a submatch by symbol name" do
+      md = RE2::Regexp.new('(?P<word>Ruby)').match("I ♥ Ruby")
+
+      expect(md.bytebegin(:word)).to eq(6)
+    end
+
+    it "returns nil for an unmatched submatch" do
+      md = RE2::Regexp.new('a(b)?').match("ac")
+
+      expect(md.bytebegin(1)).to be_nil
+    end
+
+    it "returns nil for a nonexistent submatch" do
+      md = RE2::Regexp.new('(a)').match("a")
+
+      expect(md.bytebegin(5)).to be_nil
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.bytebegin(0) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
+  describe "#byteend" do
+    it "returns the byte offset after the end of a match by index" do
+      md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
+
+      expect(md.byteend(0)).to eq(10)
+    end
+
+    it "returns the byte offset after the end of a submatch by string name" do
+      md = RE2::Regexp.new('(?P<heart>♥)').match("I ♥ Ruby")
+
+      expect(md.byteend("heart")).to eq(5)
+    end
+
+    it "returns the byte offset after the end of a submatch by symbol name" do
+      md = RE2::Regexp.new('(?P<heart>♥)').match("I ♥ Ruby")
+
+      expect(md.byteend(:heart)).to eq(5)
+    end
+
+    it "returns nil for an unmatched submatch" do
+      md = RE2::Regexp.new('a(b)?').match("ac")
+
+      expect(md.byteend(1)).to be_nil
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.byteend(0) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
+  describe "#byteoffset" do
+    it "returns the byte offsets of a match by index" do
+      md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
+
+      expect(md.byteoffset(0)).to eq([6, 10])
+    end
+
+    it "returns the byte offsets of a submatch by string name" do
+      md = RE2::Regexp.new('(?P<heart>♥)').match("I ♥ Ruby")
+
+      expect(md.byteoffset("heart")).to eq([2, 5])
+    end
+
+    it "returns the byte offsets of a submatch by symbol name" do
+      md = RE2::Regexp.new('(?P<heart>♥)').match("I ♥ Ruby")
+
+      expect(md.byteoffset(:heart)).to eq([2, 5])
+    end
+
+    it "can be used to slice the original string by bytes" do
+      md = RE2::Regexp.new('(Ruby)').match("I ♥ Ruby")
+
+      expect(md.string.byteslice(*md.byteoffset(1))).to eq("Ruby")
+    end
+
+    it "returns nil for an unmatched submatch" do
+      md = RE2::Regexp.new('a(b)?').match("ac")
+
+      expect(md.byteoffset(1)).to be_nil
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate.byteoffset(0) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
   describe "#offset" do
     it "returns the offset of a match by index" do
       md = RE2::Regexp.new('ob (\d+)').match("bob 123")

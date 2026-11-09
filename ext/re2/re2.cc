@@ -713,11 +713,11 @@ static VALUE re2_matchdata_begin(const VALUE self, VALUE n) {
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
   if (match == nullptr) {
     return Qnil;
-  } else {
-    long offset = match->data() - RSTRING_PTR(m->text);
-
-    return LONG2NUM(rb_str_sublen(m->text, offset));
   }
+
+  long offset = match->data() - RSTRING_PTR(m->text);
+
+  return LONG2NUM(rb_str_sublen(m->text, offset));
 }
 
 /*
@@ -738,11 +738,11 @@ static VALUE re2_matchdata_end(const VALUE self, VALUE n) {
   re2::StringPiece *match = re2_matchdata_find_match(n, self);
   if (match == nullptr) {
     return Qnil;
-  } else {
-    long offset = (match->data() - RSTRING_PTR(m->text)) + match->size();
-
-    return LONG2NUM(rb_str_sublen(m->text, offset));
   }
+
+  long offset = (match->data() - RSTRING_PTR(m->text)) + match->size();
+
+  return LONG2NUM(rb_str_sublen(m->text, offset));
 }
 
 /*
@@ -826,6 +826,85 @@ static VALUE re2_matchdata_offset(const VALUE self, VALUE n) {
   VALUE array = rb_ary_new2(2);
   rb_ary_push(array, LONG2NUM(rb_str_sublen(m->text, start)));
   rb_ary_push(array, LONG2NUM(rb_str_sublen(m->text, end_pos)));
+
+  return array;
+}
+
+/*
+ * Returns the byte offset of the start of the nth element of the
+ * {RE2::MatchData}, like Ruby's `MatchData#bytebegin`. This is cheaper than
+ * {RE2::MatchData#begin} as it does not need to count characters.
+ *
+ * @param [Integer, String, Symbol] n the name or number of the submatch
+ * @return [Integer, nil] the byte offset of the start of the match or `nil` if
+ *   there is no such submatch
+ * @example
+ *   m = RE2::Regexp.new('(Ruby)').partial_match("I ♥ Ruby")
+ *   m.bytebegin(0) #=> 6
+ *   m.begin(0)     #=> 4
+ */
+static VALUE re2_matchdata_bytebegin(const VALUE self, VALUE n) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+
+  re2::StringPiece *match = re2_matchdata_find_match(n, self);
+  if (match == nullptr) {
+    return Qnil;
+  }
+
+  return LONG2NUM(match->data() - RSTRING_PTR(m->text));
+}
+
+/*
+ * Returns the byte offset of the byte following the end of the nth element of
+ * the {RE2::MatchData}, like Ruby's `MatchData#byteend`. This is cheaper than
+ * {RE2::MatchData#end} as it does not need to count characters.
+ *
+ * @param [Integer, String, Symbol] n the name or number of the match
+ * @return [Integer, nil] the byte offset of the byte following the end of the
+ *   match or `nil` if there is no such match
+ * @example
+ *   m = RE2::Regexp.new('(Ruby)').partial_match("I ♥ Ruby")
+ *   m.byteend(0) #=> 10
+ *   m.end(0)     #=> 8
+ */
+static VALUE re2_matchdata_byteend(const VALUE self, VALUE n) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+
+  re2::StringPiece *match = re2_matchdata_find_match(n, self);
+  if (match == nullptr) {
+    return Qnil;
+  }
+
+  return LONG2NUM((match->data() - RSTRING_PTR(m->text)) + match->size());
+}
+
+/*
+ * Returns a two-element array containing the beginning and ending byte
+ * offsets of the nth match, like Ruby's `MatchData#byteoffset`. This is
+ * cheaper than {RE2::MatchData#offset} as it does not need to count
+ * characters.
+ *
+ * @param [Integer, String, Symbol] n the name or number of the match
+ * @return [Array<Integer>, nil] a two-element array with the beginning and
+ *   ending byte offsets of the match or `nil` if there is no such match
+ * @example
+ *   m = RE2::Regexp.new('(Ruby)').partial_match("I ♥ Ruby")
+ *   m.byteoffset(0) #=> [6, 10]
+ *   m.offset(0)     #=> [4, 8]
+ */
+static VALUE re2_matchdata_byteoffset(const VALUE self, VALUE n) {
+  re2_matchdata *m = unwrap_re2_matchdata(self);
+
+  re2::StringPiece *match = re2_matchdata_find_match(n, self);
+  if (match == nullptr) {
+    return Qnil;
+  }
+
+  long start = match->data() - RSTRING_PTR(m->text);
+
+  VALUE array = rb_ary_new2(2);
+  rb_ary_push(array, LONG2NUM(start));
+  rb_ary_push(array, LONG2NUM(start + match->size()));
 
   return array;
 }
@@ -2800,6 +2879,12 @@ extern "C" void Init_re2(void) {
       RUBY_METHOD_FUNC(re2_matchdata_post_match), 0);
   rb_define_method(re2_cMatchData, "offset",
       RUBY_METHOD_FUNC(re2_matchdata_offset), 1);
+  rb_define_method(re2_cMatchData, "bytebegin",
+      RUBY_METHOD_FUNC(re2_matchdata_bytebegin), 1);
+  rb_define_method(re2_cMatchData, "byteend",
+      RUBY_METHOD_FUNC(re2_matchdata_byteend), 1);
+  rb_define_method(re2_cMatchData, "byteoffset",
+      RUBY_METHOD_FUNC(re2_matchdata_byteoffset), 1);
   rb_define_method(re2_cMatchData, "match_length",
       RUBY_METHOD_FUNC(re2_matchdata_match_length), 1);
   rb_define_method(re2_cMatchData, "[]", RUBY_METHOD_FUNC(re2_matchdata_aref),
