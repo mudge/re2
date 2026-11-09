@@ -1112,4 +1112,95 @@ RSpec.describe RE2::MatchData do
       expect { described_class.allocate.deconstruct_keys(nil) }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
     end
   end
+
+  describe "#==" do
+    it "returns true for matches with the same regexp, text, and offsets" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match("abc 123")).to eq(re.match("abc 123"))
+    end
+
+    it "returns true for matches against equal but distinct regexps" do
+      md = RE2::Regexp.new('(\d+)').match("abc 123")
+
+      expect(md).to eq(RE2::Regexp.new('(\d+)').match("abc 123"))
+    end
+
+    it "returns true for matches against a copy of the text" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match("abc 123")).to eq(re.match("abc 123".dup))
+    end
+
+    it "returns true for matches with unmatched optional groups" do
+      re = RE2::Regexp.new('a(b)?')
+
+      expect(re.match("ac")).to eq(re.match("ac"))
+    end
+
+    it "returns false for matches against different text" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match("abc 123")).not_to eq(re.match("abc 456"))
+    end
+
+    it "returns false for the same captures at different offsets" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match("123 abc")).not_to eq(re.match("abc 123"))
+    end
+
+    it "returns false for matches against regexps with different options" do
+      md = RE2::Regexp.new('(abc)').match("abc")
+
+      expect(md).not_to eq(RE2::Regexp.new('(abc)', case_sensitive: false).match("abc"))
+    end
+
+    it "returns false for matches with a different number of submatches" do
+      re = RE2::Regexp.new('(a)(b)')
+
+      expect(re.match("ab")).not_to eq(re.match("ab", submatches: 1))
+    end
+
+    it "returns false for a non-MatchData" do
+      expect(RE2::Regexp.new('(a)').match("a")).not_to eq("a")
+    end
+
+    it "is aliased to eql?" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match("abc 123")).to eql(re.match("abc 123"))
+    end
+
+    it "raises an error when called on an uninitialized object" do
+      expect { described_class.allocate == RE2::Regexp.new('(a)').match("a") }.to raise_error(TypeError, /uninitialized RE2::MatchData/)
+    end
+  end
+
+  describe "#hash" do
+    it "is the same for equal matches" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match("abc 123").hash).to eq(re.match("abc 123").hash)
+    end
+
+    it "differs for matches at different offsets" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect(re.match("123 abc").hash).not_to eq(re.match("abc 123").hash)
+    end
+
+    it "allows matches to be used as Hash keys" do
+      re = RE2::Regexp.new('(\d+)')
+      hash = { re.match("abc 123") => :found }
+
+      expect(hash[re.match("abc 123")]).to eq(:found)
+    end
+
+    it "allows matches to be deduplicated" do
+      re = RE2::Regexp.new('(\d+)')
+
+      expect([re.match("abc 123"), re.match("abc 123")].uniq.size).to eq(1)
+    end
+  end
 end

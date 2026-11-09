@@ -16,5 +16,6 @@ rescue LoadError
 end
 
 require "re2/regexp"
+require "re2/match_data"
 require "re2/scanner"
 require "re2/version"

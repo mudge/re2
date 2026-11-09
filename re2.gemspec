@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
     "Gemfile",
     "lib/re2.rb",
     "lib/re2/regexp.rb",
+    "lib/re2/match_data.rb",
     "lib/re2/scanner.rb",
     "lib/re2/string.rb",
     "lib/re2/version.rb",
