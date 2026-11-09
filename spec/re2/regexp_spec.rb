@@ -808,6 +808,18 @@ RSpec.describe RE2::Regexp do
       expect(re.match?("My name is Alice Bloggs")).to eq(false)
     end
 
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.match?(nil)).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\d+')
+
+      expect(re.match?(:abc123)).to eq(true)
+    end
+
     it "raises an exception if text cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
@@ -850,6 +862,18 @@ RSpec.describe RE2::Regexp do
       expect(re.partial_match?("My name is Alice Bloggs")).to eq(false)
     end
 
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.partial_match?(nil)).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\d+')
+
+      expect(re.partial_match?(:abc123)).to eq(true)
+    end
+
     it "raises an exception if text cannot be coerced to a string" do
       re = RE2::Regexp.new('My name is (\S+) (\S+)')
 
@@ -890,6 +914,18 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('???', log_errors: false)
 
       expect(re =~ "My name is Alice Bloggs").to eq(false)
+    end
+
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re =~ nil).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\d+')
+
+      expect(re =~ :abc123).to eq(true)
     end
 
     it "raises an exception if text cannot be coerced to a string" do
@@ -1014,6 +1050,18 @@ RSpec.describe RE2::Regexp do
       re = RE2::Regexp.new('???', log_errors: false)
 
       expect(re.full_match?("My name is Alice Bloggs")).to eq(false)
+    end
+
+    it "returns false for nil" do
+      re = RE2::Regexp.new('.*')
+
+      expect(re.full_match?(nil)).to eq(false)
+    end
+
+    it "matches against symbols" do
+      re = RE2::Regexp.new('\w+')
+
+      expect(re.full_match?(:abc123)).to eq(true)
     end
 
     it "raises an exception if text cannot be coerced to a string" do

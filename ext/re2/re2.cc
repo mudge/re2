@@ -2099,11 +2099,17 @@ static VALUE re2_regexp_match(int argc, VALUE *argv, const VALUE self) {
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L413-L427
  * `PartialMatch`}.
  *
- * @param [String] text the text to search
+ * @param [String, Symbol, nil] text the text to search; `nil` returns `false`
  * @return [Boolean] whether the match was successful
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
+  if (NIL_P(text)) {
+    return Qfalse;
+  }
+  if (SYMBOL_P(text)) {
+    text = rb_sym2str(text);
+  }
   StringValue(text);
   text = rb_str_new_frozen(text);
 
@@ -2120,11 +2126,17 @@ static VALUE re2_regexp_match_p(const VALUE self, VALUE text) {
  * {https://github.com/google/re2/blob/bc0faab533e2b27b85b8ad312abf061e33ed6b5d/re2/re2.h#L376-L411
  * `FullMatch`}.
  *
- * @param [String] text the text to search
+ * @param [String, Symbol, nil] text the text to search; `nil` returns `false`
  * @return [Boolean] whether the match was successful
  * @raise [TypeError] if text cannot be coerced to a `String`
  */
 static VALUE re2_regexp_full_match_p(const VALUE self, VALUE text) {
+  if (NIL_P(text)) {
+    return Qfalse;
+  }
+  if (SYMBOL_P(text)) {
+    text = rb_sym2str(text);
+  }
   StringValue(text);
   text = rb_str_new_frozen(text);
 
